@@ -1,0 +1,264 @@
+.territory-inspector {
+  position: absolute;
+  top: 135px;
+  right: 24px;
+  z-index: 45;
+  width: min(320px, calc(100vw - 48px));
+  padding: 16px;
+  background: linear-gradient(150deg, rgba(9, 21, 36, 0.92) 0%, rgba(5, 11, 20, 0.96) 100%);
+  backdrop-filter: blur(14px);
+  border: 1px solid #1a3556;
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  font-family: 'Rajdhani', 'Chakra Petch', system-ui, sans-serif;
+  animation: inspectorSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes inspectorSlide {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.inspector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #142840;
+}
+
+.inspector-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #00d9f5;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.inspector-close-btn {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  color: #6d86a4;
+  background: transparent;
+  border: 1px solid #1c324e;
+  border-radius: 4px;
+}
+.inspector-close-btn:hover {
+  color: #edf8ff;
+  border-color: #00d9f5;
+}
+
+.inspector-body {
+  margin-top: 12px;
+}
+
+.inspector-territory-name {
+  color: #edf8ff;
+  font: 700 20px var(--heading);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.inspector-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+
+.inspector-owner-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #a4bad0;
+}
+
+.inspector-owner-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.inspector-troops-count {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  color: #edf8ff;
+  font: 700 16px var(--heading);
+}
+
+.inspector-troops-count small {
+  color: #6d86a4;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Matchup card for attack / movement */
+.inspector-matchup {
+  margin-top: 14px;
+  padding: 10px 12px;
+  background: rgba(14, 28, 48, 0.6);
+  border: 1px solid #1c3554;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.matchup-side {
+  display: flex;
+  flex-direction: column;
+}
+
+.matchup-side.target {
+  text-align: right;
+}
+
+.matchup-side span {
+  color: #6d86a4;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.matchup-side strong {
+  color: #edf8ff;
+  font: 700 14px var(--heading);
+}
+
+.matchup-vs {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  background: #091321;
+  border: 1px solid #233e61;
+  border-radius: 50%;
+  color: #ffd600;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* Quick Action Controls */
+.inspector-action-box {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.troop-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px;
+  background: #060e18;
+  border: 1px solid #1c324e;
+  border-radius: 8px;
+}
+
+.stepper-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: #00d9f5;
+  background: rgba(0, 217, 245, 0.1);
+  border: 1px solid rgba(0, 217, 245, 0.3);
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 700;
+  transition: all 0.15s ease;
+}
+
+.stepper-btn:hover:not(:disabled) {
+  background: #00d9f5;
+  color: #040810;
+}
+
+.stepper-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.stepper-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stepper-display strong {
+  color: #edf8ff;
+  font: 700 18px var(--heading);
+  letter-spacing: 0.05em;
+}
+
+.stepper-display small {
+  color: #637d9b;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.inspector-commit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  background: #00d9f5;
+  border: 1px solid #00d9f5;
+  border-radius: 8px;
+  color: #040810;
+  font: 700 12px var(--heading);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  box-shadow: 0 0 16px rgba(0, 217, 245, 0.3);
+  transition: all 0.2s ease;
+}
+
+.inspector-commit-btn:hover:not(:disabled) {
+  background: #65edff;
+  transform: translateY(-1px);
+  box-shadow: 0 0 22px rgba(0, 217, 245, 0.45);
+}
+
+.inspector-commit-btn.is-attack {
+  background: #ffd600;
+  border-color: #ffd600;
+  box-shadow: 0 0 16px rgba(255, 214, 0, 0.3);
+}
+
+.inspector-commit-btn.is-attack:hover:not(:disabled) {
+  background: #ffe34e;
+  box-shadow: 0 0 22px rgba(255, 214, 0, 0.45);
+}
+
+.inspector-commit-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 800px) {
+  .territory-inspector {
+    top: auto;
+    bottom: 84px;
+    right: 50%;
+    transform: translateX(50%);
+  }
+}

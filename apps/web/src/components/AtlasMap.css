@@ -1,0 +1,207 @@
+.atlas-map-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 45%, #081628 0%, #050e1b 50%, #030710 100%);
+  user-select: none;
+}
+
+/* Subtle nautical grid and vignette */
+.atlas-map-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: 
+    linear-gradient(rgba(0, 217, 245, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 217, 245, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.atlas-map-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 100px rgba(2, 6, 12, 0.85);
+}
+
+.atlas-map-svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(96vw, 1300px);
+  height: auto;
+  max-height: 90vh;
+  transform: translate(-50%, -48%);
+  overflow: visible;
+  filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.85));
+}
+
+/* Non-playable / background territories */
+.atlas-country {
+  fill: #091322;
+  stroke: #162a44;
+  stroke-width: 0.8;
+  outline: none;
+  transition: fill 0.2s ease, stroke 0.2s ease, filter 0.2s ease;
+}
+
+/* Playable Territories */
+.atlas-country.is-playable {
+  fill: color-mix(in srgb, var(--territory-color) 45%, #07101d);
+  stroke: color-mix(in srgb, var(--territory-color) 70%, #203a5b);
+  stroke-width: 1.6;
+  cursor: pointer;
+}
+
+.atlas-country.is-playable:hover {
+  fill: color-mix(in srgb, var(--territory-color) 65%, #0a1728);
+  stroke: #edf8ff;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 8px rgba(0, 217, 245, 0.4));
+}
+
+/* Selectable in current phase */
+.atlas-country.is-selectable {
+  stroke: color-mix(in srgb, var(--territory-color) 85%, #fff);
+  stroke-width: 1.8;
+  animation: selectablePulse 2s infinite ease-in-out;
+}
+
+@keyframes selectablePulse {
+  0%, 100% { stroke-opacity: 0.7; }
+  50% { stroke-opacity: 1; filter: drop-shadow(0 0 6px var(--territory-color)); }
+}
+
+/* Selected Territory */
+.atlas-country.is-selected {
+  fill: color-mix(in srgb, var(--territory-color) 75%, #0f223b) !important;
+  stroke: #65edff !important;
+  stroke-width: 2.8 !important;
+  filter: drop-shadow(0 0 12px rgba(101, 237, 255, 0.75)) !important;
+}
+
+/* Attackable Territory (Neighbor of selected attacker) */
+.atlas-country.is-attackable {
+  stroke: #ffd600 !important;
+  stroke-width: 2.2 !important;
+  stroke-dasharray: 6 3;
+  animation: attackableFlash 1s infinite alternate ease-in-out;
+}
+
+@keyframes attackableFlash {
+  0% { stroke-opacity: 0.5; filter: drop-shadow(0 0 2px #ffd600); }
+  100% { stroke-opacity: 1; filter: drop-shadow(0 0 10px #ffd600); }
+}
+
+/* Target Territory */
+.atlas-country.is-target {
+  stroke: #ff475d !important;
+  stroke-width: 3 !important;
+  stroke-dasharray: none;
+  filter: drop-shadow(0 0 14px rgba(255, 71, 93, 0.8)) !important;
+}
+
+/* Captured Territory Flash Effect */
+.atlas-country.is-recently-captured {
+  animation: captureSequence 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes captureSequence {
+  0% { fill: #fff; filter: brightness(2) drop-shadow(0 0 20px #fff); }
+  50% { fill: #ffd600; filter: brightness(1.5); }
+  100% { fill: color-mix(in srgb, var(--territory-color) 55%, #07101d); }
+}
+
+/* Base Tactical Strategic Lines */
+.atlas-edges line {
+  stroke: rgba(45, 76, 112, 0.45);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+/* Vector Attack/Move lines */
+.tactical-vector-line {
+  animation: marchVector 0.8s linear infinite;
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+.tactical-vector-line.is-attack {
+  stroke: #ffd600;
+  stroke-width: 2.2;
+}
+
+.tactical-vector-line.is-movement {
+  stroke: #00d9f5;
+  stroke-width: 2;
+}
+
+.tactical-vector-line.is-engaged {
+  stroke-width: 3;
+  stroke: #ff475d;
+  filter: drop-shadow(0 0 8px #ff475d);
+}
+
+@keyframes marchVector {
+  from { stroke-dashoffset: 20; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Troop Markers */
+.tactical-troop-marker {
+  cursor: pointer;
+  transition: transform 0.15s ease-out;
+}
+
+.tactical-troop-marker:hover {
+  transform: scale(1.1);
+}
+
+.tactical-marker-base {
+  transition: all 0.2s ease;
+}
+
+.tactical-troop-marker.is-selected .tactical-marker-base {
+  stroke: #65edff;
+}
+
+.tactical-marker-pulse {
+  animation: markerPulse 1.4s ease-out infinite;
+  transform-origin: center;
+}
+
+@keyframes markerPulse {
+  0% { transform: scale(0.95); opacity: 0.9; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+/* Floating Reinforce Bonus Badge (+N) */
+.floating-reinforce-tag {
+  animation: floatBonus 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes floatBonus {
+  0% {
+    opacity: 0;
+    transform: translate(0, -6px) scale(0.7);
+  }
+  30% {
+    opacity: 1;
+    transform: translate(0, -18px) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, -32px) scale(1);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .atlas-map-svg {
+    width: 140%;
+    transform: translate(-50%, -46%);
+  }
+}

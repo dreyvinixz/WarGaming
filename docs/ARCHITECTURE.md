@@ -1,35 +1,43 @@
-# Architecture — OpenConquest: Stellar Frontiers
+# Arquitetura — Atlas War
 
-## Overview
-OpenConquest is built with a strictly separated architecture. The backend serves as the absolute source of truth. The frontend is a thin client that displays the state and sends user actions.
+## Visão geral
 
-## Layers
+O projeto possui uma única raiz e dois aplicativos coordenados. O backend é autoritativo; o frontend não decide se uma ação é válida.
 
-### 1. Game Engine Layer (`game_engine/`)
-The core of the game. It is designed as a **pure function state machine**:
-- Takes the current `GameState` and an `Action`.
-- Returns a new `GameState` or raises an exception if the action is invalid.
-- **Zero side-effects:** No database calls, no network requests, no asyncio.
-- **Deterministic:** Given the same state and action, it produces the exact same new state. Randomness (e.g., in combat) is handled by passing a seeded random generator or resolving rolls clearly in a dedicated combat module.
+```text
+apps/web (React/Vite)
+  lobby + match board + AtlasMap
+        │ REST / WebSocket
+        ▼
+apps/api (FastAPI)
+  rooms → services → game_engine puro
+                         │
+                         ├─ state.py
+                         ├─ map.py
+                         ├─ validators.py
+                         ├─ combat.py
+                         ├─ objectives.py
+                         └─ reducer.py
+```
 
-### 2. Service Layer (`services/`)
-Orchestrates the application logic. 
-- Loads the game state from the database.
-- Passes user actions to the Game Engine.
-- Saves the updated state back to the database.
-- Handles authorization and room lifecycle (creating, joining, starting matches).
+## Camadas
 
-### 3. Transport Layer (`routers/` & `websocket/`)
-The interface to the outside world, powered by **FastAPI**.
-- **REST API:** Handles state-agnostic operations like authentication, lobby management, and room creation.
-- **WebSocket:** Handles realtime match communication. Subscribes to match channels, sends player actions to the Service layer, and broadcasts `GameStateUpdate` events.
+### Frontend
 
-### 4. Data Layer (`database.py` & `models/`)
-Stores persistent state (e.g., PostgreSQL).
-- **Match State:** The complex game board state is stored as a structured `JSON` column. This perfectly matches the `pydantic` models of the Game Engine, avoiding complex ORM mapping for deeply nested game structures.
+`apps/web/src/pages/MatchBoard.tsx` coordena seleção e intenção de ação. `AtlasMap.tsx` apenas renderiza a malha mundial, os nós e os eventos de clique. `services/ws.ts` envia ações e recebe snapshots do servidor.
 
-### 5. Frontend Layer (`apps/web/`)
-A React/Vite application.
-- Holds local state in stores (e.g., Zustand).
-- Synchronizes local state with server state via WebSocket events.
-- Never computes game logic directly—it only renders the `GameState` it receives.
+### Serviço e transporte
+
+`apps/api/app/services` coordena salas e partidas. REST cuida de criação/entrada/início de sala; WebSocket transmite estado e ações durante a partida.
+
+### Motor
+
+`apps/api/app/game_engine` usa uma máquina de estados baseada em cópia imutável dos modelos Pydantic. A regra recebe estado + ação e devolve estado novo ou erro. Não há chamadas de banco, rede ou framework nessa camada.
+
+### Dados
+
+O estado da partida pode ser persistido como JSON no modelo de match. O mapa atual mantém adjacência, regiões, posições e tropas no backend; o frontend recebe tudo necessário para renderizar e selecionar nós.
+
+## Regra de separação do mapa
+
+O `AtlasMap` tem apenas um mapeamento de apresentação (`N1 → ca`, `I1 → br`, etc.) para a primeira integração. A adjacência oficial continua em `apps/api/app/game_engine/map.py`. Para migrar para países completos, primeiro atualize o modelo de mapa e os testes do motor; depois remova o mapeamento temporário do frontend.

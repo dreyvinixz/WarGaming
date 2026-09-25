@@ -1,71 +1,46 @@
-# REST API Specification
+# API — Atlas War
 
-This document defines the REST endpoints for managing the lobby and rooms. Real-time game events happen over WebSocket.
+Base REST: `/api/v1`
 
-## Base URL
-`/api/v1`
-
----
-
-## Rooms (Lobby)
-
-### `GET /rooms`
-List all active public rooms waiting for players.
-- **Response**: `200 OK`
-  ```json
-  [
-    {
-      "id": "room-uuid",
-      "name": "Alpha Sector Skirmish",
-      "players": 2,
-      "max_players": 4,
-      "status": "waiting"
-    }
-  ]
-  ```
+## Salas
 
 ### `POST /rooms`
-Create a new room.
-- **Payload**:
-  ```json
-  {
-    "name": "Alpha Sector Skirmish",
-    "max_players": 4,
-    "map_id": "default_galaxy"
-  }
-  ```
-- **Response**: `201 Created`
-  ```json
-  {
-    "id": "room-uuid",
-    "name": "Alpha Sector Skirmish",
-    "status": "waiting",
-    "host_token": "player-secret-token"
-  }
-  ```
 
-### `POST /rooms/{room_id}/join`
-Join an existing room.
-- **Payload**:
-  ```json
-  {
-    "player_name": "Commander Shepard"
-  }
-  ```
-- **Response**: `200 OK`
-  ```json
-  {
-    "player_id": "player-uuid",
-    "player_token": "player-secret-token"
-  }
-  ```
+Cria uma sala e retorna o código, o token do host e o jogador criado.
 
-### `POST /rooms/{room_id}/start`
-Start the match (Host only).
-- **Headers**: `Authorization: Bearer {host_token}`
-- **Response**: `200 OK`
-  ```json
-  {
-    "match_id": "match-uuid"
-  }
-  ```
+```json
+{ "player_name": "Jogador Amarelo", "max_players": 4, "map_id": "atlas_world_v1" }
+```
+
+### `POST /rooms/{room_code}/join`
+
+Adiciona um jogador a uma sala em espera.
+
+```json
+{ "player_name": "Jogador Ciano" }
+```
+
+### `POST /rooms/{room_code}/start`
+
+Inicia a partida. Requer o token do host.
+
+## WebSocket
+
+Conexão: `ws://localhost:8000/ws/rooms/{room_code}?player_name={nome}`
+
+Ações enviadas pelo cliente:
+
+```json
+{ "type": "place_reinforcement", "payload": { "territory_id": "N1", "troops": 2 } }
+{ "type": "attack", "payload": { "source_id": "N1", "target_id": "N2", "attacking_troops": 1 } }
+{ "type": "move_troops", "payload": { "source_id": "N1", "target_id": "C1", "moving_troops": 1 } }
+{ "type": "advance_phase", "payload": {} }
+{ "type": "end_turn", "payload": {} }
+```
+
+Eventos principais:
+
+- `match_state_updated`: snapshot completo da partida.
+- `action_rejected`: ação inválida e motivo.
+
+O frontend nunca deve atualizar tropas localmente como fonte definitiva; ele aguarda o snapshot do servidor.

@@ -49,7 +49,7 @@ def create_players(names: list[str]) -> dict[str, Player]:
 def start_match(player_names: list[str] | None = None, room_code: str = "TEST01", rng: random.Random | None = None) -> MatchState:
     player_names = player_names or ["Andrey", "Maria"]
     if not (2 <= len(player_names) <= 4):
-        raise ValueError("OpenConquest MVP requires 2 to 4 players")
+        raise ValueError("Atlas War MVP requires 2 to 4 players")
     rng = rng or random.Random(7)
     players = create_players(player_names)
     player_order = list(players.keys())
@@ -85,8 +85,8 @@ def start_match(player_names: list[str] | None = None, room_code: str = "TEST01"
     )
     pool = calculate_reinforcement_pool(state, current_player_id)
     state.players[current_player_id] = state.players[current_player_id].model_copy_update(reinforcement_pool=pool)
-    _log(state, "match_started", current_player_id, "Match started", {"room_code": room_code})
-    _log(state, "turn_started", current_player_id, "Turn started", {"round": state.round_number, "reinforcement_pool": pool})
+    _log(state, "match_started", current_player_id, "A partida começou", {"room_code": room_code})
+    _log(state, "turn_started", current_player_id, "Novo turno iniciado", {"round": state.round_number, "reinforcement_pool": pool})
     return state
 
 
@@ -97,7 +97,7 @@ def place_reinforcement(state: MatchState, player_id: str, territory_id: str, tr
     player = new_state.players[player_id]
     new_state.territories[territory_id] = territory.model_copy_update(troops=territory.troops + troops)
     new_state.players[player_id] = player.model_copy_update(reinforcement_pool=player.reinforcement_pool - troops)
-    _log(new_state, "reinforcement", player_id, f"Placed {troops} fleet(s) on {territory.name}", {"territory_id": territory_id, "troops": troops})
+    _log(new_state, "reinforcement", player_id, f"{troops} tropa(s) enviada(s) para {territory.name}", {"territory_id": territory_id, "troops": troops})
     return new_state
 
 
@@ -138,7 +138,7 @@ def attack(state: MatchState, player_id: str, source_id: str, target_id: str, at
         new_state.territories[target_id] = target.model_copy_update(owner_id=player_id, troops=attacking_troops)
         attacker = new_state.players[player_id]
         new_state.players[player_id] = attacker.model_copy_update(territories_conquered_this_turn=attacker.territories_conquered_this_turn + 1)
-        _log(new_state, "attack_success", player_id, f"Captured {target.name}", result.model_dump() | {"source_id": source_id, "target_id": target_id})
+        _log(new_state, "attack_success", player_id, f"Território conquistado: {target.name}", result.model_dump() | {"source_id": source_id, "target_id": target_id})
         if not _player_has_territories(new_state, defender_id):
             defender = new_state.players[defender_id]
             new_state.players[defender_id] = defender.model_copy_update(eliminated=True)
@@ -147,7 +147,7 @@ def attack(state: MatchState, player_id: str, source_id: str, target_id: str, at
             _log(new_state, "player_eliminated", player_id, f"Eliminated {defender.name}", {"eliminated_player_id": defender_id})
     else:
         new_state.territories[source_id] = source.model_copy_update(troops=source.troops - attacking_troops)
-        _log(new_state, "attack_failed", player_id, f"Failed to capture {target.name}", result.model_dump() | {"source_id": source_id, "target_id": target_id})
+        _log(new_state, "attack_failed", player_id, f"Ataque repelido em {target.name}", result.model_dump() | {"source_id": source_id, "target_id": target_id})
     return new_state
 
 
@@ -159,7 +159,7 @@ def move_troops(state: MatchState, player_id: str, source_id: str, target_id: st
     new_state.territories[source_id] = source.model_copy_update(troops=source.troops - troops)
     new_state.territories[target_id] = target.model_copy_update(troops=target.troops + troops)
     new_state.movement_used_this_turn = True
-    _log(new_state, "troop_movement", player_id, f"Moved {troops} fleet(s)", {"source_id": source_id, "target_id": target_id, "troops": troops})
+    _log(new_state, "troop_movement", player_id, f"{troops} tropa(s) movida(s)", {"source_id": source_id, "target_id": target_id, "troops": troops})
     return new_state
 
 
@@ -214,5 +214,5 @@ def end_turn(state: MatchState, player_id: str) -> MatchState:
         reinforcement_pool=pool,
         territories_conquered_this_turn=0,
     )
-    _log(new_state, "turn_started", next_player_id, "Turn started", {"round": new_state.round_number, "reinforcement_pool": pool})
+    _log(new_state, "turn_started", next_player_id, "Novo turno iniciado", {"round": new_state.round_number, "reinforcement_pool": pool})
     return new_state

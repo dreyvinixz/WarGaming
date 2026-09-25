@@ -1,7 +1,7 @@
 [project]
 name = "openconquest-stellar-frontiers-api"
 version = "0.1.0"
-description = "Server-authoritative backend and pure game engine for OpenConquest: Stellar Frontiers."
+description = "Server-authoritative backend and pure game engine for Atlas War."
 requires-python = ">=3.12"
 dependencies = [
   "fastapi>=0.111.0",

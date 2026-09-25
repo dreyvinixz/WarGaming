@@ -1,31 +1,31 @@
-# Game Rules
+# Regras atuais — Atlas War
 
-This document maps the abstract game engine rules to the space theme of Stellar Frontiers.
+## Tabuleiro
 
-## Game Board
-The galaxy map consists of **Nodes** (planets, stations) grouped into **Sectors** (regions).
-- Nodes are connected by jump lanes (adjacency).
-- Fleets (troops) are stationed at these nodes.
+O tabuleiro é o mapa mundial do Atlas Vivo. Nesta versão, ele apresenta 13 territórios estratégicos conectados por adjacência no motor. Cada território tem proprietário, quantidade de tropas, região e lista de vizinhos.
 
-## Phases of a Turn
+## Fases do turno
 
-### 1. Reinforcement Phase
-At the beginning of a turn, the active player receives new fleets based on the nodes they control.
-- **Base calculation:** Number of controlled nodes divided by 3 (minimum 3).
-- **Sector Bonus:** If a player controls *every* node in a Sector, they receive bonus fleets specific to that Sector.
-- The player places these fleets on any nodes they already control.
+### Reforço
 
-### 2. Attack Phase (Orbital Invasions)
-The player can launch attacks from their controlled nodes to adjacent enemy nodes.
-- **Requirement:** The attacking node must have at least 2 fleets (1 must stay behind).
-- **Combat Resolution:** Dice rolls or deterministic strength comparison (depending on configuration) resolves the combat. If the attacker wins, they conquer the node and move at least the attacking fleets into it.
+O jogador ativo recebe tropas calculadas pelo número de territórios controlados e pelos bônus de regiões completas. Ele deve colocar todo o pool antes de avançar.
 
-### 3. Movement Phase
-The player can move fleets between connected nodes they control.
-- **Requirement:** Must leave at least 1 fleet behind on the origin node.
-- Typically limited to one movement action per turn, or limited by path adjacency.
+### Ataque
 
-## Secret Missions (Objectives)
-Each player receives a secret mission at the start of the game.
-- Example: "Control 2 entire Sectors" or "Eliminate the Red Faction".
-- The game checks objective completion at the end of every turn. If met, the player wins the game.
+O ataque parte de território próprio para território inimigo adjacente. O território de origem precisa manter pelo menos uma tropa. O combate usa rolagem de ataque e defesa no motor; o resultado é registrado no log.
+
+### Movimentação
+
+O jogador pode mover tropas entre territórios próprios conectados, mantendo pelo menos uma tropa na origem. A versão atual limita a uma movimentação por turno.
+
+### Encerramento
+
+Ao encerrar, o motor verifica eliminação, objetivo e passa o turno para o próximo jogador ativo.
+
+## Objetivos
+
+O motor possui objetivos de controle de quantidade de territórios, controle de regiões específicas e eliminação de jogadores. Eles são avaliados no encerramento do turno.
+
+## Limites intencionais do MVP
+
+Não há cartas, diplomacia, névoa de guerra ou unidades especializadas. O objetivo é validar o tabuleiro, o fluxo e o combate antes de expandir o conjunto de regras.

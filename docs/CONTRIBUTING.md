@@ -1,4 +1,4 @@
-# Contributing to OpenConquest
+# Contributing to Atlas War
 
 O projeto é desenvolvido ativamente com auxílio de IA (Vibe Coding Assistido). Para manter a integridade, siga estritamente este fluxo.
 
@@ -29,7 +29,7 @@ Exemplos de branches:
 - `feature/database-persistence`
 - `feature/websocket-sync`
 - `feature/frontend-shell`
-- `feature/galaxy-map`
+- `feature/atlas-map`
 
 ## Regras de Submissão
 1. Leia o `README.md` e a documentação na pasta `docs/` antes de alterar código.

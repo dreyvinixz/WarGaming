@@ -44,21 +44,21 @@ class Player(EngineModel):
 
 
 class Territory(EngineModel):
-    """Generic node in the engine. In the space theme this is a planet/station."""
+    """Nó territorial genérico do mapa Atlas War."""
 
     id: str
     name: str
     region: str
     terrain: str
     owner_id: str | None = None
-    troops: int = 0  # Theme label: fleets
+    troops: int = 0
     neighbors: list[str] = Field(default_factory=list)
     x: float = 0
     y: float = 0
 
 
 class Region(EngineModel):
-    """Generic region in the engine. In the space theme this is a galactic sector."""
+    """Região do mapa que pode conceder bônus de reforço."""
 
     id: str
     name: str

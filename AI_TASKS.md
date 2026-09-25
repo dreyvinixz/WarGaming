@@ -1,39 +1,22 @@
-# AI Tasks — OpenConquest: Stellar Frontiers
+# Tarefas para agentes — Atlas War
 
-## Current Priority
+## Regras de trabalho
 
-Build a playable MVP before adding advanced visuals or complex mechanics.
+- Leia `README.md` e os documentos em `docs/` antes de alterar o domínio.
+- Preserve o backend autoritativo e o motor puro.
+- Não mova regras para componentes React.
+- Não crie um segundo app fora de `apps/web`.
+- Toda mudança de regra deve incluir testes no backend.
+- Toda mudança visual que altera o fluxo deve ser verificada no navegador.
 
-## Rules for AI Agents
+## Prioridade atual
 
-- Read README.md and docs before coding.
-- Do not rewrite architecture without explicit approval.
-- Do not copy commercial games.
-- Keep game_engine pure.
-- Keep backend server-authoritative.
-- Add tests for every game rule change.
-- Prefer small pull requests.
-- Explain all changes.
+1. **Frontend / UX:** Executar a transição de Dashboard para Game HUD (conforme [ROADMAP.md](file:///c:/Users/User/wargaming/ROADMAP.md)).
+2. **Engine / Backend:** Migrar o grafo estratégico de 13 nós para países do Atlas Vivo sem quebrar salas, WebSocket, objetivos ou o playthrough existente.
 
-## Task Queue
+## O que evitar
 
-### Task 1 — Scaffold Audit
-Status: pending
-
-### Task 2 — Room REST API
-Status: completed
-
-### Task 3 — Persistence
-Status: completed
-
-### Task 4 — WebSocket Sync
-Status: completed
-
-### Task 5 — Frontend Shell
-Status: completed
-
-### Task 6 — Galaxy Map
-Status: completed
-
-### [x] Task 7: Full Playthrough E2E
-Status: completed
+- Reintroduzir um tema espacial ou outro escopo fora do Atlas War.
+- Tratar a malha SVG como fonte de adjacência.
+- Alterar o estado de tropas apenas no cliente.
+- Copiar nomes, arte ou regras proprietárias de jogos comerciais.

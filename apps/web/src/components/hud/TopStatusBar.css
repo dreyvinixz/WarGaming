@@ -1,0 +1,181 @@
+.top-status-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: rgba(4, 8, 16, 0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(26, 47, 76, 0.7);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  font-family: 'Rajdhani', 'Chakra Petch', system-ui, sans-serif;
+}
+
+.top-bar-left,
+.top-bar-center,
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.top-bar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #edf8ff;
+  font: 700 16px var(--heading);
+  letter-spacing: 0.15em;
+}
+
+.top-bar-brand-icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: #ffd600;
+  background: rgba(255, 214, 0, 0.1);
+  border: 1px solid rgba(255, 214, 0, 0.3);
+  border-radius: 6px;
+}
+
+.top-bar-divider {
+  width: 1px;
+  height: 18px;
+  background: #1e3654;
+}
+
+.top-bar-meta-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.top-bar-meta-label {
+  color: #657e9d;
+  font-weight: 600;
+}
+
+.top-bar-meta-value {
+  color: #d8e5f2;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+/* Center: Turn Status */
+.turn-indicator-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(11, 22, 39, 0.7);
+  border: 1px solid #1a3556;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.turn-indicator-badge.is-my-turn {
+  background: rgba(0, 217, 245, 0.12);
+  border-color: #00d9f5;
+  color: #00d9f5;
+  box-shadow: 0 0 16px rgba(0, 217, 245, 0.25);
+}
+
+.turn-indicator-badge.is-waiting {
+  color: #8397ae;
+  border-color: #233952;
+}
+
+.turn-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #62768e;
+}
+
+.turn-indicator-badge.is-my-turn .turn-dot {
+  background: #00d9f5;
+  box-shadow: 0 0 10px #00d9f5;
+  animation: pulseCyan 1.5s infinite;
+}
+
+@keyframes pulseCyan {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+/* Right Side: Reserves and Utility */
+.reserves-counter-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  background: rgba(15, 29, 50, 0.6);
+  border: 1px solid #233e61;
+  border-radius: 6px;
+  color: #edf8ff;
+}
+
+.reserves-counter-badge.has-reserves {
+  background: rgba(255, 214, 0, 0.1);
+  border-color: rgba(255, 214, 0, 0.4);
+  color: #ffd600;
+  box-shadow: 0 0 12px rgba(255, 214, 0, 0.15);
+}
+
+.reserves-icon {
+  display: grid;
+  place-items: center;
+}
+
+.reserves-count {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.top-bar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  color: #8da4be;
+  background: transparent;
+  border: 1px solid #20354e;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
+
+.top-bar-btn:hover {
+  color: #edf8ff;
+  border-color: #00d9f5;
+  background: rgba(0, 217, 245, 0.08);
+}
+
+@media (max-width: 800px) {
+  .top-status-bar {
+    padding: 0 12px;
+    height: 48px;
+  }
+  .top-bar-meta-item.hide-mobile {
+    display: none;
+  }
+  .top-bar-brand span {
+    display: none;
+  }
+}

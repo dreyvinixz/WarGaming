@@ -13,7 +13,7 @@ def _generate_room_code(length=6) -> str:
 
 class RoomService:
     @classmethod
-    def create_room(cls, db: Session, host_name: str, max_players: int = 4, map_id: str = "default_galaxy") -> tuple[Room, RoomPlayer]:
+    def create_room(cls, db: Session, host_name: str, max_players: int = 4, map_id: str = "atlas_world_v1") -> tuple[Room, RoomPlayer]:
         room_code = _generate_room_code()
         
         # Ensure unique code

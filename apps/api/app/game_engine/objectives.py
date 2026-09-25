@@ -8,14 +8,14 @@ def load_default_objectives() -> dict[str, Objective]:
         "control_7_territories": Objective(
             id="control_7_territories",
             title="Expansion Doctrine",
-            description="Control at least 7 planets or stations at the end of your turn.",
+            description="Controle pelo menos 7 territórios ao final do seu turno.",
             type=ObjectiveType.CONTROL_TERRITORY_COUNT,
             params={"count": 7},
         ),
         "control_2_regions": Objective(
             id="control_2_regions",
             title="Sector Command",
-            description="Fully control at least 2 galactic sectors at the end of your turn.",
+            description="Controle completamente pelo menos 2 regiões ao final do seu turno.",
             type=ObjectiveType.CONTROL_REGION_COUNT,
             params={"count": 2},
         ),

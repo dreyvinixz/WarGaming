@@ -1,178 +1,269 @@
 import { useState } from 'react';
-import { useGameStore } from '../store/useGameStore';
-import { Card } from '../components/Card';
-import { Button } from '../components/Button';
-import { GalaxyMap } from '../components/GalaxyMap';
+import { TopStatusBar } from '../components/hud/TopStatusBar';
+import { PhaseBanner } from '../components/hud/PhaseBanner';
+import { ActionDock } from '../components/hud/ActionDock';
+import { ObjectiveBadge } from '../components/hud/ObjectiveBadge';
+import { TerritoryInspector } from '../components/hud/TerritoryInspector';
+import { GameLogDrawer, GameLogTrigger } from '../components/hud/GameLogDrawer';
+import { AtlasMap } from '../components/AtlasMap';
 import { ActionModal } from '../components/ActionModal';
+import { Onboarding } from '../components/Onboarding';
+import { useGameStore } from '../store/useGameStore';
 import { sendAction } from '../services/ws';
+import './MatchBoard.css';
+
+type PhaseType = 'reinforcement' | 'attack' | 'movement';
+
+const PLAYER_COLORS = ['#ffd600', '#00d9f5', '#8b4cc4', '#ff475d', '#71d88e', '#ef8c48'];
+
+function territoryName(matchState: any, nodeId: string | null) {
+  return nodeId ? matchState?.territories?.[nodeId]?.name ?? nodeId : 'território';
+}
 
 export function MatchBoard() {
   const { matchState, playerName } = useGameStore();
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [actionType, setActionType] = useState<'reinforce' | 'attack' | 'move' | null>(null);
   const [targetNode, setTargetNode] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [logDrawerOpen, setLogDrawerOpen] = useState(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
 
   if (!matchState) return null;
 
+  const playerIds = Object.keys(matchState.players ?? {}).sort();
   const currentPlayerId = matchState.current_player_id;
   const isMyTurn = matchState.players[currentPlayerId]?.name === playerName;
   const myPlayerId = Object.keys(matchState.players).find(id => matchState.players[id].name === playerName);
+  const myPlayer = matchState.players[myPlayerId ?? ''];
+  const phase = (matchState.phase as PhaseType) ?? 'reinforcement';
 
-  console.log('MatchBoard render. round:', matchState.round_number, 'territories exists:', !!matchState.territories);
+  const getPlayerColor = (playerId: string | null) => {
+    if (!playerId) return '#1b2a40';
+    const index = playerIds.indexOf(playerId);
+    return PLAYER_COLORS[index < 0 ? 0 : index % PLAYER_COLORS.length];
+  };
+
+  const getPlayerName = (playerId: string | null) => {
+    if (!playerId) return 'Neutro';
+    return matchState.players[playerId]?.name ?? 'Comandante';
+  };
+
+  const selectedTerritory = selectedNode ? matchState.territories[selectedNode] : null;
+  const targetTerritory = targetNode ? matchState.territories[targetNode] : null;
+
+  const controlledCount = Object.values(matchState.territories).filter(
+    (territory: any) => territory.owner_id === myPlayerId
+  ).length;
+
+  const troopCount = Object.values(matchState.territories)
+    .filter((territory: any) => territory.owner_id === myPlayerId)
+    .reduce((total: number, territory: any) => total + territory.troops, 0);
+
+  const totalTerritories = Object.keys(matchState.territories).length || 13;
 
   const handleNodeClick = (nodeId: string) => {
-    if (!isMyTurn) return;
-
     const territory = matchState.territories[nodeId];
+    if (!territory) return;
     const isMine = territory.owner_id === myPlayerId;
 
-    if (matchState.phase === 'reinforcement') {
+    if (!isMyTurn) {
+      // In observation mode, clicking inspects the territory
+      setSelectedNode(nodeId === selectedNode ? null : nodeId);
+      setTargetNode(null);
+      return;
+    }
+
+    if (phase === 'reinforcement') {
       if (isMine) {
         setSelectedNode(nodeId);
-        setActionType('reinforce');
-        setModalOpen(true);
+        setTargetNode(null);
+        if ((myPlayer?.reinforcement_pool ?? 0) > 0) {
+          setModalOpen(true);
+        }
       }
       return;
     }
 
-    if (matchState.phase === 'attack' || matchState.phase === 'movement') {
+    if (phase === 'attack' || phase === 'movement') {
       if (!selectedNode) {
-        // Select source
         if (isMine && territory.troops > 1) {
           setSelectedNode(nodeId);
-        }
-      } else {
-        // Select target
-        if (nodeId === selectedNode) {
-          setSelectedNode(null); // Deselect
-          return;
-        }
-        
-        // Check adjacency
-        const neighbors = matchState.territories[selectedNode].neighbors || [];
-        if (neighbors.includes(nodeId)) {
-          setTargetNode(nodeId);
-          setActionType(matchState.phase === 'attack' ? 'attack' : 'move');
-          setModalOpen(true);
         } else {
-          // If clicked another valid source, change selection
-          if (isMine && territory.troops > 1) {
-            setSelectedNode(nodeId);
-          }
+          setSelectedNode(nodeId);
         }
+        return;
+      }
+
+      if (nodeId === selectedNode) {
+        setSelectedNode(null);
+        setTargetNode(null);
+        return;
+      }
+
+      const neighbors: string[] = matchState.territories[selectedNode]?.neighbors || [];
+      if (neighbors.includes(nodeId)) {
+        setTargetNode(nodeId);
+        setModalOpen(true);
+      } else if (isMine && territory.troops > 1) {
+        setSelectedNode(nodeId);
+        setTargetNode(null);
       }
     }
+
   };
 
   const handleConfirmAction = (troops: number) => {
-    if (actionType === 'reinforce' && selectedNode) {
+    if (phase === 'reinforcement' && selectedNode) {
       sendAction('place_reinforcement', { territory_id: selectedNode, troops });
-    } else if (actionType === 'attack' && selectedNode && targetNode) {
-      sendAction('attack', { source_id: selectedNode, target_id: targetNode, attacking_troops: troops });
-    } else if (actionType === 'move' && selectedNode && targetNode) {
-      sendAction('move_troops', { source_id: selectedNode, target_id: targetNode, moving_troops: troops });
+      if ((myPlayer?.reinforcement_pool ?? 0) - troops <= 0) {
+        setSelectedNode(null);
+      }
     }
-    
-    // Reset selection after action attempt (backend will broadcast result)
+
+    if (phase === 'attack' && selectedNode && targetNode) {
+      sendAction('attack', { source_id: selectedNode, target_id: targetNode, attacking_troops: troops });
+      setTargetNode(null);
+    }
+
+    if (phase === 'movement' && selectedNode && targetNode) {
+      sendAction('move_troops', { source_id: selectedNode, target_id: targetNode, moving_troops: troops });
+      setSelectedNode(null);
+      setTargetNode(null);
+    }
+
     setModalOpen(false);
-    setSelectedNode(null);
-    setTargetNode(null);
-    setActionType(null);
   };
-
-  const handleCancelAction = () => {
-    setModalOpen(false);
-    if (actionType === 'reinforce') setSelectedNode(null);
-    setTargetNode(null);
-    setActionType(null);
-  };
-
-  // Determine max troops for modal
-  let maxTroops = 0;
-  let modalTitle = '';
-  let modalDesc = '';
-
-  if (actionType === 'reinforce') {
-    maxTroops = matchState.players[myPlayerId!].reinforcement_pool;
-    modalTitle = 'Deploy Fleet';
-    modalDesc = `Deploying to ${selectedNode}`;
-  } else if ((actionType === 'attack' || actionType === 'move') && selectedNode) {
-    maxTroops = matchState.territories[selectedNode].troops - 1; // leave 1 behind
-    modalTitle = actionType === 'attack' ? 'Initiate Attack' : 'Move Fleet';
-    modalDesc = `From ${selectedNode} to ${targetNode}`;
-  }
 
   const handleAdvance = () => {
     sendAction('advance_phase');
     setSelectedNode(null);
+    setTargetNode(null);
   };
 
   const handleEndTurn = () => {
     sendAction('end_turn');
     setSelectedNode(null);
+    setTargetNode(null);
   };
 
+  // Max troops for stepper/action
+  const maxTroops = phase === 'reinforcement'
+    ? myPlayer?.reinforcement_pool ?? 0
+    : selectedTerritory
+    ? Math.max(1, selectedTerritory.troops - 1)
+    : 1;
+
+  const isSelectedMine = selectedTerritory?.owner_id === myPlayerId;
+  const actionTitle = phase === 'reinforcement'
+    ? 'Enviar reforços'
+    : phase === 'attack'
+    ? 'Iniciar ataque'
+    : 'Mover tropas';
+
+  const actionDescription = phase === 'reinforcement'
+    ? `Escolha quantas tropas enviar para ${territoryName(matchState, selectedNode)}.`
+    : `${territoryName(matchState, selectedNode)} → ${territoryName(matchState, targetNode)}`;
+
   return (
-    <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem', height: '100vh', boxSizing: 'border-box' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h2 className="text-gradient">Sector: {matchState.room_code}</h2>
-          <p className="text-muted">Round {matchState.round_number} • {matchState.phase}</p>
-        </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <div style={{ textAlign: 'right' }}>
-             <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem' }}>Reinforcements</p>
-             <h3 style={{ margin: 0, color: 'var(--primary-cyan)' }}>{matchState.players[myPlayerId!]?.reinforcement_pool || 0}</h3>
-          </div>
-          <Card style={{ padding: '0.5rem 1rem' }}>
-            <h3 style={{ margin: 0 }}>
-              {isMyTurn ? <span className="text-glow" style={{ color: 'var(--success-green)' }}>YOUR TURN</span> : `Waiting for ${matchState.players[currentPlayerId]?.name}...`}
-            </h3>
-          </Card>
-        </div>
-      </header>
+    <div className="match-screen">
+      {/* 1. Military Top Status Bar */}
+      <TopStatusBar
+        roomCode={matchState.room_code}
+        roundNumber={matchState.round_number}
+        isMyTurn={isMyTurn}
+        currentPlayerName={matchState.players[currentPlayerId]?.name ?? 'Outro Jogador'}
+        reinforcementPool={myPlayer?.reinforcement_pool ?? 0}
+        onOpenTutorial={() => setTutorialOpen(true)}
+      />
 
-      <div style={{ display: 'flex', gap: '2rem', flex: 1, minHeight: 0 }}>
-        {/* Main Map Area */}
-        <Card glow style={{ flex: 3, padding: 0, position: 'relative', overflow: 'hidden' }}>
-          <GalaxyMap 
-            matchState={matchState} 
-            selectedNode={selectedNode} 
-            targetNode={targetNode}
-            onNodeClick={handleNodeClick}
+      {/* 2. Full-Viewport Battlefield Canvas */}
+      <main className="match-viewport">
+        {/* Floating Contextual Phase Banner */}
+        <PhaseBanner phase={phase} isMyTurn={isMyTurn} />
+
+        {/* 100% SVG World Map */}
+        <AtlasMap
+          matchState={matchState}
+          selectedNode={selectedNode}
+          targetNode={targetNode}
+          onNodeClick={handleNodeClick}
+          myPlayerId={myPlayerId}
+          phase={phase}
+        />
+
+        {/* Floating Contextual Territory Inspector (Opens on Selection) */}
+        {selectedTerritory && (
+          <TerritoryInspector
+            key={`${selectedNode}-${targetNode ?? 'none'}-${phase}`}
+            selectedTerritory={selectedTerritory}
+            targetTerritory={targetTerritory}
+            phase={phase}
+            isMyTurn={isMyTurn}
+            isMine={isSelectedMine}
+            ownerName={getPlayerName(selectedTerritory.owner_id)}
+            ownerColor={getPlayerColor(selectedTerritory.owner_id)}
+            targetOwnerName={targetTerritory ? getPlayerName(targetTerritory.owner_id) : undefined}
+            targetOwnerColor={targetTerritory ? getPlayerColor(targetTerritory.owner_id) : undefined}
+            maxTroops={maxTroops}
+            onConfirmAction={handleConfirmAction}
+            onClose={() => {
+              setSelectedNode(null);
+              setTargetNode(null);
+            }}
           />
-          
-          {/* Floating Phase Controls */}
-          {isMyTurn && (
-            <div style={{ position: 'absolute', bottom: '2rem', right: '2rem', display: 'flex', gap: '1rem' }}>
-               <Button onClick={handleAdvance} variant="secondary">Advance Phase</Button>
-               <Button onClick={handleEndTurn} variant="primary">End Turn</Button>
-            </div>
-          )}
-        </Card>
+        )}
 
-        {/* Sidebar */}
-        <Card style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '1rem', overflowY: 'auto' }}>
-          <h3 style={{ marginBottom: '1rem' }}>Comms Log</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.85rem' }}>
-            {[...matchState.action_log].reverse().slice(0, 20).map((log: any, i: number) => (
-              <div key={i} style={{ padding: '0.5rem', background: 'rgba(0,0,0,0.3)', borderRadius: '4px', borderLeft: '2px solid var(--primary-cyan)' }}>
-                <strong style={{ color: 'var(--text-muted)' }}>[{log.type}]</strong><br/>
-                {log.message}
-              </div>
-            ))}
-          </div>
-        </Card>
-      </div>
+        {/* Floating Bottom Left Objective Widget */}
+        <ObjectiveBadge
+          controlledCount={controlledCount}
+          troopCount={troopCount}
+          totalTerritories={totalTerritories}
+        />
 
+        {/* Floating Bottom Center Action Dock */}
+        <ActionDock
+          phase={phase}
+          isMyTurn={isMyTurn}
+          onAdvancePhase={handleAdvance}
+          onEndTurn={handleEndTurn}
+          onToggleObjective={() => setTutorialOpen(true)}
+        />
+
+        {/* Floating Bottom Right Game Log Trigger */}
+        <div className="match-log-trigger-anchor">
+          <GameLogTrigger
+            onClick={() => setLogDrawerOpen(true)}
+            count={(matchState.action_log ?? []).length}
+          />
+        </div>
+      </main>
+
+      {/* 3. Retractable Game Log Drawer */}
+      <GameLogDrawer
+        open={logDrawerOpen}
+        onClose={() => setLogDrawerOpen(false)}
+        logs={matchState.action_log ?? []}
+      />
+
+      {/* 4. Onboarding / Mission Briefing Modal */}
+      <Onboarding
+        phase={phase}
+        selectedNode={selectedNode}
+        open={tutorialOpen}
+        onClose={() => setTutorialOpen(false)}
+      />
+
+      {/* 5. Optional Deep Action Modal (if needed for granular confirmation) */}
       {modalOpen && (
-        <ActionModal 
-          title={modalTitle}
-          description={modalDesc}
+        <ActionModal
+          title={actionTitle}
+          description={actionDescription}
           maxTroops={maxTroops}
           onConfirm={handleConfirmAction}
-          onCancel={handleCancelAction}
+          onCancel={() => {
+            setModalOpen(false);
+            setTargetNode(null);
+          }}
         />
       )}
     </div>

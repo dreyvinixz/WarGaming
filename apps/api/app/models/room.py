@@ -10,7 +10,7 @@ class Room(Base):
 
     id = Column(String, primary_key=True, index=True) # Ex: "A1B2C3"
     max_players = Column(Integer, default=4)
-    map_id = Column(String, default="default_galaxy")
+    map_id = Column(String, default="atlas_world_v1")
     status = Column(String, default="waiting") # waiting, started
     match_id = Column(String, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

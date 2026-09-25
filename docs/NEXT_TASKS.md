@@ -1,28 +1,21 @@
-# Next Tasks for Development IA
+# Próximas tarefas
 
-## Phase 1 — Stabilize Engine
+## Motor
 
-- Run all tests.
-- Add tests for map graph validation.
-- Add tests for 3 and 4 player match setup.
-- Replace remaining user-facing `troop` strings with theme labels at API/UI layer only.
+- Executar a suíte completa antes de cada alteração de regra.
+- Criar uma fonte de dados versionada para países e adjacência.
+- Adicionar testes para 3 e 4 jogadores e para o mapa mundial.
+- Tornar a resolução de combate reproduzível com seed por partida.
 
-## Phase 2 — REST API
+## Frontend
 
-- Implement room creation.
-- Implement join room.
-- Implement start match.
-- Implement get match state.
+- Traduzir o lobby e o modal de ação para o vocabulário Atlas War.
+- Mostrar nome do país, região, proprietário e tropas no painel do território.
+- Usar o resultado real do combate no log e no painel de batalha.
+- Cobrir seleção por teclado dos países e estados de alvo.
 
-## Phase 3 — WebSocket
+## Integração
 
-- Add connection manager by room code.
-- Add action dispatch for reinforcement, attack, movement, phase advance and end turn.
-- Broadcast `match_state_updated`.
-
-## Phase 4 — Frontend
-
-- Create Vite React app.
-- Add lobby and room screens.
-- Add SVG galaxy map.
-- Add action panel.
+- Remover o protótipo duplicado `wargame/` depois de validar a integração na raiz.
+- Manter `apps/web` como única aplicação web oficial.
+- Atualizar o teste E2E para validar o AtlasMap e o fluxo de uma partida.

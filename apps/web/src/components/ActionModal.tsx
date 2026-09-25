@@ -23,20 +23,20 @@ export function ActionModal({ title, description, maxTroops, onConfirm, onCancel
         
         <Input 
           type="number" 
-          label="Number of Fleets" 
+          label="Quantidade de tropas"
           value={troops} 
           min={1} 
           max={maxTroops}
           onChange={(e) => setTroops(Number(e.target.value))}
         />
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-          <span>Min: 1</span>
-          <span>Max: {maxTroops}</span>
+          <span>Mínimo: 1</span>
+          <span>Máximo: {maxTroops}</span>
         </div>
 
         <div className="modal-actions">
-          <Button variant="secondary" onClick={onCancel}>Cancel</Button>
-          <Button variant="primary" onClick={() => onConfirm(troops)}>Execute</Button>
+          <Button variant="secondary" onClick={onCancel}>Voltar</Button>
+          <Button variant="primary" onClick={() => onConfirm(troops)}>Confirmar ação</Button>
         </div>
       </Card>
     </div>

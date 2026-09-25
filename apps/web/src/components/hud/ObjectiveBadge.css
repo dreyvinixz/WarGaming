@@ -1,0 +1,126 @@
+.objective-badge-container {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  z-index: 45;
+  font-family: 'Rajdhani', 'Chakra Petch', system-ui, sans-serif;
+}
+
+.objective-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(7, 16, 29, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid #1a3454;
+  border-radius: 8px;
+  color: #b5c7dc;
+  font: 600 11px var(--heading);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+}
+
+.objective-trigger-btn:hover {
+  color: #ffd600;
+  border-color: #ffd600;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(255, 214, 0, 0.2);
+}
+
+.objective-trigger-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffd600;
+  box-shadow: 0 0 8px #ffd600;
+}
+
+.objective-card-popover {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  width: 290px;
+  padding: 16px;
+  background: linear-gradient(145deg, #091524 0%, #050b14 100%);
+  border: 1px solid #1d3656;
+  border-left: 3px solid #ffd600;
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+  animation: popoverFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popoverFade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.objective-popover-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffd600;
+  font: 700 11px var(--heading);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.objective-popover-title {
+  margin-top: 6px;
+  color: #edf8ff;
+  font: 700 15px var(--heading);
+  letter-spacing: 0.05em;
+}
+
+.objective-popover-desc {
+  margin-top: 4px;
+  color: #8da4be;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.objective-progress-bar {
+  height: 6px;
+  margin-top: 12px;
+  background: #0e1e32;
+  border: 1px solid #1a2f4c;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.objective-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd600, #ffea79);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.objective-stats-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  color: #6d86a4;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.objective-stats-row strong {
+  color: #edf8ff;
+}
+
+@media (max-width: 600px) {
+  .objective-badge-container {
+    bottom: 74px;
+    left: 12px;
+  }
+}

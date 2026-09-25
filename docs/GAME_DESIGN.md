@@ -1,38 +1,35 @@
-# Game Design — OpenConquest: Stellar Frontiers
+# Game Design — Atlas War
 
-## Concept
+## Visão
 
-OpenConquest: Stellar Frontiers is a multiplayer turn-based space conquest game. Players command rival factions after the collapse of a central federation and compete to control planets, stations, jump gates and strategic galactic sectors.
+Atlas War transforma o mapa mundial do Atlas Vivo em um centro de comando para um jogo de conquista territorial por turnos. A partida deve ser rápida de entender, legível em uma tela e suficientemente estratégica para criar decisões claras entre reforçar, atacar e mover tropas.
 
-## Core Loop
+## Pilares
 
-1. Receive fleet reinforcements.
-2. Deploy fleets to controlled planets/stations.
-3. Launch orbital invasions against connected enemy nodes.
-4. Transfer fleets between adjacent controlled nodes.
-5. End turn and check secret mission completion.
+1. **Mapa vivo:** o mundo é a interface principal; seleção, tropas, controle e alvos devem aparecer diretamente nele.
+2. **Regras verificáveis:** o servidor valida toda ação e o motor pode ser testado sem rede.
+3. **Leitura imediata:** cores, marcadores, fase atual e log explicam o estado sem depender de tutorial.
+4. **Identidade própria:** inspiração no gênero de conquista, sem copiar nomes, arte ou conteúdo proprietário.
 
-## MVP Theme Mapping
+## Loop principal
 
-The game engine is generic and testable. The user-facing theme is space conquest.
+1. Receber reforços no início do turno.
+2. Distribuir tropas em territórios próprios.
+3. Atacar um território rival conectado.
+4. Mover tropas entre territórios próprios conectados.
+5. Encerrar o turno e verificar o objetivo.
 
-- Territory = planet/station/orbital node
-- Region = galactic sector
-- Troops = fleets
-- Attack = orbital invasion
-- Objective = secret mission
+## Vocabulário
 
-## MVP Secret Missions
+| Motor | Interface Atlas War |
+|---|---|
+| Territory | Território |
+| Region | Continente / região |
+| Troops | Tropas |
+| Attack | Ataque |
+| Movement | Movimentação |
+| Objective | Objetivo |
 
-- Control at least 7 planets or stations.
-- Fully control at least 2 galactic sectors.
-- Fully control Iron Coast Sector and Sun Desert Sector.
-- Eliminate at least one rival faction.
+## Estado do produto
 
-## Design Pillars
-
-- Strategic map control
-- High readability
-- Short MVP rules
-- Server-authoritative multiplayer
-- Original identity, not a clone of any commercial board game
+O motor atual trabalha com 13 territórios conectados, organizados em quatro regiões abstratas. O frontend já usa a malha geográfica mundial como tabuleiro visual e ancora esses territórios no mapa. A expansão para países individuais será uma mudança de dados e regras, não uma decisão tomada dentro do componente SVG.

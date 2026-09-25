@@ -1,0 +1,176 @@
+.match-screen {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  overflow: hidden;
+  background: #040810;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+/* Fullscreen Map Canvas Viewport */
+.match-viewport {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: calc(100vh - 52px);
+  overflow: hidden;
+  background: #040810;
+}
+
+/* Floating Bottom Trigger for Game Log */
+.match-log-trigger-anchor {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  z-index: 45;
+}
+
+/* Tutorial / Help Modal */
+.tutorial-backdrop {
+  position: fixed;
+  z-index: 120;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(2, 7, 20, 0.75);
+  backdrop-filter: blur(8px);
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.tutorial-modal {
+  position: relative;
+  width: min(560px, 94vw);
+  padding: 30px;
+  background: linear-gradient(150deg, #13243a 0%, #081220 100%);
+  border: 1px solid #2f4b70;
+  border-radius: 14px;
+  box-shadow: 0 26px 75px rgba(0, 0, 0, 0.85);
+  font-family: 'Rajdhani', 'Chakra Petch', system-ui, sans-serif;
+}
+
+.tutorial-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  color: #8fa5bf;
+  background: transparent;
+  border: 1px solid #20354e;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.tutorial-close:hover {
+  color: #ffd600;
+  border-color: #ffd600;
+}
+
+.tutorial-modal h2 {
+  font: 700 28px var(--heading);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #edf8ff;
+}
+
+.tutorial-modal h2 em {
+  color: #ffd600;
+  font-style: normal;
+}
+
+.tutorial-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 22px 0;
+}
+
+.tutorial-step {
+  display: grid;
+  grid-template-columns: 26px 32px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  color: #7d93ad;
+  background: rgba(7, 19, 33, 0.7);
+  border: 1px solid #1a2f47;
+  border-radius: 8px;
+}
+
+.tutorial-step.is-active {
+  color: #edf8ff;
+  border-color: #00d9f5;
+  background: rgba(0, 217, 245, 0.08);
+}
+
+.tutorial-step > span {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  color: #7d93ad;
+  border: 1px solid #314a68;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.tutorial-step.is-active > span {
+  color: #040810;
+  background: #00d9f5;
+  border-color: #00d9f5;
+}
+
+.tutorial-step strong {
+  display: block;
+  font: 700 15px var(--heading);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.tutorial-step p {
+  margin-top: 2px;
+  color: #8da4be;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.tutorial-modal .primary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  color: #040810;
+  background: #ffd600;
+  border: 1px solid #ffd600;
+  border-radius: 8px;
+  font: 700 13px var(--heading);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
+
+.tutorial-modal .primary-action:hover {
+  background: #ffe566;
+  box-shadow: 0 0 20px rgba(255, 214, 0, 0.35);
+}
+
+@media (max-width: 800px) {
+  .match-log-trigger-anchor {
+    bottom: 74px;
+    right: 12px;
+  }
+}
