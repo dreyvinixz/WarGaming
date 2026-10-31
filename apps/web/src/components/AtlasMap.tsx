@@ -4,6 +4,8 @@ import type { CSSProperties, WheelEvent, PointerEvent } from 'react';
 import { TroopBadge } from './map/TroopBadge';
 import { AttackRoute } from './map/AttackRoute';
 import { TacticalOverlay } from './map/TacticalOverlay';
+import { BattleAnimation } from './map/BattleAnimation';
+import { TERRITORY_FLAGS } from './map/territoryFlags';
 import geographicMap from './map/world_v2.json';
 import './AtlasMap.css';
 
@@ -28,6 +30,7 @@ interface AtlasMapProps {
   onNodeClick: (nodeId: string) => void;
   myPlayerId?: string | null;
   phase?: 'reinforcement' | 'attack' | 'movement';
+  battleAnimation?: any;
 }
 
 export function AtlasMap({
@@ -37,6 +40,7 @@ export function AtlasMap({
   onNodeClick,
   myPlayerId,
   phase,
+  battleAnimation,
 }: AtlasMapProps) {
   // Track owners to trigger capture animation
   const prevOwnersRef = useRef<Record<string, string>>({});
@@ -96,6 +100,23 @@ export function AtlasMap({
   }, [matchState]);
 
   if (!matchState?.territories) return null;
+  const battlePosition = (territoryId: string): [number, number] | null => {
+    if (matchState.map_id === 'atlas_world_v2') {
+      const geo = geographicMap[territoryId as keyof typeof geographicMap];
+      return geo ? [geo.x, geo.y] : null;
+    }
+    if (matchState.map_id === 'atlas_world_v1') {
+      const territory = matchState.territories[territoryId];
+      return territory ? [12 + territory.x * 118 + 56, 12 + territory.y * 126 + 60] : null;
+    }
+    return NODE_POSITION[territoryId] ?? null;
+  };
+  const battleSource = battleAnimation ? battlePosition(battleAnimation.source_id) : null;
+  const battleTarget = battleAnimation ? battlePosition(battleAnimation.target_id) : null;
+  const playerColor = (playerId: string | null, fallbackIndex = 0) => {
+    const chosen = playerId ? matchState.players?.[playerId]?.color : null;
+    return chosen || PLAYER_COLORS[fallbackIndex % PLAYER_COLORS.length];
+  };
   if (matchState.map_id === 'atlas_world_v1' || matchState.map_id === 'atlas_world_v2') {
     const players = Object.keys(matchState.players).sort();
     const source = selectedNode ? matchState.territories[selectedNode] : null;
@@ -111,18 +132,15 @@ export function AtlasMap({
         {matchState.map_id === 'atlas_world_v2' ? Object.values(matchState.territories).map((item: any) => {
           const geo = geographicMap[item.id as keyof typeof geographicMap];
           if (!geo) return null;
-          const color = PLAYER_COLORS[Math.max(0, players.indexOf(item.owner_id)) % PLAYER_COLORS.length];
+          const color = playerColor(item.owner_id, Math.max(0, players.indexOf(item.owner_id)));
           const valid = source && source.owner_id === myPlayerId && source.troops > 1 && source.neighbors.includes(item.id) && ((phase === 'attack' && item.owner_id !== myPlayerId) || (phase === 'movement' && item.owner_id === myPlayerId));
           return <g key={item.id} role="button" tabIndex={0} aria-label={`${item.name}, ${matchState.players[item.owner_id]?.name ?? 'Neutro'}, ${item.troops} tropas`} onClick={() => { if (!dragMoved.current) onNodeClick(item.id); }} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNodeClick(item.id); } }} className={`world-cell geo-cell ${selectedNode === item.id ? 'selected' : ''} ${targetNode === item.id || valid ? 'valid' : ''}`}>
             {geo.paths.map((path, i) => <path key={i} d={path.d} transform={'transform' in path ? path.transform : undefined} fill={color} />)}
-            <path className="geo-token-shape" d={`M${geo.x - 11} ${geo.y - 12}h22v15c0 5-4.2 8.8-11 12-6.8-3.2-11-7-11-12v-15Z`} style={{ fill: color }} />
-            <image className="geo-token-frame" href="/assets/tokens/troop-token-frame.svg" x={geo.x - 15} y={geo.y - 15} width="30" height="34" />
-            <text x={geo.x} y={geo.y + 3} textAnchor="middle" className="geo-troops">{item.troops}</text>
-            <text x={geo.x} y={geo.y + 27} textAnchor="middle" className="geo-name">{item.name}</text><title>{item.name}</title>
+            <title>{item.name}</title>
           </g>;
         }) : Object.values(matchState.territories).map((item: any) => {
           const x = 12 + item.x * 118, y = 12 + item.y * 126;
-          const color = PLAYER_COLORS[Math.max(0, players.indexOf(item.owner_id)) % PLAYER_COLORS.length];
+          const color = playerColor(item.owner_id, Math.max(0, players.indexOf(item.owner_id)));
           const valid = source && source.owner_id === myPlayerId && source.troops > 1 && source.neighbors.includes(item.id) && ((phase === 'attack' && item.owner_id !== myPlayerId) || (phase === 'movement' && item.owner_id === myPlayerId));
           return <g key={item.id} role="button" tabIndex={0} aria-label={`${item.name}, ${matchState.players[item.owner_id]?.name ?? 'Neutro'}, ${item.troops} tropas`} onClick={() => { if (!dragMoved.current) onNodeClick(item.id); }} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNodeClick(item.id); } }} className={`world-cell ${selectedNode === item.id ? 'selected' : ''} ${targetNode === item.id || valid ? 'valid' : ''}`} transform={`translate(${x} ${y})`}>
             <rect width="112" height="120" rx="9" fill={color} />
@@ -130,8 +148,27 @@ export function AtlasMap({
             <circle cx="56" cy="94" r="16" /><text x="56" y="99" textAnchor="middle" className="world-cell-troops">{item.troops}</text>
           </g>;
         })}
+        {matchState.map_id === 'atlas_world_v2' && <g className="geo-markers">{Object.values(matchState.territories).map((item: any) => {
+          const geo = geographicMap[item.id as keyof typeof geographicMap];
+          if (!geo) return null;
+          const color = playerColor(item.owner_id, Math.max(0, players.indexOf(item.owner_id)));
+          const valid = source && source.owner_id === myPlayerId && source.troops > 1 && source.neighbors.includes(item.id) && ((phase === 'attack' && item.owner_id !== myPlayerId) || (phase === 'movement' && item.owner_id === myPlayerId));
+          const flagCode = TERRITORY_FLAGS[item.id] ?? 'un';
+          return <g key={item.id} role="button" tabIndex={0} aria-label={`${item.name}, ${matchState.players[item.owner_id]?.name ?? 'Neutro'}, ${item.troops} tropas`} onClick={() => { if (!dragMoved.current) onNodeClick(item.id); }} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNodeClick(item.id); } }} className={`geo-marker ${selectedNode === item.id ? 'selected' : ''} ${targetNode === item.id || valid ? 'valid' : ''}`}>
+            <rect className="geo-flag-border" x={geo.x - 16} y={geo.y - 15} width="32" height="22" rx="2" fill="#090909" stroke={color} strokeWidth="1.5" />
+            <text x={geo.x} y={geo.y} textAnchor="middle" className="geo-flag-fallback">{flagCode.toUpperCase()}</text>
+            <image className="geo-country-flag" href={`https://flagcdn.com/w80/${flagCode}.png`} x={geo.x - 15} y={geo.y - 14} width="30" height="20" preserveAspectRatio="xMidYMid slice" onError={event => { event.currentTarget.style.display = 'none'; }} />
+            <rect className="geo-troop-count-bg" x={geo.x - 9} y={geo.y + 6} width="18" height="13" rx="2" fill="#090909" stroke={color} strokeWidth="1" />
+            <text x={geo.x} y={geo.y + 16} textAnchor="middle" className="geo-troops">{item.troops}</text>
+          </g>;
+        })}</g>}
+        {matchState.map_id === 'atlas_world_v2' && <g className="geo-labels" pointerEvents="none">{Object.values(matchState.territories).map((item: any) => {
+          const geo = geographicMap[item.id as keyof typeof geographicMap];
+          return geo ? <text key={item.id} x={geo.x} y={geo.y + 29} textAnchor="middle" className="geo-name">{item.name}</text> : null;
+        })}</g>}
+        {battleAnimation && battleSource && battleTarget && <BattleAnimation source={battleSource} target={battleTarget} color={battleAnimation.attackerColor} troopCount={battleAnimation.attacking_troops_sent} animationId={battleAnimation.animationId} />}
       </svg>
-      <div className="world-legend">{players.map((id, i) => <span key={id}><i style={{background: PLAYER_COLORS[i % PLAYER_COLORS.length]}} />{matchState.players[id].name}</span>)}</div>
+      <div className="world-legend">{players.map((id, i) => <span key={id}><i style={{background: playerColor(id, i)}} />{matchState.players[id].name}</span>)}</div>
       </div>
     </div>;
   }
@@ -144,7 +181,7 @@ export function AtlasMap({
   const getPlayerColor = (playerId: string | null) => {
     if (!playerId) return '#101C29';
     const index = playerIds.indexOf(playerId);
-    return PLAYER_COLORS[index < 0 ? 0 : index % PLAYER_COLORS.length];
+    return playerColor(playerId, index < 0 ? 0 : index);
   };
 
   const nodeByCountry = Object.fromEntries(
@@ -375,6 +412,8 @@ export function AtlasMap({
             );
           })}
         </g>
+
+        {battleAnimation && battleSource && battleTarget && <BattleAnimation source={battleSource} target={battleTarget} color={battleAnimation.attackerColor} troopCount={battleAnimation.attacking_troops_sent} animationId={battleAnimation.animationId} />}
       </svg>
     </div>
   );

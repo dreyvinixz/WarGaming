@@ -22,7 +22,7 @@ def _to_response(room: Room) -> RoomResponse:
         status=room.status,
         max_players=room.max_players,
         map_id=room.map_id,
-        players=[PlayerResponse(id=p.id, name=p.player_name, is_host=p.is_host) for p in room.players]
+        players=[PlayerResponse(id=p.id, name=p.player_name, is_host=p.is_host, color=p.color or "#49A3D9") for p in room.players]
     )
 
 @router.post("", response_model=JoinResponse, status_code=201)
@@ -31,7 +31,8 @@ def create_room(request: RoomCreateRequest, db: Session = Depends(get_db)):
         db=db,
         host_name=request.player_name,
         max_players=request.max_players,
-        map_id=request.map_id
+        map_id=request.map_id,
+        color=request.color,
     )
     return JoinResponse(
         room_code=room.id,
@@ -51,7 +52,7 @@ def get_room(room_code: str, db: Session = Depends(get_db)):
 
 @router.post("/{room_code}/join", response_model=JoinResponse)
 def join_room(room_code: str, request: RoomJoinRequest, db: Session = Depends(get_db)):
-    room, player = RoomService.join_room(db, room_code.upper(), request.player_name)
+    room, player = RoomService.join_room(db, room_code.upper(), request.player_name, request.color)
     return JoinResponse(
         room_code=room.id,
         player_id=player.id,

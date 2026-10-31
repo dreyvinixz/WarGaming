@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
 import { TopStatusBar } from '../components/hud/TopStatusBar';
 import { PhaseBanner } from '../components/hud/PhaseBanner';
 import { ActionDock } from '../components/hud/ActionDock';
@@ -23,7 +24,23 @@ export function MatchBoard() {
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [exitOpen, setExitOpen] = useState(false);
   const [battle, setBattle] = useState<any>(null);
+  const [battleResultVisible, setBattleResultVisible] = useState(false);
   const previousState = useRef<any>(null);
+  const timeoutRequestRef = useRef<{ deadline: string | null; sentAt: number }>({ deadline: null, sentAt: 0 });
+  const [clockNow, setClockNow] = useState(Date.now());
+  const deadlineAt = matchState?.phase_deadline_at as string | null | undefined;
+  const deadlineMs = deadlineAt ? Date.parse(deadlineAt) : NaN;
+  const secondsRemaining = Number.isFinite(deadlineMs) ? Math.max(0, Math.ceil((deadlineMs - clockNow) / 1000)) : null;
+  useEffect(() => {
+    const timer = setInterval(() => setClockNow(Date.now()), 250);
+    return () => clearInterval(timer);
+  }, []);
+  useEffect(() => {
+    if (!isConnected || secondsRemaining !== 0 || !deadlineAt) return;
+    if (timeoutRequestRef.current.deadline === deadlineAt && clockNow - timeoutRequestRef.current.sentAt < 3000) return;
+    timeoutRequestRef.current = { deadline: deadlineAt, sentAt: clockNow };
+    sendAction('phase_timeout');
+  }, [clockNow, deadlineAt, isConnected, secondsRemaining]);
   useEffect(() => {
     const previous = previousState.current;
     previousState.current = matchState;
@@ -33,8 +50,18 @@ export function MatchBoard() {
     if (!entry) return;
     const payload = entry.payload ?? {};
     const defenderId = previous.territories?.[payload.target_id]?.owner_id;
-    setBattle({ ...payload, won: entry.type === 'attack_success', attacker: previous.players?.[entry.player_id]?.name ?? 'Atacante', defender: previous.players?.[defenderId]?.name ?? 'Defensor', source: previous.territories?.[payload.source_id]?.name ?? 'Origem', target: previous.territories?.[payload.target_id]?.name ?? 'Destino' });
+    setBattle({ ...payload, animationId: entry.id, attackerColor: previous.players?.[entry.player_id]?.color ?? '#CF3630', defenderColor: previous.players?.[defenderId]?.color ?? '#49A3D9', won: entry.type === 'attack_success', attacker: previous.players?.[entry.player_id]?.name ?? 'Atacante', defender: previous.players?.[defenderId]?.name ?? 'Defensor', source: previous.territories?.[payload.source_id]?.name ?? 'Origem', target: previous.territories?.[payload.target_id]?.name ?? 'Destino' });
   }, [matchState]);
+
+  useEffect(() => {
+    if (!battle) {
+      setBattleResultVisible(false);
+      return;
+    }
+    setBattleResultVisible(false);
+    const timer = setTimeout(() => setBattleResultVisible(true), 2050);
+    return () => clearTimeout(timer);
+  }, [battle]);
 
   if (!matchState) return null;
 
@@ -48,8 +75,26 @@ export function MatchBoard() {
   const getPlayerColor = (playerId: string | null) => {
     if (!playerId) return '#101C29';
     const index = playerIds.indexOf(playerId);
-    return PLAYER_COLORS[index < 0 ? 0 : index % PLAYER_COLORS.length];
+    return matchState.players[playerId]?.color ?? PLAYER_COLORS[index < 0 ? 0 : index % PLAYER_COLORS.length];
   };
+
+  const armyColor = getPlayerColor(myPlayerId ?? null);
+  const armyColorRgb = /^#[\da-f]{6}$/i.test(armyColor)
+    ? [1, 3, 5].map(offset => parseInt(armyColor.slice(offset, offset + 2), 16))
+    : null;
+  const armyTextColor = armyColorRgb && (armyColorRgb[0] * 299 + armyColorRgb[1] * 587 + armyColorRgb[2] * 114) / 1000 > 150
+    ? '#090909'
+    : '#FFFFFF';
+  const matchThemeStyle = {
+    '--army-color': armyColor,
+    '--army-ink': armyTextColor,
+    '--accent-primary': armyColor,
+    '--accent-primary-hover': `color-mix(in srgb, ${armyColor} 78%, white)`,
+    '--accent-selection': armyColor,
+    '--yellow': armyColor,
+    '--red': armyColor,
+    '--cyan': armyColor,
+  } as CSSProperties;
 
   const getPlayerName = (playerId: string | null) => {
     if (!playerId) return 'Neutro';
@@ -209,8 +254,8 @@ export function MatchBoard() {
     : 1;
 
   return (
-    <div className="match-screen">
-      {battle && <div className="battle-backdrop" role="presentation"><section className="battle-result" role="dialog" aria-modal="true" aria-labelledby="battle-title"><div className="battle-header">RELATÓRIO DE COMBATE</div><h2 id="battle-title">{battle.won ? 'Território conquistado' : 'Ataque repelido'}</h2><p className="battle-route">{battle.source} <span>→</span> {battle.target}</p><div className="battle-forces"><div><small>ATACANTE</small><strong>{battle.attacker}</strong><div className="battle-die">{battle.attack_roll}</div><span>Força total: {battle.attack_power}</span><b>Perdas: {battle.attacking_troops_lost}</b></div><span className="battle-versus">VS</span><div><small>DEFENSOR</small><strong>{battle.defender}</strong><div className="battle-die defense">{battle.defense_roll}</div><span>Força total: {battle.defense_power}</span><b>Perdas: {battle.defending_troops_lost}</b></div></div><p className="battle-rule">Força total = tropas + dado. O defensor vence empates.</p><button onClick={() => setBattle(null)}>Continuar partida</button></section></div>}
+    <div className="match-screen" style={matchThemeStyle}>
+      {battle && battleResultVisible && <div className="battle-backdrop" role="presentation"><section className="battle-result" role="dialog" aria-modal="true" aria-labelledby="battle-title"><div className="battle-header">RELATÓRIO DE COMBATE</div><h2 id="battle-title">{battle.won ? 'Território conquistado' : 'Ataque repelido'}</h2><p className="battle-route">{battle.source} <span>→</span> {battle.target}</p><div className="battle-forces"><div><small>ATACANTE</small><strong>{battle.attacker}</strong><div className="battle-die">{battle.attack_roll}</div><span>Força total: {battle.attack_power}</span><b>Perdas: {battle.attacking_troops_lost}</b></div><span className="battle-versus">VS</span><div><small>DEFENSOR</small><strong>{battle.defender}</strong><div className="battle-die defense">{battle.defense_roll}</div><span>Força total: {battle.defense_power}</span><b>Perdas: {battle.defending_troops_lost}</b></div></div><p className="battle-rule">Força total = tropas + dado. O defensor vence empates.</p><button onClick={() => setBattle(null)}>Continuar partida</button></section></div>}
       {exitOpen && <div className="victory-overlay" role="dialog" aria-modal="true" aria-labelledby="exit-title"><div><h1 id="exit-title">Voltar ao início?</h1><p>Sua vaga permanece na partida. Você poderá retomá-la neste navegador; os demais jogadores podem precisar aguardar seu turno.</p><button onClick={() => setExitOpen(false)}>Continuar jogando</button> <button onClick={() => { disconnectWebSocket(); saveAndExit(); }}>Voltar ao início</button></div></div>}
       {error && <div role="alert" className="match-error">{error} <button onClick={() => setError('')}>Fechar</button></div>}
       {!isConnected && <div role="status" className="match-error">Conexão perdida. Tentando reconectar…</div>}
@@ -230,7 +275,7 @@ export function MatchBoard() {
       <main className="match-viewport">
         <div className="command-players" aria-label="Comandantes da partida">{playerIds.map(id => <div className={`command-player ${id === currentPlayerId ? 'active' : ''}`} key={id}><span className="command-player__medal" style={{ backgroundColor: getPlayerColor(id) }}><img src="/assets/ui/atlas-crest.svg" alt="" /><b>{matchState.players[id].name.slice(0, 1).toUpperCase()}</b></span><span><strong>{matchState.players[id].name}{id === myPlayerId ? ' · você' : ''}</strong><small>{id === currentPlayerId ? 'Jogando agora' : 'Aguardando'}</small></span></div>)}</div>
         {/* Floating Contextual Phase Banner */}
-        <PhaseBanner phase={phase} isMyTurn={isMyTurn} />
+        <PhaseBanner phase={phase} isMyTurn={isMyTurn} secondsRemaining={secondsRemaining} />
 
         {/* 100% SVG World Map */}
         <AtlasMap
@@ -240,6 +285,7 @@ export function MatchBoard() {
           onNodeClick={handleNodeClick}
           myPlayerId={myPlayerId}
           phase={phase}
+          battleAnimation={battle}
         />
 
         {/* Floating Contextual Territory Inspector (Opens on Selection) */}

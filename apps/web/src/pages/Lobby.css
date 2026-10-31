@@ -53,7 +53,7 @@
 .menu-modal>button:last-child{width:100%;margin-top:24px;padding:14px;color:#1d241d;background:#d0ad70;border:1px solid #f1d59e;font:700 17px 'Barlow Condensed',sans-serif;}
 
 /* Waiting room */
-.waiting-screen{min-height:100svh;color:#f0e4c9;background:linear-gradient(90deg,#101b1af2,#12211dd9),url('/campaign-art.png') center/cover fixed;font-family:'Barlow Condensed',sans-serif;}
+.waiting-screen{min-height:100svh;color:#f0e4c9;background:linear-gradient(90deg,#101b1af2,#12211dd9),url('/assets/campaign/campaign-art.png') center/cover fixed;font-family:'Barlow Condensed',sans-serif;}
 .waiting-screen .lobby-nav{max-width:none;padding:20px clamp(20px,5vw,72px);border-bottom:1px solid #d9b26d36;}
 .waiting-screen .lobby-brand{gap:12px;color:#f4ecd9;font:700 25px 'Cinzel',Georgia,serif;letter-spacing:.04em;}
 .waiting-screen .lobby-brand img{width:43px;height:48px;object-fit:contain;}
@@ -180,7 +180,7 @@
 .menu-modal h2{font-family:'Barlow Condensed','Segoe UI',sans-serif;font-size:30px;}
 .menu-modal p{color:#94A8BB;}
 .menu-modal>button:last-child{color:#fff;background:#EF534F;border-color:#ff7771;}
-.waiting-screen{color:#F1F5F9;background-color:#0B121B;background-image:linear-gradient(90deg,#0B121Bf2,#101C29d9),url('/campaign-art.png');}
+.waiting-screen{color:#F1F5F9;background-color:#0B121B;background-image:linear-gradient(90deg,#0B121Bf2,#101C29d9),url('/assets/campaign/campaign-art.png');}
 .waiting-screen .lobby-nav{border-color:#34495E;}
 .waiting-screen .lobby-brand{color:#F1F5F9;}
 .waiting-screen .lobby-brand b,.waiting-copy h1 em,.room-code-display strong{color:#EF534F;}
@@ -195,6 +195,6 @@
 .waiting-screen .connection-line{color:#94A8BB;}
 .waiting-screen .connection-line i.online{background:#34B78F;box-shadow:0 0 8px #34B78F;}
 .waiting-screen .error-banner{background:#3d2027;border-color:#EF534F;color:#ffdadd;}.resume-session{color:#CBD5E1;background:#101C29;border-color:#34495E;}.resume-session button{color:#fff;background:#EF534F;border-color:#ff7771;}
-.waiting-screen{background-image:linear-gradient(90deg,#0B121Bf2,#101C29d9),url('/campaign-war.webp');}
+.waiting-screen{background-image:linear-gradient(90deg,#0B121Bf2,#101C29d9),url('/assets/campaign/campaign-war.webp');}
 .waiting-figure{filter:saturate(.55) hue-rotate(155deg) brightness(.78);}
 .menu-modal input{accent-color:#EF534F;}

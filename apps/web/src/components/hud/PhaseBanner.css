@@ -55,6 +55,21 @@
   text-transform: uppercase;
 }
 
+.phase-countdown {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  margin-left: 7px;
+  padding: 3px 6px;
+  color: #EDEBE7;
+  background: #29292C;
+  border: 1px solid #444447;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .08em;
+}
+.phase-countdown.is-urgent { color: #F05449; border-color: #CF3630; }
+
 .is-attack .phase-banner-eyebrow {
   color: #ffd600;
 }

@@ -4,6 +4,7 @@ import './PhaseBanner.css';
 interface PhaseBannerProps {
   phase: 'reinforcement' | 'attack' | 'movement';
   isMyTurn: boolean;
+  secondsRemaining: number | null;
 }
 
 const phaseInfo = {
@@ -31,7 +32,7 @@ const phaseInfo = {
 
 } as const;
 
-export function PhaseBanner({ phase, isMyTurn }: PhaseBannerProps) {
+export function PhaseBanner({ phase, isMyTurn, secondsRemaining }: PhaseBannerProps) {
   const current = phaseInfo[phase] ?? phaseInfo.reinforcement;
   const Icon = current.icon;
 
@@ -42,6 +43,7 @@ export function PhaseBanner({ phase, isMyTurn }: PhaseBannerProps) {
           <Icon size={12} />
           <span>{current.code}</span>
           {!isMyTurn && <span>· AGUARDE SUA VEZ</span>}
+          {secondsRemaining !== null && <span className={`phase-countdown ${secondsRemaining <= 10 ? 'is-urgent' : ''}`} role="timer" aria-live="off" aria-label={`Tempo restante: ${secondsRemaining} segundos`}>{String(Math.floor(secondsRemaining / 60)).padStart(2, '0')}:{String(secondsRemaining % 60).padStart(2, '0')}</span>}
         </div>
         <div className="phase-banner-title">{current.title}</div>
         <div className="phase-banner-description">

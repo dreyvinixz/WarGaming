@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Minus, Plus, Shield, Swords, Truck, X } from 'lucide-react';
+import { getTerritoryFlagCode } from '../map/territoryFlags';
 import './TerritoryInspector.css';
 
 interface TerritoryInspectorProps {
@@ -44,6 +45,8 @@ export function TerritoryInspector({
 
   if (!selectedTerritory) return null;
 
+  const flagCode = getTerritoryFlagCode(selectedTerritory.id);
+
   const canCommit = isMyTurn && maxTroops > 0 && (
     (phase === 'reinforcement' && isMine) ||
     (phase === 'attack' && targetTerritory && isMine) ||
@@ -72,7 +75,10 @@ export function TerritoryInspector({
       </div>
 
       <div className="inspector-body">
-        <div className="inspector-territory-name">{selectedTerritory.name}</div>
+        <div className="inspector-territory-title">
+          {flagCode && <img className="inspector-country-flag" src={`https://flagcdn.com/w80/${flagCode}.png`} alt={`Bandeira de ${selectedTerritory.name}`} />}
+          <div className="inspector-territory-name">{selectedTerritory.name}</div>
+        </div>
 
         <div className="inspector-status-row">
           <div className="inspector-owner-badge">

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import random
 from math import floor
+from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 from .combat import resolve_combat
@@ -18,6 +19,11 @@ from .validators import (
 )
 
 PLAYER_COLORS = ["blue", "red", "green", "yellow"]
+PHASE_TIMEOUT_SECONDS = 90
+
+
+def _next_phase_deadline() -> datetime:
+    return datetime.now(timezone.utc) + timedelta(seconds=PHASE_TIMEOUT_SECONDS)
 
 
 def _log(state: MatchState, type_: str, player_id: str, message: str, payload: dict | None = None) -> None:
@@ -31,7 +37,7 @@ def calculate_reinforcement_pool(state: MatchState, player_id: str) -> int:
     return base + bonus
 
 
-def create_players(names: list[str]) -> dict[str, Player]:
+def create_players(names: list[str], colors: list[str] | None = None) -> dict[str, Player]:
     players: dict[str, Player] = {}
     objectives = list(load_default_objectives().keys())
     for i, name in enumerate(names):
@@ -39,19 +45,21 @@ def create_players(names: list[str]) -> dict[str, Player]:
         players[pid] = Player(
             id=pid,
             name=name,
-            color=PLAYER_COLORS[i % len(PLAYER_COLORS)],
+            color=(colors[i] if colors and i < len(colors) else PLAYER_COLORS[i % len(PLAYER_COLORS)]),
             is_host=(i == 0),
             objective_id=objectives[i % len(objectives)],
         )
     return players
 
 
-def start_match(player_names: list[str] | None = None, room_code: str = "TEST01", rng: random.Random | None = None, map_id: str = "atlas_legacy_v1", player_ids: list[str] | None = None) -> MatchState:
+def start_match(player_names: list[str] | None = None, room_code: str = "TEST01", rng: random.Random | None = None, map_id: str = "atlas_legacy_v1", player_ids: list[str] | None = None, player_colors: list[str] | None = None) -> MatchState:
     player_names = player_names or ["Andrey", "Maria"]
     if not (2 <= len(player_names) <= 4):
         raise ValueError("Atlas War MVP requires 2 to 4 players")
     rng = rng or random.Random(7)
-    players = create_players(player_names)
+    if player_colors is not None and (len(player_colors) != len(player_names) or any(not color.startswith("#") or len(color) != 7 for color in player_colors)):
+        raise ValueError("Invalid player colors")
+    players = create_players(player_names, player_colors)
     if player_ids is not None:
         if len(player_ids) != len(player_names) or len(set(player_ids)) != len(player_ids):
             raise ValueError("Invalid player identities")
@@ -90,6 +98,7 @@ def start_match(player_names: list[str] | None = None, room_code: str = "TEST01"
         regions=regions,
         objectives=load_default_objectives(),
         phase=GamePhase.REINFORCEMENT,
+        phase_deadline_at=_next_phase_deadline(),
     )
     if map_id in ("atlas_world_v1", "atlas_world_v2"):
         state.objectives["control_7_territories"] = state.objectives["control_7_territories"].model_copy_update(
@@ -131,6 +140,7 @@ def advance_phase(state: MatchState, player_id: str) -> MatchState:
         raise GameActionError(f"Phase advance is not allowed in phase {state.phase.value}")
     new_state = state.model_copy(deep=True)
     new_state.phase = next_phase
+    new_state.phase_deadline_at = _next_phase_deadline()
     _log(new_state, "phase_changed", player_id, f"Advanced to {next_phase.value}", {"phase": next_phase.value})
     return new_state
 
@@ -209,6 +219,7 @@ def end_turn(state: MatchState, player_id: str) -> MatchState:
         new_state.phase = GamePhase.FINISHED
         new_state.status = "finished"
         new_state.winner_player_id = winner
+        new_state.phase_deadline_at = None
         _log(new_state, "match_finished", winner, "Match finished: last faction standing", {"winner_player_id": winner})
         return new_state
 
@@ -216,6 +227,7 @@ def end_turn(state: MatchState, player_id: str) -> MatchState:
         new_state.phase = GamePhase.FINISHED
         new_state.status = "finished"
         new_state.winner_player_id = player_id
+        new_state.phase_deadline_at = None
         _log(new_state, "match_finished", player_id, "Match finished: secret objective completed", {"winner_player_id": player_id})
         return new_state
 
@@ -224,6 +236,7 @@ def end_turn(state: MatchState, player_id: str) -> MatchState:
         new_state.round_number += 1
     new_state.current_player_id = next_player_id
     new_state.phase = GamePhase.REINFORCEMENT
+    new_state.phase_deadline_at = _next_phase_deadline()
     new_state.movement_used_this_turn = False
     pool = calculate_reinforcement_pool(new_state, next_player_id)
     new_state.players[next_player_id] = new_state.players[next_player_id].model_copy_update(
@@ -232,3 +245,27 @@ def end_turn(state: MatchState, player_id: str) -> MatchState:
     )
     _log(new_state, "turn_started", next_player_id, "Novo turno iniciado", {"round": new_state.round_number, "reinforcement_pool": pool})
     return new_state
+
+
+def timeout_phase(state: MatchState) -> MatchState:
+    """Advance an expired phase and forfeit any reinforcement pool left unused."""
+    if state.phase == GamePhase.FINISHED or state.phase_deadline_at is None:
+        raise GameActionError("No active phase timer")
+    deadline = state.phase_deadline_at
+    if deadline.tzinfo is None:
+        deadline = deadline.replace(tzinfo=timezone.utc)
+    if datetime.now(timezone.utc) + timedelta(seconds=2) < deadline:
+        raise GameActionError("Phase timer has not expired")
+
+    player_id = state.current_player_id
+    if state.phase == GamePhase.REINFORCEMENT:
+        new_state = state.model_copy(deep=True)
+        remaining = new_state.players[player_id].reinforcement_pool
+        new_state.players[player_id] = new_state.players[player_id].model_copy_update(reinforcement_pool=0)
+        if remaining:
+            _log(new_state, "reinforcement_timeout", player_id, "Reforços não distribuídos foram perdidos", {"troops": remaining})
+        state = new_state
+
+    if state.phase == GamePhase.MOVEMENT:
+        return end_turn(state, player_id)
+    return advance_phase(state, player_id)

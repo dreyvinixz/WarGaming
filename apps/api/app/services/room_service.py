@@ -13,7 +13,7 @@ def _generate_room_code(length=6) -> str:
 
 class RoomService:
     @classmethod
-    def create_room(cls, db: Session, host_name: str, max_players: int = 4, map_id: str = "atlas_world_v2") -> tuple[Room, RoomPlayer]:
+    def create_room(cls, db: Session, host_name: str, max_players: int = 4, map_id: str = "atlas_world_v2", color: str = "#CF3630") -> tuple[Room, RoomPlayer]:
         if map_id not in ("atlas_world_v1", "atlas_world_v2"):
             raise HTTPException(status_code=400, detail="Unknown map")
         room_code = _generate_room_code()
@@ -35,7 +35,8 @@ class RoomService:
             room_id=room_code,
             player_name=host_name,
             is_host=True,
-            token=str(uuid4())
+            token=str(uuid4()),
+            color=color.upper(),
         )
         db.add(host_player)
         
@@ -57,7 +58,7 @@ class RoomService:
         return room
 
     @classmethod
-    def join_room(cls, db: Session, room_code: str, player_name: str) -> tuple[Room, RoomPlayer]:
+    def join_room(cls, db: Session, room_code: str, player_name: str, color: str = "#49A3D9") -> tuple[Room, RoomPlayer]:
         room = cls.get_room(db, room_code)
         
         if room.status != "waiting":
@@ -74,7 +75,8 @@ class RoomService:
             room_id=room_code,
             player_name=player_name,
             is_host=False,
-            token=str(uuid4())
+            token=str(uuid4()),
+            color=color.upper(),
         )
         db.add(new_player)
         db.commit()
@@ -116,7 +118,7 @@ class RoomService:
             
         # Initialize pure game engine match state
         player_names = [p.player_name for p in room.players]
-        match_state = start_match(player_names=player_names, room_code=room.id, map_id=room.map_id, player_ids=[p.id for p in room.players])
+        match_state = start_match(player_names=player_names, room_code=room.id, map_id=room.map_id, player_ids=[p.id for p in room.players], player_colors=[p.color or "#49A3D9" for p in room.players])
         
         # Save Match state as JSON
         new_match = Match(

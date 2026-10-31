@@ -14,6 +14,7 @@ const logLabels: Record<string, string> = {
   turn_ended: 'Turno encerrado',
   phase_changed: 'Fase avançada',
   reinforcement: 'Reforço enviado',
+  reinforcement_timeout: 'Reforços expirados',
   attack_success: 'Território conquistado',
   attack_failed: 'Ataque repelido',
   troop_movement: 'Tropas movidas',
@@ -42,6 +43,7 @@ function friendlyMessage(log: any) {
   if (log.type === 'turn_ended') return 'O turno foi encerrado e o mapa avançou.';
   if (log.type === 'phase_changed') return `A fase mudou para ${phaseLabels[log.payload?.phase] ?? 'a próxima etapa'}.`;
   if (log.type === 'reinforcement') return `Reforços enviados para ${territory}.`;
+  if (log.type === 'reinforcement_timeout') return `${log.payload?.troops ?? 0} reforços não distribuídos foram perdidos pelo tempo.`;
   if (log.type === 'attack_success') return 'O território foi conquistado com sucesso.';
   if (log.type === 'attack_failed') return 'A defesa inimiga repeliu o ataque.';
   if (log.type === 'troop_movement') return 'Tropas reposicionadas entre territórios conectados.';

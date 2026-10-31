@@ -7,7 +7,7 @@ async function request(input: RequestInfo | URL, init?: RequestInit) {
 
 
 
-export async function createRoom(playerName: string, maxPlayers: number = 2) {
+export async function createRoom(playerName: string, color: string, maxPlayers: number = 2) {
 
   const res = await request(`${API_URL}/rooms`, {
 
@@ -15,7 +15,7 @@ export async function createRoom(playerName: string, maxPlayers: number = 2) {
 
     headers: { 'Content-Type': 'application/json' },
 
-    body: JSON.stringify({ player_name: playerName, max_players: maxPlayers })
+    body: JSON.stringify({ player_name: playerName, color, max_players: maxPlayers })
 
   });
 
@@ -27,7 +27,7 @@ export async function createRoom(playerName: string, maxPlayers: number = 2) {
 
 
 
-export async function joinRoom(roomCode: string, playerName: string) {
+export async function joinRoom(roomCode: string, playerName: string, color: string) {
 
   const res = await request(`${API_URL}/rooms/${roomCode}/join`, {
 
@@ -35,7 +35,7 @@ export async function joinRoom(roomCode: string, playerName: string) {
 
     headers: { 'Content-Type': 'application/json' },
 
-    body: JSON.stringify({ player_name: playerName })
+    body: JSON.stringify({ player_name: playerName, color })
 
   });
 

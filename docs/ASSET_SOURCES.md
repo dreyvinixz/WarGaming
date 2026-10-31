@@ -26,8 +26,10 @@ A primeira camada do redesign usa CSS, SVG do Atlas Vivo e `lucide-react` para v
 - Identificado na página da fonte como domínio público (Public Domain Mark). Usado como textura de fundo; não representa o tabuleiro jogável.
 
 ### Arte de campanha e tipografia
-- `campaign-art.png`, `campaign-war.webp` e `army-standard.png`: ilustrações originais geradas para Atlas War, sem uso de imagens dos jogos de referência. `campaign-war.webp` é o poster/fallback do vídeo no menu principal.
-- `campaign-loop.mp4`: clipe de campanha fornecido para o Atlas War, preparado para começar a reprodução progressiva no menu; reproduz sem áudio e em loop.
+- `apps/web/public/assets/campaign/`: `campaign-art.png`, `campaign-war.webp` e `army-standard.png`, ilustrações originais geradas para Atlas War, sem uso de imagens dos jogos de referência. `campaign-war.webp` é o poster/fallback do vídeo no menu principal.
+- `apps/web/public/assets/campaign/campaign-loop.mp4`: clipe de campanha fornecido para o Atlas War, preparado para começar a reprodução progressiva no menu; reproduz sem áudio e em loop.
+- `apps/web/public/assets/maps/world-atlas-1926.jpg`: mapa histórico da tela inicial.
+- `assets/concept-art/grow.png` e `assets/backgrounds/16391-271607398_small.mp4`: materiais de referência mantidos fora da pasta pública da aplicação.
 - `assets/ui/atlas-crest.svg`, `assets/ui/ornate-divider.svg`, `assets/map/sea-chart.svg`, `assets/map/compass-rose.svg`, `assets/tokens/troop-token-frame.svg` e `assets/combat/die-red.svg` / `die-blue.svg`: vetores originais criados para Atlas War nesta etapa.
 - Barlow Condensed e Cinzel: pacotes Fontsource auto-hospedados sob SIL Open Font License 1.1. Os avisos completos acompanham a aplicação em `apps/web/public/assets/licenses/`.
 - Removemos a dependência runtime de Google Fonts; os estilos usam os arquivos tipográficos locais.

@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from datetime import datetime, timezone
 from app.models.match import Match
 from app.game_engine.state import MatchState
 from app.game_engine.validators import GameActionError
@@ -9,7 +10,8 @@ from app.game_engine.reducer import (
     advance_phase,
     attack,
     move_troops,
-    end_turn
+    end_turn,
+    timeout_phase,
 )
 
 def handle_player_action(db: Session, room_code: str, player_id: str, action_data: dict) -> dict:
@@ -27,7 +29,18 @@ def handle_player_action(db: Session, room_code: str, player_id: str, action_dat
     payload = action_data.get("payload", {})
 
     try:
-        if action_type == "place_reinforcement":
+        deadline = current_state.phase_deadline_at
+        if deadline is not None and deadline.tzinfo is None:
+            deadline = deadline.replace(tzinfo=timezone.utc)
+        expired = deadline is not None and datetime.now(timezone.utc) >= deadline
+
+        if action_type == "phase_timeout" and not expired:
+            # A delayed/duplicate timeout request is harmless after another client advanced the phase.
+            new_state = current_state
+        elif action_type != "phase_timeout" and expired:
+            # Enforce the deadline on the server even if the browser timer fires late.
+            new_state = timeout_phase(current_state)
+        elif action_type == "place_reinforcement":
             new_state = place_reinforcement(current_state, player_id, **payload)
         elif action_type == "advance_phase":
             new_state = advance_phase(current_state, player_id)
@@ -37,6 +50,8 @@ def handle_player_action(db: Session, room_code: str, player_id: str, action_dat
             new_state = move_troops(current_state, player_id, **payload)
         elif action_type == "end_turn":
             new_state = end_turn(current_state, player_id)
+        elif action_type == "phase_timeout":
+            new_state = timeout_phase(current_state)
         else:
             raise ValueError(f"Unknown or forbidden action type: {action_type}")
     except (GameActionError, TypeError) as e:
