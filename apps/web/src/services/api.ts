@@ -1,7 +1,7 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:8000/api/v1' : '/api/v1');
 async function request(input: RequestInfo | URL, init?: RequestInit) {
   try { return await fetch(input, init); }
-  catch { throw new Error('Não foi possível conectar ao servidor. Verifique se a API está em execução na porta 8000.'); }
+  catch { throw new Error('Não foi possível conectar ao servidor do jogo. Verifique sua conexão e tente novamente.'); }
 }
 
 
