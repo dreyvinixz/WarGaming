@@ -9,7 +9,7 @@ Base REST: `/api/v1`
 Cria uma sala e retorna o código, o token do host e o jogador criado.
 
 ```json
-{ "player_name": "Jogador Amarelo", "max_players": 4, "map_id": "atlas_world_v1" }
+{ "player_name": "Jogador Amarelo", "max_players": 6, "map_id": "atlas_world_v1" }
 ```
 
 ### `POST /rooms/{room_code}/join`

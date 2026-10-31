@@ -11,6 +11,7 @@ import './Lobby.css';
 
 export function Lobby() {
   const [name, setName] = useState('');
+  const [maxPlayers, setMaxPlayers] = useState(6);
   const [playerColor, setPlayerColor] = useState('#CF3630');
   const [customColorChosen, setCustomColorChosen] = useState(false);
   const [mode, setMode] = useState<'create' | 'join'>('create');
@@ -46,7 +47,7 @@ export function Lobby() {
   const handleCreateRoom = async () => {
     if (name.trim().length < 2) return setError('Digite pelo menos 2 caracteres para o seu nome.');
     setLoading(true); setError('');
-    try { const data = await createRoom(name.trim(), playerColor); setPlayerInfo(name.trim(), data.room_code, data.player_token); }
+    try { const data = await createRoom(name.trim(), playerColor, maxPlayers); setPlayerInfo(name.trim(), data.room_code, data.player_token); }
     catch (e: any) { setError(e.message || 'Não foi possível criar a sala.'); }
     finally { setLoading(false); }
   };
@@ -84,7 +85,7 @@ export function Lobby() {
       <header className="lobby-nav"><div className="lobby-brand"><svg className="lobby-brand-crest" viewBox="0 0 96 108" aria-hidden="true"><path d="M8 8h80v51c0 21-17 34-40 44C25 93 8 80 8 59V8Z" fill="#131314" stroke="#EDEBE7" strokeWidth="2.5"/><path d="M14 14h68v44c0 17-13 28-34 38-21-10-34-21-34-38V14Z" stroke="#77777B" strokeWidth="1.3"/><path d="m48 25 4.8 15.2L69 45l-16.2 4.8L48 66l-4.8-16.2L27 45l16.2-4.8L48 25Z" fill="var(--army-color)"/><circle cx="48" cy="45" r="5" fill="#131314" stroke="#A5A29F" strokeWidth="1.5"/><path d="M19 66c7 0 11 4 13 10-6 0-10-2-13-10Zm58 0c-7 0-11 4-13 10 6 0 10-2 13-10Z" stroke="#A5A29F" strokeWidth="2" strokeLinecap="round"/><path d="M31 78h34M36 84h24" stroke="#EDEBE7" strokeWidth="1.5" strokeLinecap="round"/></svg> ATLAS <b>WAR</b></div><span className="lobby-nav-note">SALA DE ESPERA</span></header>
       <main className="waiting-layout">
         <div className="waiting-copy"><span className="section-kicker">A FRONTEIRA ESTÁ PRONTA</span><h1>Sala <em>{roomCode}</em></h1><p>Convide outro jogador para iniciar a disputa pelo mapa.</p><div className="room-code-display"><small>CÓDIGO DA SALA</small><strong>{roomCode}</strong><span>Compartilhe este código com quem vai jogar.</span></div><img className="waiting-figure" src="/assets/campaign/army-standard.png" alt="" aria-hidden="true" /></div>
-        <section className="waiting-card panel-card"><div className="waiting-card-heading"><div className="waiting-pulse"><i /><i /><i /></div><div><span className="section-kicker">PONTO DE ENCONTRO</span><h2>Jogadores</h2></div></div>
+        <section className="waiting-card panel-card"><div className="waiting-card-heading"><div className="waiting-pulse"><i /><i /><i /></div><div><span className="section-kicker">PONTO DE ENCONTRO</span><h2>Jogadores <span className="waiting-player-count">{room?.players?.length ?? 1}/{room?.max_players ?? maxPlayers}</span></h2></div></div>
           {room?.players?.map((p: any) => <div className={`player-slot ${p.name === useGameStore.getState().playerName ? 'is-self' : ''}`} key={p.id}><span className="player-avatar" style={{ backgroundColor: p.color ?? '#49A3D9' }}><b>{p.name.slice(0, 1).toUpperCase()}</b></span><div><strong>{p.name}</strong><small>{p.is_host ? 'anfitrião' : 'jogador'}{p.name === useGameStore.getState().playerName ? ' · você' : ''}</small></div><span className="player-color-chip" style={{ backgroundColor: p.color ?? '#49A3D9' }} aria-label={`Cor ${p.color ?? '#49A3D9'}`} /></div>)}
           {error && <div className="error-banner">{error}</div>}
           {room?.players?.some((p: any) => p.is_host && p.name === useGameStore.getState().playerName) ? <><Button onClick={handleStartMatch} isLoading={loading} disabled={!isConnected || room.players.length < 2} className="lobby-primary"><Play size={17} /> Iniciar partida</Button>{room.players.length < 2 && <p className="waiting-note">Aguardando pelo menos dois jogadores.</p>}</> : <p className="waiting-note">Aguardando o anfitrião iniciar...</p>}
@@ -115,10 +116,11 @@ export function Lobby() {
           {savedSession && <div className="resume-session"><span>Partida guardada: <strong>{savedSession.room}</strong></span><button type="button" onClick={resume}>Retomar partida</button></div>}
           <Input label="Nome do comandante" placeholder="Ex.: Comandante Lia" value={name} onChange={event => setName(event.target.value)} maxLength={20}/>
           {mode === 'join' && <Input label="Código da sala" placeholder="Ex.: A7C9T2" value={roomToJoin} onChange={event => setRoomToJoin(event.target.value.toUpperCase())} maxLength={6}/>}
+          {mode === 'create' && <label className="commander-capacity-picker"><span>Limite de jogadores</span><select value={maxPlayers} onChange={event => setMaxPlayers(Number(event.target.value))} aria-label="Limite de jogadores">{[2, 3, 4, 5, 6].map(count => <option key={count} value={count}>{count} jogadores</option>)}</select></label>}
           <label className="commander-color-picker"><span>Cor do exército</span><input type="color" value={playerColor} onChange={event => { setPlayerColor(event.target.value.toUpperCase()); setCustomColorChosen(true); }} /><strong>{playerColor}</strong></label>
           {error && <div className="error-banner" role="alert">{error}</div>}
           {mode === 'create' ? <Button onClick={handleCreateRoom} isLoading={loading} className="menu-play menu-play--create"><span>CRIAR PARTIDA</span><ArrowRight size={21}/></Button> : <Button onClick={handleJoinRoom} isLoading={loading} className="menu-play menu-play--join"><span>ENTRAR NA SALA</span><ArrowRight size={21}/></Button>}
-          <p className="menu-panel-note">PARTIDA PRIVADA · ATÉ 6 COMANDANTES</p>
+          <p className="menu-panel-note">PARTIDA PRIVADA · {mode === 'create' ? `${maxPlayers} VAGAS` : 'ATÉ 6 COMANDANTES'}</p>
         </section>
         <footer className="game-menu__stage-footer">ATLAS WAR <span>·</span> JOGO DE ESTRATÉGIA</footer>
       </main>

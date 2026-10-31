@@ -9,7 +9,7 @@ class Room(Base):
     __tablename__ = "rooms"
 
     id = Column(String, primary_key=True, index=True) # Ex: "A1B2C3"
-    max_players = Column(Integer, default=4)
+    max_players = Column(Integer, default=6)
     map_id = Column(String, default="atlas_world_v1")
     status = Column(String, default="waiting") # waiting, started
     match_id = Column(String, nullable=True)

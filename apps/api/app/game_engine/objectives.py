@@ -33,6 +33,20 @@ def load_default_objectives() -> dict[str, Objective]:
             type=ObjectiveType.ELIMINATE_PLAYER_COUNT,
             params={"count": 1},
         ),
+        "control_12_territories": Objective(
+            id="control_12_territories",
+            title="Deep Expansion",
+            description="Controle pelo menos 12 territórios ao final do seu turno.",
+            type=ObjectiveType.CONTROL_TERRITORY_COUNT,
+            params={"count": 12},
+        ),
+        "eliminate_two_players": Objective(
+            id="eliminate_two_players",
+            title="Decisive Campaign",
+            description="Elimine pelo menos dois exércitos rivais.",
+            type=ObjectiveType.ELIMINATE_PLAYER_COUNT,
+            params={"count": 2},
+        ),
     }
 
 

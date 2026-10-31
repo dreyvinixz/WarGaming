@@ -18,7 +18,7 @@ from .validators import (
     validate_reinforcement_action,
 )
 
-PLAYER_COLORS = ["blue", "red", "green", "yellow"]
+PLAYER_COLORS = ["blue", "red", "green", "yellow", "purple", "orange"]
 PHASE_TIMEOUT_SECONDS = 90
 
 
@@ -54,8 +54,8 @@ def create_players(names: list[str], colors: list[str] | None = None) -> dict[st
 
 def start_match(player_names: list[str] | None = None, room_code: str = "TEST01", rng: random.Random | None = None, map_id: str = "atlas_legacy_v1", player_ids: list[str] | None = None, player_colors: list[str] | None = None) -> MatchState:
     player_names = player_names or ["Andrey", "Maria"]
-    if not (2 <= len(player_names) <= 4):
-        raise ValueError("Atlas War MVP requires 2 to 4 players")
+    if not (2 <= len(player_names) <= 6):
+        raise ValueError("Atlas War supports 2 to 6 players")
     rng = rng or random.Random(7)
     if player_colors is not None and (len(player_colors) != len(player_names) or any(not color.startswith("#") or len(color) != 7 for color in player_colors)):
         raise ValueError("Invalid player colors")

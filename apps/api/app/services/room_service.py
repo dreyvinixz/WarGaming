@@ -13,7 +13,7 @@ def _generate_room_code(length=6) -> str:
 
 class RoomService:
     @classmethod
-    def create_room(cls, db: Session, host_name: str, max_players: int = 4, map_id: str = "atlas_world_v2", color: str = "#CF3630") -> tuple[Room, RoomPlayer]:
+    def create_room(cls, db: Session, host_name: str, max_players: int = 6, map_id: str = "atlas_world_v2", color: str = "#CF3630") -> tuple[Room, RoomPlayer]:
         if map_id not in ("atlas_world_v1", "atlas_world_v2"):
             raise HTTPException(status_code=400, detail="Unknown map")
         room_code = _generate_room_code()
