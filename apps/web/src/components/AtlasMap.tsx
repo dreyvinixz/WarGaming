@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import rawWorldMap from '@svg-maps/world';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, WheelEvent, PointerEvent } from 'react';
 import { TroopBadge } from './map/TroopBadge';
 import { AttackRoute } from './map/AttackRoute';
 import { TacticalOverlay } from './map/TacticalOverlay';
@@ -43,6 +43,28 @@ export function AtlasMap({
   const [capturedNodes, setCapturedNodes] = useState<Set<string>>(new Set());
   const [zoom, setZoom] = useState(1);
   const [listOpen, setListOpen] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{x:number;y:number;left:number;top:number}|null>(null);
+  const dragMoved = useRef(false);
+  const [dragging, setDragging] = useState(false);
+  const handleWheel = (event: WheelEvent<HTMLDivElement>) => {
+    if (!event.ctrlKey && !event.metaKey) return;
+    event.preventDefault();
+    const box = event.currentTarget.getBoundingClientRect();
+    const px = event.clientX - box.left + event.currentTarget.scrollLeft;
+    const py = event.clientY - box.top + event.currentTarget.scrollTop;
+    const factor = event.deltaY < 0 ? 1.15 : 1 / 1.15;
+    const next = Math.min(2.5, Math.max(0.75, zoom * factor));
+    setZoom(next);
+    requestAnimationFrame(() => { const el = scrollRef.current; if (el) { el.scrollLeft = px * next / zoom - (event.clientX - box.left); el.scrollTop = py * next / zoom - (event.clientY - box.top); } });
+  };
+  const startPan = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0 || (event.target as HTMLElement).closest('[role="button"],button')) return;
+    dragRef.current = { x:event.clientX,y:event.clientY,left:event.currentTarget.scrollLeft,top:event.currentTarget.scrollTop };
+    dragMoved.current = false; setDragging(true); event.currentTarget.setPointerCapture(event.pointerId);
+  };
+  const pan = (event: PointerEvent<HTMLDivElement>) => { const start = dragRef.current; if (!start) return; if (Math.abs(event.clientX-start.x)+Math.abs(event.clientY-start.y)>3) dragMoved.current=true; event.currentTarget.scrollLeft=start.left-(event.clientX-start.x); event.currentTarget.scrollTop=start.top-(event.clientY-start.y); };
+  const endPan = () => { dragRef.current=null; setDragging(false); setTimeout(()=>{dragMoved.current=false},0); };
 
   useEffect(() => {
     if (!matchState?.territories) return;
@@ -82,7 +104,7 @@ export function AtlasMap({
         <button type="button" onClick={() => setZoom(z => Math.max(1, z - 0.25))} disabled={zoom <= 1} aria-label="Diminuir zoom">−</button><span aria-live="polite">{Math.round(zoom * 100)}%</span><button type="button" onClick={() => setZoom(z => Math.min(2, z + 0.25))} disabled={zoom >= 2} aria-label="Aumentar zoom">+</button><button type="button" aria-expanded={listOpen} onClick={() => setListOpen(open => !open)}>Territórios</button>
       </div>
       {listOpen && <div className="world-territory-list" role="region" aria-label="Lista de territórios"><div className="world-list-heading">Selecione um território <button type="button" onClick={() => setListOpen(false)} aria-label="Fechar lista">×</button></div>{Object.values(matchState.regions).map((region: any) => <section key={region.id}><h3>{region.name} · bônus +{region.bonus_troops}</h3>{region.territory_ids.map((id: string) => { const t = matchState.territories[id]; if (!t) return null; return <button type="button" className={selectedNode === id ? 'active' : ''} key={id} onClick={() => { onNodeClick(id); setListOpen(false); }}><span>{t.name}</span><small>{matchState.players[t.owner_id]?.name ?? 'Neutro'} · {t.troops} tropas</small></button>; })}</section>)}</div>}
-      <div className="world-board-scroll" tabIndex={0} aria-label="Mapa: role para ver todos os territórios">
+      <div ref={scrollRef} className={`world-board-scroll ${dragging ? 'is-dragging' : ''}`} tabIndex={0} aria-label="Mapa: arraste para deslocar; Ctrl+roda para ampliar" onWheel={handleWheel} onPointerDown={startPan} onPointerMove={pan} onPointerUp={endPan} onPointerCancel={endPan}>
       <svg className="world-board" style={{ width: matchState.map_id === 'atlas_world_v2' ? `max(${850 * zoom}px, min(${100 * zoom}vw, calc(${138.46 * zoom}vh - ${328.15 * zoom}px)))` : `${zoom * 100}%`, minWidth: `${zoom * 850}px` }} viewBox={matchState.map_id === 'atlas_world_v2' ? "182 114 720 520" : "0 0 1080 520"} role="group" aria-label="Tabuleiro territorial Atlas War">
         {matchState.map_id === 'atlas_world_v2' && source && source.owner_id === myPlayerId && source.troops > 1 && (phase === 'attack' || phase === 'movement') && <g className="map-valid-routes" aria-hidden="true">{source.neighbors.map((neighborId: string) => { const neighbor = matchState.territories[neighborId]; const from = geographicMap[selectedNode as keyof typeof geographicMap]; const to = geographicMap[neighborId as keyof typeof geographicMap]; if (!from || !to || !neighbor || (phase === 'attack' ? neighbor.owner_id === myPlayerId : neighbor.owner_id !== myPlayerId)) return null; return <line key={neighborId} x1={from.x} y1={from.y} x2={to.x} y2={to.y} />; })}</g>}
         {matchState.map_id === 'atlas_world_v2' ? Object.values(matchState.territories).map((item: any) => {
@@ -90,16 +112,16 @@ export function AtlasMap({
           if (!geo) return null;
           const color = PLAYER_COLORS[Math.max(0, players.indexOf(item.owner_id)) % PLAYER_COLORS.length];
           const valid = source && source.owner_id === myPlayerId && source.troops > 1 && source.neighbors.includes(item.id) && ((phase === 'attack' && item.owner_id !== myPlayerId) || (phase === 'movement' && item.owner_id === myPlayerId));
-          return <g key={item.id} role="button" tabIndex={0} aria-label={`${item.name}, ${matchState.players[item.owner_id]?.name ?? 'Neutro'}, ${item.troops} tropas`} onClick={() => onNodeClick(item.id)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNodeClick(item.id); } }} className={`world-cell geo-cell ${selectedNode === item.id ? 'selected' : ''} ${targetNode === item.id || valid ? 'valid' : ''}`}>
+          return <g key={item.id} role="button" tabIndex={0} aria-label={`${item.name}, ${matchState.players[item.owner_id]?.name ?? 'Neutro'}, ${item.troops} tropas`} onClick={() => { if (!dragMoved.current) onNodeClick(item.id); }} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNodeClick(item.id); } }} className={`world-cell geo-cell ${selectedNode === item.id ? 'selected' : ''} ${targetNode === item.id || valid ? 'valid' : ''}`}>
             {geo.paths.map((path, i) => <path key={i} d={path.d} transform={'transform' in path ? path.transform : undefined} fill={color} />)}
-            <circle cx={geo.x} cy={geo.y} r="8" /><text x={geo.x} y={geo.y + 3} textAnchor="middle" className="geo-troops">{item.troops}</text>
+            <circle cx={geo.x} cy={geo.y} r="10" /><text x={geo.x} y={geo.y + 4} textAnchor="middle" className="geo-troops">{item.troops}</text>
             <text x={geo.x} y={geo.y + 16} textAnchor="middle" className="geo-name">{item.name}</text><title>{item.name}</title>
           </g>;
         }) : Object.values(matchState.territories).map((item: any) => {
           const x = 12 + item.x * 118, y = 12 + item.y * 126;
           const color = PLAYER_COLORS[Math.max(0, players.indexOf(item.owner_id)) % PLAYER_COLORS.length];
           const valid = source && source.owner_id === myPlayerId && source.troops > 1 && source.neighbors.includes(item.id) && ((phase === 'attack' && item.owner_id !== myPlayerId) || (phase === 'movement' && item.owner_id === myPlayerId));
-          return <g key={item.id} role="button" tabIndex={0} aria-label={`${item.name}, ${matchState.players[item.owner_id]?.name ?? 'Neutro'}, ${item.troops} tropas`} onClick={() => onNodeClick(item.id)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNodeClick(item.id); } }} className={`world-cell ${selectedNode === item.id ? 'selected' : ''} ${targetNode === item.id || valid ? 'valid' : ''}`} transform={`translate(${x} ${y})`}>
+          return <g key={item.id} role="button" tabIndex={0} aria-label={`${item.name}, ${matchState.players[item.owner_id]?.name ?? 'Neutro'}, ${item.troops} tropas`} onClick={() => { if (!dragMoved.current) onNodeClick(item.id); }} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNodeClick(item.id); } }} className={`world-cell ${selectedNode === item.id ? 'selected' : ''} ${targetNode === item.id || valid ? 'valid' : ''}`} transform={`translate(${x} ${y})`}>
             <rect width="112" height="120" rx="9" fill={color} />
             <text x="56" y="36" textAnchor="middle" className="world-cell-name">{item.name.split(' ').map((word: string, i: number) => <tspan key={i} x="56" dy={i ? 14 : 0}>{word}</tspan>)}</text>
             <circle cx="56" cy="94" r="16" /><text x="56" y="99" textAnchor="middle" className="world-cell-troops">{item.troops}</text>

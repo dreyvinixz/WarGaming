@@ -1,9 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap');
 
 :root {
-  font-family: 'Inter', 'Chakra Petch', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   color: #edf8ff;
-  background: #040810;
+  background: #172624;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   --ink: #edf8ff;
@@ -11,12 +10,12 @@
   --line: #1a2f4c;
   --panel: #07101d;
   --panel-deep: #050b14;
-  --yellow: #ffd600;
-  --cyan: #00d9f5;
-  --purple: #8b4cc4;
-  --red: #ff475d;
-  --success: #71d88e;
-  --heading: 'Rajdhani', 'Chakra Petch', sans-serif;
+  --yellow: #d0a64e;
+  --cyan: #719aa0;
+  --purple: #a683b4;
+  --red: #a36562;
+  --success: #82916b;
+  --heading: 'Roboto Condensed', 'Barlow Condensed', sans-serif;
 }
 * { box-sizing: border-box; }
 html, body, #root { min-width: 320px; min-height: 100%; margin: 0; }
