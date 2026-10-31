@@ -48,12 +48,27 @@
   align-items: center;
   gap: 8px;
   color: #00d9f5;
-  font-family: 'Rajdhani', 'Chakra Petch', sans-serif;
+  font-family: 'Barlow Condensed', 'Barlow Condensed', sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }
+
+.phase-countdown {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  margin-left: 7px;
+  padding: 3px 6px;
+  color: #EDEBE7;
+  background: #29292C;
+  border: 1px solid #444447;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .08em;
+}
+.phase-countdown.is-urgent { color: #F05449; border-color: #CF3630; }
 
 .is-attack .phase-banner-eyebrow {
   color: #ffd600;
@@ -65,7 +80,7 @@
 .phase-banner-title {
   margin-top: 2px;
   color: #edf8ff;
-  font-family: 'Rajdhani', 'Chakra Petch', sans-serif;
+  font-family: 'Barlow Condensed', 'Barlow Condensed', sans-serif;
   font-size: 17px;
   font-weight: 700;
   letter-spacing: 0.08em;

@@ -4,34 +4,38 @@ import './PhaseBanner.css';
 interface PhaseBannerProps {
   phase: 'reinforcement' | 'attack' | 'movement';
   isMyTurn: boolean;
+  secondsRemaining: number | null;
+  roundNumber: number;
 }
 
 const phaseInfo = {
   reinforcement: {
     icon: Shield,
-    code: 'PROTOCOLO // 01 · REFORÇO',
-    title: 'Fortifique seus territórios',
-    description: 'Distribua seus reforços disponíveis nos territórios sob seu controle.',
+    code: 'FASE 1 DE 3 · REFORÇO',
+    title: 'Prepare suas defesas',
+    description: 'Escolha um território seu e envie reforços.',
     typeClass: 'is-reinforcement',
   },
   attack: {
     icon: Swords,
-    code: 'PROTOCOLO // 02 · ATAQUE',
+    code: 'FASE 2 DE 3 · ATAQUE',
     title: 'Expanda seu domínio',
-    description: 'Selecione uma base aliada e mire uma fronteira inimiga adjacente.',
+    description: 'Escolha seu território e depois uma fronteira inimiga.',
     typeClass: 'is-attack',
   },
   movement: {
     icon: Truck,
-    code: 'PROTOCOLO // 03 · MANOBRA',
+    code: 'FASE 3 DE 3 · MANOBRA',
     title: 'Reposicione suas tropas',
-    description: 'Transfira tropas entre territórios aliados conectados para consolidar suas linhas.',
+    description: 'Escolha dois territórios seus que sejam vizinhos.',
     typeClass: 'is-movement',
   },
 
 } as const;
 
-export function PhaseBanner({ phase, isMyTurn }: PhaseBannerProps) {
+export function PhaseBanner({ phase, isMyTurn, secondsRemaining, roundNumber }: PhaseBannerProps) {
+  if (!isMyTurn) return null;
+
   const current = phaseInfo[phase] ?? phaseInfo.reinforcement;
   const Icon = current.icon;
 
@@ -41,11 +45,15 @@ export function PhaseBanner({ phase, isMyTurn }: PhaseBannerProps) {
         <div className="phase-banner-eyebrow">
           <Icon size={12} />
           <span>{current.code}</span>
-          {!isMyTurn && <span>· MODO OBSERVAÇÃO</span>}
+          {secondsRemaining !== null && <span className={`phase-countdown ${secondsRemaining <= 10 ? 'is-urgent' : ''}`} role="timer" aria-live="off" aria-label={`Tempo restante: ${secondsRemaining} segundos`}>{String(Math.floor(secondsRemaining / 60)).padStart(2, '0')}:{String(secondsRemaining % 60).padStart(2, '0')}</span>}
         </div>
-        <div className="phase-banner-title">{current.title}</div>
+        <div className="phase-banner-title">
+          {phase === 'attack' && roundNumber === 1 ? 'Trégua da rodada inicial' : current.title}
+        </div>
         <div className="phase-banner-description">
-          {isMyTurn ? current.description : 'Aguarde as ações da facção ativa neste turno.'}
+          {phase === 'attack' && roundNumber === 1
+            ? 'Trégua inicial: ataques liberados a partir da rodada 2.'
+            : current.description}
         </div>
       </div>
     </div>

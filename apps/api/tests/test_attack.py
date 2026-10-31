@@ -22,8 +22,8 @@ from tests.conftest import make_match
 # ---------------------------------------------------------------------------
 
 
-def get_to_attack_phase(state):
-    """Drain reinforcement pool and advance to attack phase."""
+def get_to_attack_phase(state, round_number=2):
+    """Drain reinforcement pool and advance to attack phase in the requested round."""
     pid = state.current_player_id
     pool = state.players[pid].reinforcement_pool
     if pool > 0:
@@ -33,7 +33,7 @@ def get_to_attack_phase(state):
         state = place_reinforcement(state, pid, territory.id, pool)
     state = advance_phase(state, pid)
     assert state.phase == GamePhase.ATTACK
-    return state
+    return state.model_copy_update(round_number=round_number)
 
 
 def find_attack_pair(state):
@@ -88,6 +88,16 @@ class TestAttack:
 
         with pytest.raises(GameActionError, match="not your turn"):
             attack(state, other_pid, source.id, target.id, 1)
+
+    def test_attack_is_disabled_during_first_round(self):
+        state = get_to_attack_phase(make_match(), round_number=1)
+        pid = state.current_player_id
+        source, target = find_attack_pair(state)
+        if source is None:
+            pytest.skip("No attackable pair found")
+
+        with pytest.raises(GameActionError, match="first round"):
+            attack(state, pid, source.id, target.id, 1)
 
     def test_attack_source_must_belong_to_player(self):
         state = make_match()

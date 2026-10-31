@@ -7,7 +7,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  font-family: 'Rajdhani', 'Chakra Petch', system-ui, sans-serif;
+  font-family: 'Barlow Condensed', 'Barlow Condensed', system-ui, sans-serif;
 }
 
 .action-dock {

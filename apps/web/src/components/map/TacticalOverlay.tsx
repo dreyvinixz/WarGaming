@@ -25,7 +25,7 @@ export function TacticalOverlay() {
       </g>
 
       {/* Coordinate Labels */}
-      <g className="tactical-coord-labels" fill="#4d6f95" fontSize="8" fontFamily="'Rajdhani', sans-serif" opacity="0.6">
+      <g className="tactical-coord-labels" fill="#c7b889" fontSize="8" fontFamily="'Barlow Condensed', sans-serif" opacity="0.6">
         <text x="12" y="174">N 60°</text>
         <text x="12" y="274">N 30°</text>
         <text x="12" y="374">EQ 00°</text>

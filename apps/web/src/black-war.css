@@ -1,0 +1,357 @@
+/* Atlas War: Black War palette */
+:root {
+  color-scheme: dark;
+  --bg-primary: #090909;
+  --bg-secondary: #131314;
+  --bg-panel: #1B1B1D;
+  --bg-elevated: #29292C;
+  --border-primary: #444447;
+  --border-hover: #77777B;
+  --text-primary: #EDEBE7;
+  --text-secondary: #A5A29F;
+  --text-muted: #858588;
+  --accent-primary: #CF3630;
+  --accent-primary-hover: #F05449;
+  --accent-selection: #F05449;
+  --accent-success: #34B78F;
+  --ink: #EDEBE7;
+  --muted: #A5A29F;
+  --line: #444447;
+  --panel: #1B1B1D;
+  --panel-deep: #131314;
+  --yellow: #CF3630;
+  --red: #F05449;
+  --cyan: #A5A29F;
+  background: #090909;
+  color: #EDEBE7;
+}
+
+html, body, #root { background: #090909; color: #EDEBE7; }
+body { background: #090909; color: #EDEBE7; }
+body::before { display: none; }
+button:focus-visible, input:focus-visible, [role='button']:focus-visible { outline-color: #F05449; }
+
+/* Main menu: keep the cinematic art natural; the command side is black. */
+.game-menu { background: #090909; color: #EDEBE7; }
+.game-menu__stage { background: #090909; }
+.game-menu__world::after { border-color: #444447; box-shadow: inset -22px 0 45px #0009; }
+.game-menu__brand, .game-menu__heading h1 { color: #EDEBE7; }
+.game-menu .game-menu__brand img { filter: grayscale(1); }
+.game-menu__brand b, .game-menu__heading h1 em { color: #A5A29F; }
+.game-menu__brand small, .game-menu__world-footer, .game-menu__stage-footer { color: #A5A29F; }
+.game-menu__heading > span, .game-menu__panel-heading .section-kicker { color: #A5A29F; }
+.game-menu__heading p { color: #EDEBE7; }
+.game-menu__panel, .menu-modal { color: #EDEBE7; background: #1B1B1D; border-color: #444447; box-shadow: 0 24px 62px #000b; }
+.game-menu__panel-heading h2, .menu-modal h2 { color: #EDEBE7; }
+.game-menu__panel-heading p, .menu-modal p { color: #A5A29F; }
+.menu-settings, .menu-modal-close { color: #EDEBE7; background: #29292C; border-color: #444447; }
+.menu-settings:hover, .menu-modal-close:hover { background: #343438; border-color: #77777B; }
+.menu-mode-tabs button { color: #A5A29F; background: #131314; border-color: #444447; }
+.menu-mode-tabs button:hover { color: #EDEBE7; border-color: #77777B; }
+.menu-mode-tabs button.active { color: #EDEBE7; background: #29292C; border-color: #77777B; box-shadow: inset 0 -3px #77777B; }
+.game-menu__panel .input-label { color: #EDEBE7; }
+.game-menu__panel .input-field { color: #EDEBE7; background: #131314; border-color: #444447; }
+.game-menu__panel .input-field::placeholder { color: #858588; }
+.game-menu__panel .input-field:focus { border-color: #77777B; box-shadow: 0 0 0 3px #77777B33; }
+.game-menu__panel .menu-play--create { color: #fff; background: #CF3630; border-color: #F05449; box-shadow: 0 4px 0 #76201d, 0 12px 22px #0006; }
+.game-menu__panel .menu-play--create:hover:not(:disabled) { background: #F05449; }
+.game-menu__panel .menu-play--join, .menu-modal > button:last-child, .resume-session button { color: #EDEBE7; background: #29292C; border-color: #55555A; box-shadow: 0 3px 0 #111, 0 8px 16px #0005; }
+.game-menu__panel .menu-play--join:hover:not(:disabled), .menu-modal > button:last-child:hover, .resume-session button:hover { background: #343438; border-color: #77777B; }
+.menu-panel-note { color: #A5A29F; }
+.resume-session { color: #EDEBE7; background: #29292C; border-color: #444447; }
+.menu-modal-backdrop, .battle-backdrop { background: #000e; }
+.menu-modal input { accent-color: #858588; }
+.game-menu .audio-settings-control input[type=range] { accent-color: #858588; }
+.game-menu button:focus-visible, .game-menu input:focus-visible { outline-color: #A5A29F; }
+.commander-color-picker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 10px 12px;
+  color: #EDEBE7;
+  background: #131314;
+  border: 1px solid #444447;
+  font: 700 14px 'Barlow Condensed', sans-serif;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.commander-color-picker input[type='color'] {
+  width: 40px;
+  height: 34px;
+  padding: 2px;
+  background: #29292C;
+  border: 1px solid #77777B;
+  cursor: pointer;
+}
+.commander-color-picker strong {
+  margin-left: auto;
+  color: #A5A29F;
+  font: 600 12px ui-monospace, monospace;
+  letter-spacing: .05em;
+}
+.waiting-screen { background-image: none; }
+.game-menu__panel::before, .waiting-card::before {
+  background-image: linear-gradient(90deg, #444447 0%, #444447 calc(50% - 8px), transparent calc(50% - 8px), transparent calc(50% + 8px), #444447 calc(50% + 8px), #444447 100%);
+  background-size: 100% 1px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.game-menu__panel::after, .waiting-card::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: #CF3630;
+  transform: translateX(-50%) rotate(45deg);
+}
+.game-menu__panel::after { top: calc(clamp(24px, 3.5vw, 52px) + 4.5px); }
+.waiting-card::after { top: 11.5px; }
+@media (max-width: 760px) {
+  .game-menu__panel::after { top: 26px; }
+}
+
+/* Waiting room */
+.waiting-screen { color: #EDEBE7; background-color: #090909; background-image: linear-gradient(90deg, #090909f5, #090909e8), url('/assets/campaign/campaign-war.webp'); }
+.waiting-screen .lobby-nav { border-color: #444447; }
+.waiting-screen .lobby-brand { color: #EDEBE7; }
+.waiting-screen .lobby-brand b, .waiting-copy h1 em, .room-code-display strong { color: #CF3630; }
+.waiting-screen .lobby-nav-note, .waiting-copy > p, .waiting-note, .room-code-display span { color: #A5A29F; }
+.waiting-screen .room-code-display { border-color: #CF3630; }
+.waiting-card { background: #1B1B1D; border-color: #444447; }
+.waiting-card-heading h2, .waiting-screen .player-slot strong { color: #EDEBE7; }
+.waiting-screen .player-slot { background: #131314; border-color: #444447; }
+.waiting-screen .player-avatar { background: #343438; }
+.waiting-screen .player-slot small { color: #A5A29F; }
+.waiting-pulse i { background: #CF3630; }
+.waiting-screen .connection-line { color: #A5A29F; }
+.waiting-screen .connection-line i.online { background: #34B78F; box-shadow: 0 0 8px #34B78F; }
+.waiting-screen .error-banner { color: #ffe1df; background: #3d1717; border-color: #CF3630; }
+@media (min-width: 761px) {
+  .waiting-copy { isolation: isolate; }
+  .waiting-figure { top: 220px; right: -15px; left: auto; z-index: 0; height: 255px; opacity: .55; }
+  .waiting-copy > :not(.waiting-figure) { position: relative; z-index: 1; }
+}
+@media (max-width: 760px) {
+  .waiting-figure { top: 20px; right: 0; left: auto; height: 150px; }
+}
+
+/* Shared controls and cards */
+.panel-card, .glass-panel { color: #EDEBE7; background: #1B1B1D; border-color: #444447; border-radius: 3px; box-shadow: 0 14px 30px #0009; }
+.btn { border-radius: 2px; font-family: 'Barlow Condensed', sans-serif; letter-spacing: .06em; }
+.btn-primary { color: #fff; background: #CF3630; border-color: #F05449; box-shadow: 0 3px 0 #76201d, 0 8px 18px #0006; }
+.btn-primary:hover:not(:disabled) { color: #fff; background: #F05449; }
+.btn-secondary { color: #EDEBE7; background: #29292C; border-color: #444447; }
+.btn-secondary:hover:not(:disabled) { color: #fff; background: #343438; border-color: #77777B; }
+.input-label { color: #EDEBE7; }
+.input-field { color: #EDEBE7; background: #131314; border-color: #444447; }
+.input-field::placeholder { color: #858588; }
+.input-field:focus { border-color: #F05449; box-shadow: 0 0 0 2px #F0544933; }
+.error-banner { color: #ffe1df; background: #3d1717; border-color: #CF3630; }
+
+/* Live match: the ocean and exposed canvas stay black. Player colors remain distinct. */
+.match-screen { --heading: 'Barlow Condensed', sans-serif; --yellow: #CF3630; --cyan: #A5A29F; background: #090909; color: #EDEBE7; }
+.match-viewport, .atlas-map-container, .world-board-shell, .world-board-scroll { background: #090909 !important; }
+.atlas-map-container::before { background-image: linear-gradient(#ffffff08 1px, transparent 1px), linear-gradient(90deg, #ffffff08 1px, transparent 1px); }
+.atlas-map-container::after { box-shadow: inset 0 0 100px #000b; }
+.atlas-country:not(.is-playable) { fill: #131314; stroke: #343438; }
+.atlas-country.is-playable { stroke: color-mix(in srgb, var(--territory-color) 70%, #444447); }
+.atlas-country.is-playable:hover { stroke: #EDEBE7; filter: drop-shadow(0 0 7px #EDEBE755); }
+.atlas-country.is-selected { stroke: #F05449 !important; filter: drop-shadow(0 0 10px #F0544977) !important; }
+.atlas-country.is-attackable, .atlas-country.is-target { stroke: #CF3630 !important; filter: drop-shadow(0 0 9px #CF363088) !important; }
+.tactical-vector-line.is-attack, .tactical-vector-line.is-engaged { stroke: #F05449; }
+.tactical-vector-line.is-movement { stroke: #A5A29F; }
+.tactical-troop-marker.is-selected .tactical-marker-base { stroke: #F05449 !important; filter: drop-shadow(0 0 8px #F0544988) !important; }
+.tactical-troop-marker.is-target .tactical-marker-base { stroke: #CF3630 !important; filter: drop-shadow(0 0 8px #CF363088) !important; }
+
+/* Match HUD */
+.match-screen .top-status-bar { color: #EDEBE7; background: #131314; border-color: #444447; box-shadow: 0 5px 18px #0009; }
+.top-status-bar, .action-dock, .phase-banner-card { color: #EDEBE7; background: #1B1B1D; border-color: #444447; box-shadow: 0 8px 24px #0009; }
+.match-screen .top-bar-brand, .top-bar-meta-value, .phase-banner-title, .inspector-territory-name, .inspector-troops-count, .matchup-side strong, .stepper-display strong { color: #EDEBE7; }
+.match-screen .top-bar-brand b, .section-kicker, .inspector-tag { color: #F05449; }
+.match-screen .top-bar-brand-icon { color: #F05449; background: #29292C; border-color: #444447; }
+.top-bar-meta-label, .phase-banner-description, .inspector-troops-count small, .matchup-side span, .stepper-display small { color: #858588; }
+.top-bar-divider { background: #444447; }
+.top-bar-btn, .inspector-close-btn { color: #A5A29F; border-color: #444447; background: #131314; }
+.top-bar-btn:hover, .inspector-close-btn:hover { color: #EDEBE7; border-color: #77777B; }
+.turn-indicator-badge.is-my-turn, .reserves-counter-badge.has-reserves { color: #F05449; border-color: #CF3630; }
+.dock-slot { color: #A5A29F; background: #131314; border-color: #444447; }
+.dock-slot.is-active, .dock-slot.is-active.phase-attack, .dock-slot.is-active.phase-movement { color: #EDEBE7; background: #29292C; border-color: #CF3630; box-shadow: inset 0 -2px #CF3630; }
+.dock-btn-advance { color: #fff; background: #CF3630; border-color: #F05449; box-shadow: 0 3px 0 #76201d; }
+.dock-btn-advance:hover { background: #F05449; }
+.dock-btn-end { color: #A5A29F; background: #29292C; border-color: #444447; }
+.phase-banner-eyebrow, .is-attack .phase-banner-eyebrow { color: #F05449; }
+.is-movement .phase-banner-eyebrow { color: #A5A29F; }
+.phase-banner-card.is-attack { border-color: #CF3630; box-shadow: 0 8px 32px #0009, 0 0 16px #CF363022; }
+.phase-banner-card.is-movement { border-color: #444447; }
+.match-screen .phase-banner-container {
+  top: 68px;
+  right: auto;
+  left: 50%;
+  width: max-content;
+  max-width: min(460px, calc(100vw - 24px));
+  transform: translateX(-50%);
+}
+
+/* Map tools, inspectors, objective, event log and dialogs */
+.objective-trigger-btn, .game-log-trigger-btn { color: #EDEBE7; background: #131314; border-color: #444447; }
+.objective-trigger-btn:hover, .game-log-trigger-btn:hover { color: #F05449; border-color: #CF3630; }
+.objective-trigger-dot, .objective-progress-fill { background: #CF3630; box-shadow: 0 0 8px #CF3630; }
+.objective-card-popover, .territory-inspector, .game-log-drawer { color: #EDEBE7; background: #1B1B1D; border-color: #444447; box-shadow: 0 16px 40px #000b; }
+.objective-popover-header { color: #F05449; }
+.objective-popover-title, .objective-stats-row strong { color: #EDEBE7; }
+.objective-popover-desc, .objective-stats-row, .inspector-owner-badge { color: #A5A29F; }
+.objective-progress-bar, .inspector-matchup, .troop-stepper { background: #131314; border-color: #444447; }
+.inspector-header { border-color: #444447; }
+.matchup-vs { color: #F05449; background: #29292C; border-color: #444447; }
+.stepper-btn { color: #F05449; background: #29292C; border-color: #444447; }
+.stepper-btn:hover:not(:disabled) { color: #fff; background: #CF3630; }
+.inspector-commit-btn, .inspector-commit-btn.is-attack { color: #fff; background: #CF3630; border-color: #F05449; box-shadow: 0 3px 0 #76201d; }
+.inspector-commit-btn:hover:not(:disabled), .inspector-commit-btn.is-attack:hover:not(:disabled) { background: #F05449; }
+.game-log-backdrop, .modal-overlay, .tutorial-backdrop, .victory-overlay { background: #000d; }
+.game-log-drawer, .modal-content, .tutorial-modal, .victory-overlay > div { color: #EDEBE7; background: #1B1B1D; border-color: #444447; border-radius: 3px; }
+.game-log-header, .inspector-header { border-color: #444447; }
+.game-log-title, .game-log-title strong, .game-log-item-body, .tutorial-modal h2 { color: #EDEBE7; }
+.game-log-title-icon, .game-log-item-icon, .game-log-item.is-attack_success .game-log-item-icon { color: #F05449; }
+.game-log-item { border-color: #343438; }
+.game-log-item.is-attack_success, .game-log-item.is-attack_failed { border-left-color: #CF3630; }
+.game-log-item-meta, .game-log-item-body p { color: #A5A29F; }
+.tutorial-step { color: #A5A29F; background: #131314; border-color: #444447; }
+.tutorial-step.is-active { color: #EDEBE7; background: #29292C; border-color: #CF3630; }
+.tutorial-step.is-active > span, .tutorial-modal .primary-action { color: #fff; background: #CF3630; border-color: #F05449; }
+.tutorial-modal h2 em { color: #F05449; }
+.tutorial-modal .primary-action:hover { background: #F05449; box-shadow: 0 0 18px #CF363044; }
+.world-map-tools button, .world-list-heading button { color: #EDEBE7; background: #29292C; border-color: #444447; }
+.world-territory-list { color: #EDEBE7; background: #1B1B1D; border-color: #444447; }
+.world-territory-list h3 { color: #F05449; }
+.world-territory-list section > button:hover, .world-territory-list section > button:focus, .world-territory-list section > button.active { background: #343438; }
+.world-territory-list small { color: #A5A29F; }
+.match-screen .world-legend { color: #EDEBE7; background: #131314ed; border-color: #444447; }
+.match-screen .geo-name { fill: #EDEBE7; stroke: #090909; stroke-width: 3px; font-size: 9px; font-weight: 700; paint-order: stroke; }
+.match-screen .phase-countdown { color: #EDEBE7; background: #131314; border-color: #444447; }
+.match-screen .phase-countdown.is-urgent { color: #F05449; border-color: #CF3630; }
+.match-error { color: #fff; background: #3d1717; }
+
+/* In a match, replace the fixed red HUD accent with the local army color. */
+.match-screen .top-bar-brand b,
+.match-screen .section-kicker,
+.match-screen .inspector-tag,
+.match-screen .objective-popover-header,
+.match-screen .battle-header,
+.match-screen .battle-route span,
+.match-screen .battle-versus,
+.match-screen .tutorial-modal h2 em,
+.match-screen .world-territory-list h3,
+.match-screen .phase-banner-eyebrow,
+.match-screen .is-attack .phase-banner-eyebrow { color: var(--army-color); }
+.match-screen .top-bar-brand-icon,
+.match-screen .turn-indicator-badge.is-my-turn,
+.match-screen .reserves-counter-badge.has-reserves,
+.match-screen .reserves-icon,
+.match-screen .phase-countdown.is-urgent { color: var(--army-color); border-color: var(--army-color); }
+.match-screen .command-player.active { border-color: var(--army-color); box-shadow: 0 0 0 1px color-mix(in srgb, var(--army-color) 28%, transparent), 0 4px 12px #0006; }
+.match-screen .phase-banner-card.is-attack { border-color: var(--army-color); box-shadow: 0 8px 32px #0009, 0 0 16px color-mix(in srgb, var(--army-color) 14%, transparent); }
+.match-screen .dock-slot.is-active,
+.match-screen .dock-slot.is-active.phase-attack,
+.match-screen .dock-slot.is-active.phase-movement { border-color: var(--army-color); box-shadow: inset 0 -2px var(--army-color); }
+.match-screen .dock-btn-advance,
+.match-screen .inspector-commit-btn,
+.match-screen .inspector-commit-btn.is-attack,
+.match-screen .tutorial-modal .primary-action,
+.match-screen .victory-overlay button { color: var(--army-ink); background: var(--army-color); border-color: color-mix(in srgb, var(--army-color) 72%, white); box-shadow: 0 3px 0 color-mix(in srgb, var(--army-color) 62%, black), 0 8px 18px #0006; }
+.match-screen .dock-btn-advance:hover,
+.match-screen .inspector-commit-btn:hover:not(:disabled),
+.match-screen .inspector-commit-btn.is-attack:hover:not(:disabled),
+.match-screen .tutorial-modal .primary-action:hover,
+.match-screen .victory-overlay button:hover { background: color-mix(in srgb, var(--army-color) 78%, white); }
+.match-screen .objective-trigger-btn:hover,
+.match-screen .game-log-trigger-btn:hover,
+.match-screen .stepper-btn { color: var(--army-color); border-color: var(--army-color); }
+.match-screen .objective-trigger-dot,
+.match-screen .objective-progress-fill,
+.match-screen .stepper-btn:hover:not(:disabled) { color: var(--army-ink); background: var(--army-color); border-color: var(--army-color); box-shadow: 0 0 8px color-mix(in srgb, var(--army-color) 46%, transparent); }
+.match-screen .objective-card-popover { border-left-color: var(--army-color); }
+.match-screen .objective-trigger-btn:hover,
+.match-screen .game-log-trigger-btn:hover { box-shadow: 0 10px 28px color-mix(in srgb, var(--army-color) 20%, transparent); }
+.match-screen .top-bar-btn:hover,
+.match-screen .world-map-tools button:hover:not(:disabled),
+.match-screen .objective-trigger-btn:hover,
+.match-screen .game-log-trigger-btn:hover { border-color: var(--army-color); }
+.match-screen .atlas-country.is-selected { stroke: var(--army-color) !important; filter: drop-shadow(0 0 10px color-mix(in srgb, var(--army-color) 48%, transparent)) !important; }
+.match-screen .atlas-country.is-attackable,
+.match-screen .atlas-country.is-target { stroke: var(--army-color) !important; filter: drop-shadow(0 0 9px color-mix(in srgb, var(--army-color) 44%, transparent)) !important; }
+.match-screen .tactical-vector-line.is-attack,
+.match-screen .tactical-vector-line.is-engaged { stroke: var(--army-color); }
+.match-screen .tactical-troop-marker.is-selected .tactical-marker-base,
+.match-screen .tactical-troop-marker.is-target .tactical-marker-base { stroke: var(--army-color) !important; filter: drop-shadow(0 0 8px color-mix(in srgb, var(--army-color) 52%, transparent)) !important; }
+.match-screen .geo-marker.selected .geo-flag-border,
+.match-screen .geo-marker.valid .geo-flag-border { stroke: var(--army-color); }
+.match-screen .geo-cell.valid path,
+.match-screen .map-valid-routes line { stroke: var(--army-color); }
+.match-screen .world-territory-list section > button:hover,
+.match-screen .world-territory-list section > button:focus,
+.match-screen .world-territory-list section > button.active { box-shadow: inset 3px 0 var(--army-color); }
+.match-screen button:focus-visible,
+.match-screen input:focus-visible,
+.match-screen [role='button']:focus-visible { outline-color: var(--army-color); }
+.match-screen .top-bar-meta-value,
+.match-screen .reserves-count,
+.match-screen .objective-stats-row strong,
+.match-screen .game-log-title-icon,
+.match-screen .game-log-item.is-attack_success .game-log-item-icon,
+.match-screen .game-log-item.is-attack_success .game-log-item-meta strong,
+.match-screen .tutorial-step.is-active > span { color: var(--army-color); }
+.match-screen .game-log-item.is-attack_success { border-left-color: var(--army-color); }
+.match-screen .game-log-item.is-attack_success .game-log-item-icon,
+.match-screen .tutorial-step.is-active > span { border-color: var(--army-color); }
+.match-screen .tutorial-step.is-active { border-color: var(--army-color); box-shadow: inset 0 -2px var(--army-color); }
+.match-screen .tutorial-step.is-active > span { color: var(--army-ink); background: var(--army-color); }
+.match-screen .phase-countdown.is-urgent { background: color-mix(in srgb, var(--army-color) 12%, #131314); }
+.match-screen .world-legend i { border-color: var(--army-color); }
+.match-screen .battle-backdrop { animation: battle-backdrop-in .24s ease-out both; }
+.match-screen .battle-result { animation: battle-report-in .38s cubic-bezier(.16,.8,.24,1) both; }
+.match-screen .battle-result::before { background-image: none; border-top: 1px solid #444447; border-bottom: 1px solid #29292C; }
+@keyframes battle-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes battle-report-in { from { opacity: 0; transform: translateY(14px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+/* The waiting room follows the color stored for this player's army too. */
+.waiting-screen {
+  --accent-primary: var(--army-color);
+  --accent-selection: var(--army-color);
+  background: #090909 !important;
+  background-image: none !important;
+}
+.waiting-screen .lobby-brand b,
+.waiting-screen .waiting-copy .section-kicker,
+.waiting-screen .waiting-copy h1 em,
+.waiting-screen .room-code-display strong,
+.waiting-screen .waiting-card .section-kicker { color: var(--army-color); }
+.waiting-screen .room-code-display { border-color: var(--army-color); }
+.waiting-screen .waiting-pulse i { background: var(--army-color); }
+.waiting-screen .waiting-card::before {
+  background-image: linear-gradient(90deg, #444447 0%, #444447 calc(50% - 8px), transparent calc(50% - 8px), transparent calc(50% + 8px), #444447 calc(50% + 8px), #444447 100%);
+  background-size: 100% 1px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.waiting-screen .waiting-card::after {
+  content: '';
+  position: absolute;
+  top: 11.5px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: var(--army-color);
+  transform: translateX(-50%) rotate(45deg);
+}
+.waiting-screen .player-slot.is-self { border-color: var(--army-color); box-shadow: 0 0 0 1px color-mix(in srgb, var(--army-color) 25%, transparent); }
+.waiting-screen .player-avatar { width: 42px; height: 42px; border: 1px solid #EDEBE7; border-radius: 50%; clip-path: none; }
+.waiting-screen .player-avatar b { margin: 0; color: var(--army-ink); font: 700 17px 'Cinzel', Georgia, serif; text-shadow: none; }
+.waiting-screen .player-color-chip { flex: 0 0 auto; width: 13px; height: 13px; border: 1px solid #EDEBE7; border-radius: 50%; }
+.waiting-screen .btn-primary { color: var(--army-ink); background: var(--army-color); border-color: color-mix(in srgb, var(--army-color) 72%, white); box-shadow: 0 3px 0 color-mix(in srgb, var(--army-color) 62%, black), 0 8px 18px #0006; }
+.waiting-screen .btn-primary:hover:not(:disabled) { color: var(--army-ink); background: color-mix(in srgb, var(--army-color) 78%, white); }
+.waiting-screen button:focus-visible,
+.waiting-screen input:focus-visible,
+.waiting-screen [role='button']:focus-visible { outline-color: var(--army-color); }
+.waiting-screen .lobby-brand-crest { flex: 0 0 auto; width: 43px; height: 48px; }

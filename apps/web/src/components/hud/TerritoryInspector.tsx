@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Minus, Plus, Shield, Swords, Truck, X } from 'lucide-react';
+import { getTerritoryFlagCode } from '../map/territoryFlags';
 import './TerritoryInspector.css';
 
 interface TerritoryInspectorProps {
@@ -44,6 +45,8 @@ export function TerritoryInspector({
 
   if (!selectedTerritory) return null;
 
+  const flagCode = getTerritoryFlagCode(selectedTerritory.id);
+
   const canCommit = isMyTurn && maxTroops > 0 && (
     (phase === 'reinforcement' && isMine) ||
     (phase === 'attack' && targetTerritory && isMine) ||
@@ -54,7 +57,7 @@ export function TerritoryInspector({
   const actionLabel = phase === 'reinforcement'
     ? 'ENVIAR REFORÇOS'
     : phase === 'attack'
-    ? 'DISPARAR ATAQUE'
+    ? 'ATACAR'
     : 'MOVER TROPAS';
 
   const ActionIcon = phase === 'reinforcement' ? Shield : phase === 'attack' ? Swords : Truck;
@@ -64,7 +67,7 @@ export function TerritoryInspector({
       <div className="inspector-header">
         <span className="inspector-tag">
           <ActionIcon size={12} />
-          <span>{targetTerritory ? 'ENGAGEMENT TÁTICO' : 'INSPEÇÃO DE SETOR'}</span>
+          <span>{targetTerritory ? 'CONFRONTO' : 'TERRITÓRIO'}</span>
         </span>
         <button className="inspector-close-btn" onClick={onClose} aria-label="Fechar painel">
           <X size={14} />
@@ -72,7 +75,10 @@ export function TerritoryInspector({
       </div>
 
       <div className="inspector-body">
-        <div className="inspector-territory-name">{selectedTerritory.name}</div>
+        <div className="inspector-territory-title">
+          {flagCode && <img className="inspector-country-flag" src={`https://flagcdn.com/w80/${flagCode}.png`} alt={`Bandeira de ${selectedTerritory.name}`} />}
+          <div className="inspector-territory-name">{selectedTerritory.name}</div>
+        </div>
 
         <div className="inspector-status-row">
           <div className="inspector-owner-badge">
@@ -91,7 +97,7 @@ export function TerritoryInspector({
               <span>ORIGEM</span>
               <strong>{selectedTerritory.name} ({selectedTerritory.troops})</strong>
             </div>
-            <div className="matchup-vs">VS</div>
+            <div className="matchup-vs">→</div>
             <div className="matchup-side target">
               <span>ALVO ({targetOwnerName ?? 'INIMIGO'})</span>
               <strong style={{ color: targetOwnerColor ?? '#ffd600' }}>
