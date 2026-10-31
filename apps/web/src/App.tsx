@@ -5,16 +5,16 @@ import { useGameStore } from './store/useGameStore';
 import { connectWebSocket, disconnectWebSocket } from './services/ws';
 
 function App() {
-  const { matchState, roomCode, playerName } = useGameStore();
+  const { matchState, roomCode, playerToken } = useGameStore();
 
   useEffect(() => {
-    if (roomCode && playerName) {
-      connectWebSocket(roomCode, playerName);
+    if (roomCode && playerToken) {
+      connectWebSocket(roomCode, playerToken);
     }
     return () => {
       disconnectWebSocket();
     };
-  }, [roomCode, playerName]);
+  }, [roomCode, playerToken]);
 
   return (
     <>

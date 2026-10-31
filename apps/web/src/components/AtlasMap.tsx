@@ -4,6 +4,7 @@ import type { CSSProperties } from 'react';
 import { TroopBadge } from './map/TroopBadge';
 import { AttackRoute } from './map/AttackRoute';
 import { TacticalOverlay } from './map/TacticalOverlay';
+import geographicMap from './map/world_v2.json';
 import './AtlasMap.css';
 
 const worldMap = rawWorldMap as { viewBox: string; locations: Array<{ id: string; name: string; path: string }> };
@@ -18,7 +19,7 @@ const NODE_POSITION: Record<string, [number, number]> = {
   C1: [481, 226], C2: [530, 228], C3: [510, 285], C4: [536, 378], S1: [520, 570], S2: [704, 365], S3: [840, 555],
 };
 
-const PLAYER_COLORS = ['#ffd600', '#00d9f5', '#8b4cc4', '#ff475d', '#71d88e', '#ef8c48'];
+const PLAYER_COLORS = ['#d0a64e', '#719aa0', '#a36562', '#82916b', '#a683b4', '#d58350'];
 
 interface AtlasMapProps {
   matchState: any;
@@ -40,6 +41,8 @@ export function AtlasMap({
   // Track owners to trigger capture animation
   const prevOwnersRef = useRef<Record<string, string>>({});
   const [capturedNodes, setCapturedNodes] = useState<Set<string>>(new Set());
+  const [zoom, setZoom] = useState(1);
+  const [listOpen, setListOpen] = useState(false);
 
   useEffect(() => {
     if (!matchState?.territories) return;
@@ -71,6 +74,42 @@ export function AtlasMap({
   }, [matchState]);
 
   if (!matchState?.territories) return null;
+  if (matchState.map_id === 'atlas_world_v1' || matchState.map_id === 'atlas_world_v2') {
+    const players = Object.keys(matchState.players).sort();
+    const source = selectedNode ? matchState.territories[selectedNode] : null;
+    return <div className="world-board-shell">
+      <div className="world-map-tools" role="group" aria-label="Navegação do mapa">
+        <button type="button" onClick={() => setZoom(z => Math.max(1, z - 0.25))} disabled={zoom <= 1} aria-label="Diminuir zoom">−</button><span aria-live="polite">{Math.round(zoom * 100)}%</span><button type="button" onClick={() => setZoom(z => Math.min(2, z + 0.25))} disabled={zoom >= 2} aria-label="Aumentar zoom">+</button><button type="button" aria-expanded={listOpen} onClick={() => setListOpen(open => !open)}>Territórios</button>
+      </div>
+      {listOpen && <div className="world-territory-list" role="region" aria-label="Lista de territórios"><div className="world-list-heading">Selecione um território <button type="button" onClick={() => setListOpen(false)} aria-label="Fechar lista">×</button></div>{Object.values(matchState.regions).map((region: any) => <section key={region.id}><h3>{region.name} · bônus +{region.bonus_troops}</h3>{region.territory_ids.map((id: string) => { const t = matchState.territories[id]; if (!t) return null; return <button type="button" className={selectedNode === id ? 'active' : ''} key={id} onClick={() => { onNodeClick(id); setListOpen(false); }}><span>{t.name}</span><small>{matchState.players[t.owner_id]?.name ?? 'Neutro'} · {t.troops} tropas</small></button>; })}</section>)}</div>}
+      <div className="world-board-scroll" tabIndex={0} aria-label="Mapa: role para ver todos os territórios">
+      <svg className="world-board" style={{ width: matchState.map_id === 'atlas_world_v2' ? `calc(max(850px, min(100vw, calc((100vh - 237px) * 1.7778))) * ${zoom})` : `${zoom * 100}%`, minWidth: `${zoom * 850}px` }} viewBox={matchState.map_id === 'atlas_world_v2' ? "182 114 720 405" : "0 0 1080 520"} role="group" aria-label="Tabuleiro territorial Atlas War">
+        {matchState.map_id === 'atlas_world_v2' && source && source.owner_id === myPlayerId && source.troops > 1 && (phase === 'attack' || phase === 'movement') && <g className="map-valid-routes" aria-hidden="true">{source.neighbors.map((neighborId: string) => { const neighbor = matchState.territories[neighborId]; const from = geographicMap[selectedNode as keyof typeof geographicMap]; const to = geographicMap[neighborId as keyof typeof geographicMap]; if (!from || !to || !neighbor || (phase === 'attack' ? neighbor.owner_id === myPlayerId : neighbor.owner_id !== myPlayerId)) return null; return <line key={neighborId} x1={from.x} y1={from.y} x2={to.x} y2={to.y} />; })}</g>}
+        {matchState.map_id === 'atlas_world_v2' ? Object.values(matchState.territories).map((item: any) => {
+          const geo = geographicMap[item.id as keyof typeof geographicMap];
+          if (!geo) return null;
+          const color = PLAYER_COLORS[Math.max(0, players.indexOf(item.owner_id)) % PLAYER_COLORS.length];
+          const valid = source && source.owner_id === myPlayerId && source.troops > 1 && source.neighbors.includes(item.id) && ((phase === 'attack' && item.owner_id !== myPlayerId) || (phase === 'movement' && item.owner_id === myPlayerId));
+          return <g key={item.id} role="button" tabIndex={0} aria-label={`${item.name}, ${matchState.players[item.owner_id]?.name ?? 'Neutro'}, ${item.troops} tropas`} onClick={() => onNodeClick(item.id)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNodeClick(item.id); } }} className={`world-cell geo-cell ${selectedNode === item.id ? 'selected' : ''} ${targetNode === item.id || valid ? 'valid' : ''}`}>
+            {geo.paths.map((path, i) => <path key={i} d={path.d} transform={'transform' in path ? path.transform : undefined} fill={color} />)}
+            <circle cx={geo.x} cy={geo.y} r="8" /><text x={geo.x} y={geo.y + 3} textAnchor="middle" className="geo-troops">{item.troops}</text>
+            <text x={geo.x} y={geo.y + 16} textAnchor="middle" className="geo-name">{item.name}</text><title>{item.name}</title>
+          </g>;
+        }) : Object.values(matchState.territories).map((item: any) => {
+          const x = 12 + item.x * 118, y = 12 + item.y * 126;
+          const color = PLAYER_COLORS[Math.max(0, players.indexOf(item.owner_id)) % PLAYER_COLORS.length];
+          const valid = source && source.owner_id === myPlayerId && source.troops > 1 && source.neighbors.includes(item.id) && ((phase === 'attack' && item.owner_id !== myPlayerId) || (phase === 'movement' && item.owner_id === myPlayerId));
+          return <g key={item.id} role="button" tabIndex={0} aria-label={`${item.name}, ${matchState.players[item.owner_id]?.name ?? 'Neutro'}, ${item.troops} tropas`} onClick={() => onNodeClick(item.id)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNodeClick(item.id); } }} className={`world-cell ${selectedNode === item.id ? 'selected' : ''} ${targetNode === item.id || valid ? 'valid' : ''}`} transform={`translate(${x} ${y})`}>
+            <rect width="112" height="120" rx="9" fill={color} />
+            <text x="56" y="36" textAnchor="middle" className="world-cell-name">{item.name.split(' ').map((word: string, i: number) => <tspan key={i} x="56" dy={i ? 14 : 0}>{word}</tspan>)}</text>
+            <circle cx="56" cy="94" r="16" /><text x="56" y="99" textAnchor="middle" className="world-cell-troops">{item.troops}</text>
+          </g>;
+        })}
+      </svg>
+      <div className="world-legend">{players.map((id, i) => <span key={id}><i style={{background: PLAYER_COLORS[i % PLAYER_COLORS.length]}} />{matchState.players[id].name}</span>)}</div>
+      </div>
+    </div>;
+  }
 
   const territories = matchState.territories;
   const nodes = Object.keys(territories);
@@ -151,59 +190,6 @@ export function AtlasMap({
         {/* Tactical Coordinate Grid and Atmosphere */}
         <TacticalOverlay />
 
-        {/* Base Strategic Edges Between Neighbors */}
-        <g className="atlas-edges" aria-hidden="true">
-          {nodes.flatMap(nodeId =>
-            ((territories[nodeId].neighbors ?? []) as string[]).map((neighborId: string) => {
-              const edgeId = [nodeId, neighborId].sort().join('-');
-              if (drawEdges.has(edgeId) || !NODE_POSITION[nodeId] || !NODE_POSITION[neighborId]) return null;
-              drawEdges.add(edgeId);
-              const [x1, y1] = NODE_POSITION[nodeId];
-              const [x2, y2] = NODE_POSITION[neighborId];
-              return <line key={edgeId} x1={x1} y1={y1} x2={x2} y2={y2} />;
-            })
-          )}
-        </g>
-
-        {/* Dynamic Vector Lines (Marching Ants) for Active Action Paths */}
-        {selectedNode && NODE_POSITION[selectedNode] && (
-          <g className="tactical-active-routes">
-            {selectedNeighbors.map(neighborId => {
-              const neighbor = territories[neighborId];
-              if (!neighbor || !NODE_POSITION[neighborId]) return null;
-
-              const isEnemy = neighbor.owner_id !== territories[selectedNode].owner_id;
-              const isTarget = neighborId === targetNode;
-
-              if (phase === 'attack' && isEnemy) {
-                return (
-                  <AttackRoute
-                    key={`route-${selectedNode}-${neighborId}`}
-                    sourcePos={NODE_POSITION[selectedNode]}
-                    targetPos={NODE_POSITION[neighborId]}
-                    type="attack"
-                    isEngaged={isTarget}
-                  />
-                );
-              }
-
-              if (phase === 'movement' && !isEnemy) {
-                return (
-                  <AttackRoute
-                    key={`route-${selectedNode}-${neighborId}`}
-                    sourcePos={NODE_POSITION[selectedNode]}
-                    targetPos={NODE_POSITION[neighborId]}
-                    type="movement"
-                    isEngaged={isTarget}
-                  />
-                );
-              }
-
-              return null;
-            })}
-          </g>
-        )}
-
         {/* Geographic Country Paths with Visual State Machine */}
         <g className="atlas-countries">
           {worldMap.locations.map(location => {
@@ -267,6 +253,59 @@ export function AtlasMap({
             );
           })}
         </g>
+
+        {/* Base Strategic Edges Between Neighbors */}
+        <g className="atlas-edges" aria-hidden="true">
+          {nodes.flatMap(nodeId =>
+            ((territories[nodeId].neighbors ?? []) as string[]).map((neighborId: string) => {
+              const edgeId = [nodeId, neighborId].sort().join('-');
+              if (drawEdges.has(edgeId) || !NODE_POSITION[nodeId] || !NODE_POSITION[neighborId]) return null;
+              drawEdges.add(edgeId);
+              const [x1, y1] = NODE_POSITION[nodeId];
+              const [x2, y2] = NODE_POSITION[neighborId];
+              return <line key={edgeId} x1={x1} y1={y1} x2={x2} y2={y2} />;
+            })
+          )}
+        </g>
+
+        {/* Dynamic Vector Lines (Marching Ants) for Active Action Paths */}
+        {selectedNode && NODE_POSITION[selectedNode] && (
+          <g className="tactical-active-routes">
+            {selectedNeighbors.map(neighborId => {
+              const neighbor = territories[neighborId];
+              if (!neighbor || !NODE_POSITION[neighborId]) return null;
+
+              const isEnemy = neighbor.owner_id !== territories[selectedNode].owner_id;
+              const isTarget = neighborId === targetNode;
+
+              if (phase === 'attack' && isEnemy) {
+                return (
+                  <AttackRoute
+                    key={`route-${selectedNode}-${neighborId}`}
+                    sourcePos={NODE_POSITION[selectedNode]}
+                    targetPos={NODE_POSITION[neighborId]}
+                    type="attack"
+                    isEngaged={isTarget}
+                  />
+                );
+              }
+
+              if (phase === 'movement' && !isEnemy) {
+                return (
+                  <AttackRoute
+                    key={`route-${selectedNode}-${neighborId}`}
+                    sourcePos={NODE_POSITION[selectedNode]}
+                    targetPos={NODE_POSITION[neighborId]}
+                    type="movement"
+                    isEngaged={isTarget}
+                  />
+                );
+              }
+
+              return null;
+            })}
+          </g>
+        )}
 
         {/* Military Troop Badges */}
         <g className="atlas-troop-badges">

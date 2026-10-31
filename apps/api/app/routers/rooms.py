@@ -58,6 +58,12 @@ def join_room(room_code: str, request: RoomJoinRequest, db: Session = Depends(ge
         player_token=player.token
     )
 
+@router.post("/{room_code}/leave", status_code=204)
+def leave_room(room_code: str, authorization: Annotated[str | None, Header()] = None, db: Session = Depends(get_db)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
+    RoomService.leave_waiting_room(db, room_code.upper(), authorization[7:])
+
 from app.websocket.manager import manager
 from app.models.match import Match
 
@@ -74,9 +80,6 @@ async def start_room(room_code: str, authorization: Annotated[str | None, Header
     match = db.query(Match).filter(Match.id == match_id).first()
     if match:
         state_dict = match.state_json if isinstance(match.state_json, dict) else json.loads(match.state_json)
-        await manager.broadcast_to_room({
-            "event": "match_state_updated",
-            "state": state_dict
-        }, room_code.upper())
+        await manager.broadcast_state(state_dict, room_code.upper())
         
     return StartMatchResponse(match_id=match_id)

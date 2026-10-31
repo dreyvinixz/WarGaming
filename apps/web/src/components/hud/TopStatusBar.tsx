@@ -57,7 +57,7 @@ export function TopStatusBar({
         </button>
 
         {onExitMatch && (
-          <button className="top-bar-btn" onClick={onExitMatch} title="Sair da partida">
+          <button className="top-bar-btn" onClick={onExitMatch} title="Sair da partida" aria-label="Sair da partida">
             <LogOut size={15} />
           </button>
         )}

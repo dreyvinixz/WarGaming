@@ -54,7 +54,7 @@ export function TerritoryInspector({
   const actionLabel = phase === 'reinforcement'
     ? 'ENVIAR REFORÇOS'
     : phase === 'attack'
-    ? 'DISPARAR ATAQUE'
+    ? 'ATACAR'
     : 'MOVER TROPAS';
 
   const ActionIcon = phase === 'reinforcement' ? Shield : phase === 'attack' ? Swords : Truck;
@@ -64,7 +64,7 @@ export function TerritoryInspector({
       <div className="inspector-header">
         <span className="inspector-tag">
           <ActionIcon size={12} />
-          <span>{targetTerritory ? 'ENGAGEMENT TÁTICO' : 'INSPEÇÃO DE SETOR'}</span>
+          <span>{targetTerritory ? 'CONFRONTO' : 'TERRITÓRIO'}</span>
         </span>
         <button className="inspector-close-btn" onClick={onClose} aria-label="Fechar painel">
           <X size={14} />
@@ -91,7 +91,7 @@ export function TerritoryInspector({
               <span>ORIGEM</span>
               <strong>{selectedTerritory.name} ({selectedTerritory.troops})</strong>
             </div>
-            <div className="matchup-vs">VS</div>
+            <div className="matchup-vs">→</div>
             <div className="matchup-side target">
               <span>ALVO ({targetOwnerName ?? 'INIMIGO'})</span>
               <strong style={{ color: targetOwnerColor ?? '#ffd600' }}>

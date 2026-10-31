@@ -220,3 +220,52 @@
     transform: translate(-50%, -46%);
   }
 }
+
+/* Routes must remain visible above the map without blocking territory clicks. */
+.atlas-edges, .tactical-active-routes { pointer-events: none; }
+
+/* Board-game treatment: a warm ocean, clear borders and restrained markers. */
+.atlas-map-container { background: #8ca6a0; }
+.atlas-map-container::before { background-image: linear-gradient(#ffffff0d 1px, transparent 1px), linear-gradient(90deg, #ffffff0d 1px, transparent 1px); background-size: 60px 60px; }
+.atlas-map-container::after { box-shadow: inset 0 0 70px #364c4644; }
+.atlas-map-svg { filter: drop-shadow(0 5px 5px #263a3555); }
+.atlas-country { fill: #d6c49a; stroke: #aa9973; stroke-width: .8; }
+.atlas-country.is-playable { fill: color-mix(in srgb, var(--territory-color) 70%, #d5c29b); stroke: #f2e2bd; stroke-width: 2; }
+.atlas-country.is-selectable, .atlas-country.is-attackable { animation: none; filter: none; }
+.atlas-country.is-playable:hover, .atlas-country.is-selected { filter: brightness(1.15) !important; stroke: #fff8df !important; }
+.atlas-edges line { stroke: #443d30; stroke-opacity: .75; stroke-width: 1.6; }
+.tactical-vector-line { filter: none; }
+
+.world-board-scroll { position:absolute; inset:85px 0 110px; overflow:auto; background:#152b37; }
+.world-board { display:block; width:100%; min-width:850px; height:auto; margin:auto; }
+.world-cell { cursor:pointer; outline:none; }
+.world-cell rect { stroke:#263842; stroke-width:3; fill-opacity:.75; }
+.world-cell:hover rect,.world-cell:focus rect,.world-cell.selected rect { stroke:white; stroke-width:5; }
+.world-cell.valid rect { stroke:#fff26a; stroke-width:5; stroke-dasharray:7 3; }
+.world-cell-name { fill:#14232a; font-size:12px; font-weight:800; pointer-events:none; }
+.world-cell circle { fill:#172a35; stroke:#fff; stroke-width:2; pointer-events:none; }
+.world-cell-troops { fill:white; font-size:15px; font-weight:bold; pointer-events:none; }
+.world-legend { display:flex; flex-wrap:wrap; gap:14px; padding:8px 16px; color:white; }
+.world-legend span { display:flex; align-items:center; gap:5px; }
+.world-legend i { width:12px; height:12px; border-radius:50%; }
+
+.world-board-shell { position:absolute; inset:85px 0 110px; background:#152b37; }
+.world-board-shell .world-board-scroll { inset:42px 0 0; }
+.world-map-tools { position:absolute; top:0; right:8px; height:38px; display:flex; align-items:center; gap:5px; z-index:4; color:#f6edd9; font-size:12px; }
+.world-map-tools button,.world-list-heading button { min-width:36px; min-height:34px; border:1px solid #a99772; background:#343b33; color:#fff3d7; border-radius:4px; cursor:pointer; }
+.world-map-tools button:disabled { opacity:.45; cursor:default; }
+.world-map-tools span { min-width:40px; text-align:center; }
+.world-territory-list { position:absolute; top:40px; right:8px; z-index:5; width:min(310px, calc(100vw - 16px)); max-height:min(55vh, 480px); overflow:auto; background:#202c2d; color:white; border:1px solid #a99772; padding:10px; box-shadow:0 8px 22px #0009; }
+.world-list-heading { display:flex; align-items:center; justify-content:space-between; font-weight:bold; }
+.world-territory-list h3 { font-size:12px; color:#e1c37c; margin:12px 0 5px; }
+.world-territory-list section > button { display:flex; justify-content:space-between; gap:8px; width:100%; background:transparent; color:white; border:0; border-bottom:1px solid #ffffff22; padding:8px 4px; text-align:left; cursor:pointer; }
+.world-territory-list section > button:hover,.world-territory-list section > button:focus,.world-territory-list section > button.active { background:#526256; }
+.world-territory-list small { color:#c7d0c4; }
+
+.geo-cell path { stroke:#243a38; stroke-width:1; fill-opacity:.82; stroke-linejoin:round; }
+.geo-cell:hover path,.geo-cell:focus path,.geo-cell.selected path { stroke:#fff7d3; stroke-width:2.2; }
+.geo-cell.valid path { stroke:#fff175; stroke-width:2.2; stroke-dasharray:4 2; }
+.geo-cell circle { fill:#172a35; stroke:#fff; stroke-width:1.2; pointer-events:none; }
+.geo-troops { fill:white; font-size:9px; font-weight:bold; pointer-events:none; }
+
+.geo-name { fill:#fff; stroke:#1c2e30; stroke-width:2px; paint-order:stroke; font-size:6px; font-weight:700; pointer-events:none; }

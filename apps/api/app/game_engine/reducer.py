@@ -5,7 +5,7 @@ from math import floor
 from uuid import uuid4
 
 from .combat import resolve_combat
-from .map import load_default_map
+from .map import load_default_map, load_world_map, load_geographic_map
 from .objectives import check_objective_completed, controlled_regions, load_default_objectives
 from .state import GameLogEntry, GamePhase, MatchState, Player
 from .validators import (
@@ -46,18 +46,24 @@ def create_players(names: list[str]) -> dict[str, Player]:
     return players
 
 
-def start_match(player_names: list[str] | None = None, room_code: str = "TEST01", rng: random.Random | None = None) -> MatchState:
+def start_match(player_names: list[str] | None = None, room_code: str = "TEST01", rng: random.Random | None = None, map_id: str = "atlas_legacy_v1", player_ids: list[str] | None = None) -> MatchState:
     player_names = player_names or ["Andrey", "Maria"]
     if not (2 <= len(player_names) <= 4):
         raise ValueError("Atlas War MVP requires 2 to 4 players")
     rng = rng or random.Random(7)
     players = create_players(player_names)
+    if player_ids is not None:
+        if len(player_ids) != len(player_names) or len(set(player_ids)) != len(player_ids):
+            raise ValueError("Invalid player identities")
+        players = {pid: player.model_copy_update(id=pid) for pid, player in zip(player_ids, players.values())}
     player_order = list(players.keys())
-    territories, regions = load_default_map()
+    if map_id not in ("atlas_legacy_v1", "atlas_world_v1", "atlas_world_v2"):
+        raise ValueError("Unknown map")
+    territories, regions = load_geographic_map() if map_id == "atlas_world_v2" else load_world_map() if map_id == "atlas_world_v1" else load_default_map()
 
     # Deterministic initial distribution designed to produce useful adjacent pairs in tests.
     tids = list(territories.keys())
-    if len(player_order) == 2:
+    if len(player_order) == 2 and map_id == "atlas_legacy_v1":
         p1, p2 = player_order[0], player_order[1]
         p1_tids = ["N1", "N2", "C2", "C3", "S1", "S2"]
         for tid in tids:
@@ -74,6 +80,8 @@ def start_match(player_names: list[str] | None = None, room_code: str = "TEST01"
     current_player_id = player_order[0]
     state = MatchState(
         match_id=str(uuid4()),
+        map_id=map_id,
+        map_version=2 if map_id == "atlas_world_v2" else 1,
         room_code=room_code,
         current_player_id=current_player_id,
         players=players,
@@ -83,6 +91,14 @@ def start_match(player_names: list[str] | None = None, room_code: str = "TEST01"
         objectives=load_default_objectives(),
         phase=GamePhase.REINFORCEMENT,
     )
+    if map_id in ("atlas_world_v1", "atlas_world_v2"):
+        state.objectives["control_7_territories"] = state.objectives["control_7_territories"].model_copy_update(
+            title="Expansão", description="Controle pelo menos 24 territórios ao final do seu turno.", params={"count": 24})
+        state.objectives["control_iron_and_sun"] = state.objectives["control_iron_and_sun"].model_copy_update(
+            title="Domínio regional", description="Controle Aurora e Austral ao final do seu turno.", params={"regions": ["aurora", "austral"]})
+    if map_id == "atlas_world_v2":
+        state.objectives["control_iron_and_sun"] = state.objectives["control_iron_and_sun"].model_copy_update(
+            description="Controle a América do Sul e a Oceania ao final do seu turno.", params={"regions": ["america_sul", "oceania"]})
     pool = calculate_reinforcement_pool(state, current_player_id)
     state.players[current_player_id] = state.players[current_player_id].model_copy_update(reinforcement_pool=pool)
     _log(state, "match_started", current_player_id, "A partida começou", {"room_code": room_code})

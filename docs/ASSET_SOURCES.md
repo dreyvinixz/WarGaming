@@ -20,3 +20,11 @@ Os assets abaixo foram selecionados para complementar o Atlas Vivo sem substitui
 ## Decisão atual
 
 A primeira camada do redesign usa CSS, SVG do Atlas Vivo e `lucide-react` para validar a experiência. Isso reduz dependência de arte provisória e permite testar hierarquia, onboarding e leitura do mapa antes de escolher um pacote visual definitivo.
+
+### Mapa histórico da tela inicial
+- "The world (Mercator), 1926", London Atlas of Universal Geography, edição Whitehall. Wikimedia Commons: https://commons.wikimedia.org/wiki/File:The_world_(Mercator),_1926.jpg
+- Identificado na página da fonte como domínio público (Public Domain Mark). Usado como textura de fundo; não representa o tabuleiro jogável.
+
+### Arte de campanha e tipografia
+- `campaign-art.png` e `army-standard.png`: ilustrações originais geradas para Atlas War, sem uso de imagens dos jogos de referência.
+- Roboto Condensed: fonte distribuída sob SIL Open Font License por Fontsource; usada como referência tipográfica a partir do projeto Risk Game 3D. As demais fontes instaladas preservam suas respectivas licenças.

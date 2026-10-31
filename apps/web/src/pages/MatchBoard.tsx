@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TopStatusBar } from '../components/hud/TopStatusBar';
 import { PhaseBanner } from '../components/hud/PhaseBanner';
 import { ActionDock } from '../components/hud/ActionDock';
@@ -6,27 +6,35 @@ import { ObjectiveBadge } from '../components/hud/ObjectiveBadge';
 import { TerritoryInspector } from '../components/hud/TerritoryInspector';
 import { GameLogDrawer, GameLogTrigger } from '../components/hud/GameLogDrawer';
 import { AtlasMap } from '../components/AtlasMap';
-import { ActionModal } from '../components/ActionModal';
 import { Onboarding } from '../components/Onboarding';
 import { useGameStore } from '../store/useGameStore';
-import { sendAction } from '../services/ws';
+import { sendAction, disconnectWebSocket } from '../services/ws';
 import './MatchBoard.css';
 
 type PhaseType = 'reinforcement' | 'attack' | 'movement';
 
-const PLAYER_COLORS = ['#ffd600', '#00d9f5', '#8b4cc4', '#ff475d', '#71d88e', '#ef8c48'];
-
-function territoryName(matchState: any, nodeId: string | null) {
-  return nodeId ? matchState?.territories?.[nodeId]?.name ?? nodeId : 'território';
-}
+const PLAYER_COLORS = ['#d0a64e', '#719aa0', '#a36562', '#82916b', '#a683b4', '#d58350'];
 
 export function MatchBoard() {
-  const { matchState, playerName } = useGameStore();
+  const { matchState, playerName, error, setError, reset, saveAndExit, isConnected } = useGameStore();
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [targetNode, setTargetNode] = useState<string | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
   const [logDrawerOpen, setLogDrawerOpen] = useState(false);
   const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [exitOpen, setExitOpen] = useState(false);
+  const [battle, setBattle] = useState<any>(null);
+  const previousState = useRef<any>(null);
+  useEffect(() => {
+    const previous = previousState.current;
+    previousState.current = matchState;
+    if (!matchState || !previous || previous.match_id !== matchState.match_id) return;
+    const oldIds = new Set((previous.action_log ?? []).map((entry: any) => entry.id));
+    const entry = (matchState.action_log ?? []).find((item: any) => !oldIds.has(item.id) && (item.type === 'attack_success' || item.type === 'attack_failed'));
+    if (!entry) return;
+    const payload = entry.payload ?? {};
+    const defenderId = previous.territories?.[payload.target_id]?.owner_id;
+    setBattle({ ...payload, won: entry.type === 'attack_success', attacker: previous.players?.[entry.player_id]?.name ?? 'Atacante', defender: previous.players?.[defenderId]?.name ?? 'Defensor', source: previous.territories?.[payload.source_id]?.name ?? 'Origem', target: previous.territories?.[payload.target_id]?.name ?? 'Destino' });
+  }, [matchState]);
 
   if (!matchState) return null;
 
@@ -79,9 +87,6 @@ export function MatchBoard() {
       if (isMine) {
         setSelectedNode(nodeId);
         setTargetNode(null);
-        if ((myPlayer?.reinforcement_pool ?? 0) > 0) {
-          setModalOpen(true);
-        }
       } else {
         setSelectedNode(nodeId);
         setTargetNode(null);
@@ -94,7 +99,7 @@ export function MatchBoard() {
       if (nodeId === selectedNode) {
         setSelectedNode(null);
         setTargetNode(null);
-        setModalOpen(false);
+
         return;
       }
 
@@ -102,7 +107,7 @@ export function MatchBoard() {
       if (isMine) {
         setSelectedNode(nodeId);
         setTargetNode(null);
-        setModalOpen(false);
+
         return;
       }
 
@@ -115,12 +120,12 @@ export function MatchBoard() {
         if (selectedNode && isSourceMine && (sourceTerritory?.troops ?? 0) > 1 && sourceNeighbors.includes(nodeId)) {
           // Valid adjacent enemy target!
           setTargetNode(nodeId);
-          setModalOpen(true);
+
         } else {
           // Inspect enemy territory without attacking
           setSelectedNode(nodeId);
           setTargetNode(null);
-          setModalOpen(false);
+
         }
         return;
       }
@@ -130,7 +135,7 @@ export function MatchBoard() {
       if (nodeId === selectedNode) {
         setSelectedNode(null);
         setTargetNode(null);
-        setModalOpen(false);
+
         return;
       }
 
@@ -142,19 +147,19 @@ export function MatchBoard() {
         if (selectedNode && isSourceMine && (sourceTerritory?.troops ?? 0) > 1 && sourceNeighbors.includes(nodeId)) {
           // Valid movement target!
           setTargetNode(nodeId);
-          setModalOpen(true);
+
         } else {
           // Switch source
           setSelectedNode(nodeId);
           setTargetNode(null);
-          setModalOpen(false);
+
         }
         return;
       } else {
         // Inspect enemy territory
         setSelectedNode(nodeId);
         setTargetNode(null);
-        setModalOpen(false);
+
         return;
       }
     }
@@ -177,12 +182,11 @@ export function MatchBoard() {
     }
 
     if (phase === 'movement' && selectedNode && targetNode) {
-      sendAction('move_troops', { source_id: selectedNode, target_id: targetNode, moving_troops: troops });
+      sendAction('move_troops', { source_id: selectedNode, target_id: targetNode, troops });
       setSelectedNode(null);
       setTargetNode(null);
     }
 
-    setModalOpen(false);
   };
 
   const handleAdvance = () => {
@@ -204,18 +208,13 @@ export function MatchBoard() {
     ? Math.max(1, selectedTerritory.troops - 1)
     : 1;
 
-  const actionTitle = phase === 'reinforcement'
-    ? 'Enviar reforços'
-    : phase === 'attack'
-    ? 'Iniciar ataque'
-    : 'Mover tropas';
-
-  const actionDescription = phase === 'reinforcement'
-    ? `Escolha quantas tropas enviar para ${territoryName(matchState, selectedNode)}.`
-    : `${territoryName(matchState, selectedNode)} → ${territoryName(matchState, targetNode)}`;
-
   return (
     <div className="match-screen">
+      {battle && <div className="battle-backdrop" role="presentation"><section className="battle-result" role="dialog" aria-modal="true" aria-labelledby="battle-title"><div className="battle-header">RELATÓRIO DE COMBATE</div><h2 id="battle-title">{battle.won ? 'Território conquistado' : 'Ataque repelido'}</h2><p className="battle-route">{battle.source} <span>→</span> {battle.target}</p><div className="battle-forces"><div><small>ATACANTE</small><strong>{battle.attacker}</strong><div className="battle-die">{battle.attack_roll}</div><span>Força total: {battle.attack_power}</span><b>Perdas: {battle.attacking_troops_lost}</b></div><span className="battle-versus">VS</span><div><small>DEFENSOR</small><strong>{battle.defender}</strong><div className="battle-die defense">{battle.defense_roll}</div><span>Força total: {battle.defense_power}</span><b>Perdas: {battle.defending_troops_lost}</b></div></div><p className="battle-rule">Força total = tropas + dado. O defensor vence empates.</p><button onClick={() => setBattle(null)}>Continuar partida</button></section></div>}
+      {exitOpen && <div className="victory-overlay" role="dialog" aria-modal="true" aria-labelledby="exit-title"><div><h1 id="exit-title">Voltar ao início?</h1><p>Sua vaga permanece na partida. Você poderá retomá-la neste navegador; os demais jogadores podem precisar aguardar seu turno.</p><button onClick={() => setExitOpen(false)}>Continuar jogando</button> <button onClick={() => { disconnectWebSocket(); saveAndExit(); }}>Voltar ao início</button></div></div>}
+      {error && <div role="alert" className="match-error">{error} <button onClick={() => setError('')}>Fechar</button></div>}
+      {!isConnected && <div role="status" className="match-error">Conexão perdida. Tentando reconectar…</div>}
+      {matchState.phase === 'finished' && <div className="victory-overlay" role="dialog" aria-modal="true"><div><h1>Partida encerrada</h1><p>Vencedor: {matchState.players[matchState.winner_player_id]?.name ?? 'Jogador'}</p><button onClick={reset}>Voltar ao início</button></div></div>}
       {/* 1. Military Top Status Bar */}
       <TopStatusBar
         roomCode={matchState.room_code}
@@ -224,10 +223,12 @@ export function MatchBoard() {
         currentPlayerName={matchState.players[currentPlayerId]?.name ?? 'Outro Jogador'}
         reinforcementPool={myPlayer?.reinforcement_pool ?? 0}
         onOpenTutorial={() => setTutorialOpen(true)}
+        onExitMatch={() => setExitOpen(true)}
       />
 
       {/* 2. Full-Viewport Battlefield Canvas */}
       <main className="match-viewport">
+        <div className="command-players" aria-label="Comandantes da partida">{playerIds.map(id => <div className={`command-player ${id === currentPlayerId ? 'active' : ''}`} key={id}><span className="command-player__medal" style={{ backgroundColor: getPlayerColor(id) }}>{matchState.players[id].name.slice(0, 1).toUpperCase()}</span><span><strong>{matchState.players[id].name}{id === myPlayerId ? ' · você' : ''}</strong><small>{id === currentPlayerId ? 'Jogando agora' : 'Aguardando'}</small></span></div>)}</div>
         {/* Floating Contextual Phase Banner */}
         <PhaseBanner phase={phase} isMyTurn={isMyTurn} />
 
@@ -268,15 +269,16 @@ export function MatchBoard() {
           controlledCount={controlledCount}
           troopCount={troopCount}
           totalTerritories={totalTerritories}
+          objective={matchState.objectives?.[myPlayer?.objective_id]}
         />
 
         {/* Floating Bottom Center Action Dock */}
         <ActionDock
           phase={phase}
           isMyTurn={isMyTurn}
+          reinforcementPool={myPlayer?.reinforcement_pool ?? 0}
           onAdvancePhase={handleAdvance}
           onEndTurn={handleEndTurn}
-          onToggleObjective={() => setTutorialOpen(true)}
         />
 
         {/* Floating Bottom Right Game Log Trigger */}
@@ -303,19 +305,6 @@ export function MatchBoard() {
         onClose={() => setTutorialOpen(false)}
       />
 
-      {/* 5. Optional Deep Action Modal (if needed for granular confirmation) */}
-      {modalOpen && (
-        <ActionModal
-          title={actionTitle}
-          description={actionDescription}
-          maxTroops={maxTroops}
-          onConfirm={handleConfirmAction}
-          onCancel={() => {
-            setModalOpen(false);
-            setTargetNode(null);
-          }}
-        />
-      )}
     </div>
   );
 }

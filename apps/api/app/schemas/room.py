@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 class RoomCreateRequest(BaseModel):
     player_name: str = Field(..., min_length=2, max_length=20)
     max_players: int = Field(default=4, ge=2, le=4)
-    map_id: str = Field(default="atlas_world_v1")
+    map_id: str = Field(default="atlas_world_v2")
 
 class RoomJoinRequest(BaseModel):
     player_name: str = Field(..., min_length=2, max_length=20)

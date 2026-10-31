@@ -12,7 +12,7 @@ from app.game_engine.reducer import (
     end_turn
 )
 
-def handle_player_action(db: Session, room_code: str, player_name: str, action_data: dict) -> dict:
+def handle_player_action(db: Session, room_code: str, player_id: str, action_data: dict) -> dict:
     match = db.query(Match).filter(Match.room_id == room_code).first()
     if not match:
         raise ValueError("Match not found")
@@ -20,10 +20,8 @@ def handle_player_action(db: Session, room_code: str, player_name: str, action_d
     # Deserialize pure game state
     current_state = MatchState(**match.state_json)
 
-    # Resolve player_id from player_name
-    player_id = next((p.id for p in current_state.players.values() if p.name == player_name), None)
-    if not player_id:
-        raise ValueError(f"Player '{player_name}' not found in this match")
+    if player_id not in current_state.players:
+        raise ValueError("Player not found in this match")
 
     action_type = action_data.get("type")
     payload = action_data.get("payload", {})
@@ -41,7 +39,7 @@ def handle_player_action(db: Session, room_code: str, player_name: str, action_d
             new_state = end_turn(current_state, player_id)
         else:
             raise ValueError(f"Unknown or forbidden action type: {action_type}")
-    except GameActionError as e:
+    except (GameActionError, TypeError) as e:
         # Business logic validation failure from the engine
         raise ValueError(str(e))
 
@@ -51,3 +49,16 @@ def handle_player_action(db: Session, room_code: str, player_name: str, action_d
     db.commit()
 
     return new_state_json
+
+
+def state_for_player(state: dict, player_id: str) -> dict:
+    """Strip all secret objectives other than the recipient's."""
+    import copy
+    visible = copy.deepcopy(state)
+    own = visible["players"].get(player_id, {})
+    objective_id = own.get("objective_id")
+    visible["objectives"] = {key: value for key, value in visible.get("objectives", {}).items() if key == objective_id}
+    for pid, player in visible["players"].items():
+        if pid != player_id:
+            player["objective_id"] = None
+    return visible
