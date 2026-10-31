@@ -1,4 +1,7 @@
+from pathlib import Path
+
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
@@ -40,3 +43,9 @@ app.add_middleware(
 app.include_router(health.router, prefix='/api/v1')
 app.include_router(rooms_router, prefix='/api/v1')
 app.include_router(websocket_routes.router)
+
+# Serve the compiled React app in production, after the REST and WebSocket routers.
+# When running the API locally without a compiled frontend, leave Vite to serve the UI.
+frontend_dir = Path(__file__).resolve().parent.parent / 'static'
+if frontend_dir.is_dir():
+    app.mount('/', StaticFiles(directory=str(frontend_dir), html=True), name='frontend')
