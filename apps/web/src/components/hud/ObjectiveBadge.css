@@ -3,7 +3,7 @@
   bottom: 24px;
   left: 24px;
   z-index: 45;
-  font-family: 'Rajdhani', 'Chakra Petch', system-ui, sans-serif;
+  font-family: 'Barlow Condensed', 'Barlow Condensed', system-ui, sans-serif;
 }
 
 .objective-trigger-btn {
@@ -24,18 +24,18 @@
 }
 
 .objective-trigger-btn:hover {
-  color: #ffd600;
-  border-color: #ffd600;
+  color: #EF534F;
+  border-color: #EF534F;
   transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(255, 214, 0, 0.2);
+  box-shadow: 0 10px 28px rgba(239, 83, 79, 0.2);
 }
 
 .objective-trigger-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #ffd600;
-  box-shadow: 0 0 8px #ffd600;
+  background: #EF534F;
+  box-shadow: 0 0 8px #EF534F;
 }
 
 .objective-card-popover {
@@ -46,7 +46,7 @@
   padding: 16px;
   background: linear-gradient(145deg, #091524 0%, #050b14 100%);
   border: 1px solid #1d3656;
-  border-left: 3px solid #ffd600;
+  border-left: 3px solid #EF534F;
   border-radius: 10px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
   animation: popoverFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -67,7 +67,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #ffd600;
+  color: #EF534F;
   font: 700 11px var(--heading);
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -98,7 +98,7 @@
 
 .objective-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #ffd600, #ffea79);
+  background: linear-gradient(90deg, #EF534F, #FF6863);
   border-radius: 2px;
   transition: width 0.4s ease;
 }

@@ -2,6 +2,8 @@ import { useGameStore } from '../store/useGameStore';
 
 const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws';
 let socket: WebSocket | null = null;
+let retry: ReturnType<typeof setTimeout> | null = null;
+let stopped = false;
 
 function friendlyReason(reason: string) {
   const messages: Record<string, string> = {
@@ -16,12 +18,11 @@ function friendlyReason(reason: string) {
   return messages[reason] ?? reason;
 }
 
-export function connectWebSocket(roomCode: string, playerName: string) {
-  if (socket) {
-    socket.close();
-  }
+export function connectWebSocket(roomCode: string, token: string) {
+  stopped = false;
+  if (socket) { socket.onclose = null; socket.close(); }
 
-  socket = new WebSocket(`${WS_URL}/rooms/${roomCode}?player_name=${encodeURIComponent(playerName)}`);
+  socket = new WebSocket(`${WS_URL}/rooms/${roomCode}?token=${encodeURIComponent(token)}`);
 
   socket.onopen = () => {
     console.log('Atlas War connected');
@@ -36,7 +37,7 @@ export function connectWebSocket(roomCode: string, playerName: string) {
       if (data.event === 'match_state_updated' && data.state) {
         useGameStore.getState().setMatchState(data.state);
       } else if (data.event === 'action_rejected') {
-        alert(`Ação recusada: ${friendlyReason(data.reason)}`);
+        useGameStore.getState().setError(`Ação recusada: ${friendlyReason(data.reason)}`);
       }
     } catch (e) {
       console.error('Failed to parse transmission', e);
@@ -46,6 +47,7 @@ export function connectWebSocket(roomCode: string, playerName: string) {
   socket.onclose = () => {
     console.log('Atlas War disconnected');
     useGameStore.getState().setConnectionStatus(false);
+    if (!stopped) retry = setTimeout(() => connectWebSocket(roomCode, token), 2000);
   };
 }
 
@@ -53,12 +55,17 @@ export function sendAction(type: string, payload: any = {}) {
   if (socket && socket.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify({ type, payload }));
   } else {
-    console.warn('Conexão offline. Não foi possível enviar a ação.');
+    useGameStore.getState().setError('Conexão offline. Não foi possível enviar a ação.');
   }
 }
 
 export function disconnectWebSocket() {
+  stopped = true;
+  if (retry) clearTimeout(retry);
   if (socket) {
+    socket.onopen = null;
+    socket.onmessage = null;
+    socket.onclose = null;
     socket.close();
     socket = null;
   }

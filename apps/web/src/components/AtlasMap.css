@@ -220,3 +220,109 @@
     transform: translate(-50%, -46%);
   }
 }
+
+/* Routes must remain visible above the map without blocking territory clicks. */
+.atlas-edges, .tactical-active-routes { pointer-events: none; }
+
+/* Board-game treatment: a warm ocean, clear borders and restrained markers. */
+.atlas-map-container { background: #8ca6a0; }
+.atlas-map-container::before { background-image: linear-gradient(#ffffff0d 1px, transparent 1px), linear-gradient(90deg, #ffffff0d 1px, transparent 1px); background-size: 60px 60px; }
+.atlas-map-container::after { box-shadow: inset 0 0 70px #364c4644; }
+.atlas-map-svg { filter: drop-shadow(0 5px 5px #263a3555); }
+.atlas-country { fill: #d6c49a; stroke: #aa9973; stroke-width: .8; }
+.atlas-country.is-playable { fill: color-mix(in srgb, var(--territory-color) 70%, #d5c29b); stroke: #f2e2bd; stroke-width: 2; }
+.atlas-country.is-selectable, .atlas-country.is-attackable { animation: none; filter: none; }
+.atlas-country.is-playable:hover, .atlas-country.is-selected { filter: brightness(1.15) !important; stroke: #fff8df !important; }
+.atlas-edges line { stroke: #443d30; stroke-opacity: .75; stroke-width: 1.6; }
+.tactical-vector-line { filter: none; }
+
+.world-board-scroll { position:absolute; inset:85px 0 110px; overflow:auto; background:#152b37; }
+.world-board { display:block; width:100%; min-width:850px; height:auto; margin:auto; }
+.world-cell { cursor:pointer; outline:none; }
+.world-cell rect { stroke:#263842; stroke-width:3; fill-opacity:.75; }
+.world-cell:hover rect,.world-cell:focus rect,.world-cell.selected rect { stroke:white; stroke-width:5; }
+.world-cell.valid rect { stroke:#fff26a; stroke-width:5; stroke-dasharray:7 3; }
+.world-cell-name { fill:#14232a; font-size:12px; font-weight:800; pointer-events:none; }
+.world-cell circle { fill:#172a35; stroke:#fff; stroke-width:2; pointer-events:none; }
+.world-cell-troops { fill:white; font-size:15px; font-weight:bold; pointer-events:none; }
+.world-legend { display:flex; flex-wrap:wrap; gap:14px; padding:8px 16px; color:white; }
+.world-legend span { display:flex; align-items:center; gap:5px; }
+.world-legend i { width:12px; height:12px; border-radius:50%; }
+
+.world-board-shell { position:absolute; inset:85px 0 110px; background:#152b37; }
+.world-board-shell .world-board-scroll { inset:42px 0 0; }
+.world-map-tools { position:absolute; top:0; right:8px; height:38px; display:flex; align-items:center; gap:5px; z-index:4; color:#f6edd9; font-size:12px; }
+.world-map-tools button,.world-list-heading button { min-width:36px; min-height:34px; border:1px solid #a99772; background:#343b33; color:#fff3d7; border-radius:4px; cursor:pointer; }
+.world-map-tools button:disabled { opacity:.45; cursor:default; }
+.world-map-tools span { min-width:40px; text-align:center; }
+.world-territory-list { position:absolute; top:40px; right:8px; z-index:5; width:min(310px, calc(100vw - 16px)); max-height:min(55vh, 480px); overflow:auto; background:#202c2d; color:white; border:1px solid #a99772; padding:10px; box-shadow:0 8px 22px #0009; }
+.world-list-heading { display:flex; align-items:center; justify-content:space-between; font-weight:bold; }
+.world-territory-list h3 { font-size:12px; color:#e1c37c; margin:12px 0 5px; }
+.world-territory-list section > button { display:flex; justify-content:space-between; gap:8px; width:100%; background:transparent; color:white; border:0; border-bottom:1px solid #ffffff22; padding:8px 4px; text-align:left; cursor:pointer; }
+.world-territory-list section > button:hover,.world-territory-list section > button:focus,.world-territory-list section > button.active { background:#526256; }
+.world-territory-list small { color:#c7d0c4; }
+
+.geo-cell path { stroke:#243a38; stroke-width:1; fill-opacity:.82; stroke-linejoin:round; }
+.geo-cell:hover path,.geo-cell:focus path,.geo-cell.selected path { stroke:#fff7d3; stroke-width:2.2; }
+.geo-cell.valid path { stroke:#fff175; stroke-width:2.2; stroke-dasharray:4 2; }
+.geo-cell circle { fill:#172a35; stroke:#fff; stroke-width:1.2; pointer-events:none; }
+.geo-troops { fill:white; font-size:9px; font-weight:bold; pointer-events:none; }
+
+.geo-name { fill:#fff; stroke:#1c2e30; stroke-width:2px; paint-order:stroke; font-size:6px; font-weight:700; pointer-events:none; }
+.geo-flag-fallback { fill:#EDEBE7; font-size:8px; font-weight:800; pointer-events:none; }
+.geo-country-flag { pointer-events:none; }
+.geo-flag-border, .geo-troop-count-bg { pointer-events:none; }
+.geo-marker.selected .geo-flag-border { stroke:#F05449; stroke-width:2.5; }
+.geo-marker.valid .geo-flag-border { stroke:#F05449; stroke-dasharray:3 2; }
+
+.battle-animation-layer { overflow: visible; }
+.battle-route-glow { fill:none; stroke:var(--army-color,#EF534F); stroke-width:10; stroke-linecap:round; opacity:.18; filter:blur(3px); }
+.battle-route-dash { fill:none; stroke:var(--army-color,#EF534F); stroke-width:2.5; stroke-linecap:round; stroke-dasharray:7 5; animation:battle-route-flow .32s linear infinite; filter:drop-shadow(0 0 4px color-mix(in srgb,var(--army-color,#EF534F) 75%,transparent)); }
+.battle-origin-pulse { fill:color-mix(in srgb,var(--army-color,#EF534F) 20%,transparent); stroke:var(--army-color,#EF534F); stroke-width:2; transform-box:fill-box; transform-origin:center; animation:battle-origin-pulse .72s ease-out infinite; }
+.battle-impact-ring { fill:none; stroke:#fff; stroke-width:2.5; transform-box:fill-box; transform-origin:center; animation:battle-impact-ring .8s cubic-bezier(.12,.7,.25,1) both; }
+.battle-explosion { opacity:0; transform-box:fill-box; transform-origin:center; animation:explosion-enter 1.45s cubic-bezier(.12,.7,.25,1) .94s both; }
+.explosion-shockwave { fill:none; stroke:#ffe8a3; stroke-width:2; transform-box:fill-box; transform-origin:center; animation:explosion-shockwave .8s ease-out .94s both; }
+.explosion-burst { fill:#ed4935; stroke:#ffba62; stroke-width:1.6; stroke-linejoin:round; filter:drop-shadow(0 0 7px #ff532dcc); transform-box:fill-box; transform-origin:center; animation:explosion-burst .56s cubic-bezier(.12,.7,.25,1) .95s both; }
+.explosion-core { fill:#fff1bc; filter:drop-shadow(0 0 8px #ffb53c); transform-box:fill-box; transform-origin:center; animation:explosion-core .42s ease-out .95s both; }
+.explosion-rays { fill:none; stroke:#ffd37a; stroke-width:3; stroke-linecap:round; filter:drop-shadow(0 0 3px #ff4b32); transform-box:fill-box; transform-origin:center; animation:explosion-rays .7s ease-out .97s both; }
+.explosion-smoke { fill:#444448; stroke:#8b7770; stroke-width:.8; opacity:0; filter:drop-shadow(0 0 3px #000); }
+.smoke-a { animation:explosion-smoke-a 1.25s ease-out 1s both; }
+.smoke-b { animation:explosion-smoke-b 1.35s ease-out 1.04s both; }
+.smoke-c { animation:explosion-smoke-c 1.2s ease-out 1.08s both; }
+.explosion-sparks { fill:none; stroke:#ffd878; stroke-width:2; stroke-linecap:round; filter:drop-shadow(0 0 3px #ff5c35); animation:explosion-sparks .58s ease-out .96s both; }
+.battle-impact { animation:battle-impact .45s ease-out .95s both; }
+.battle-impact-core { fill:#fff; opacity:0; animation:battle-flash .36s ease-out .98s both; }
+.battle-impact-rays { fill:none; stroke:var(--army-color,#EF534F); stroke-width:3; stroke-linecap:round; opacity:0; animation:battle-rays .5s ease-out 1.02s both; }
+.battle-smoke { fill:#a5a29f; opacity:0; filter:drop-shadow(0 1px 2px #000); }
+.smoke-one { animation:battle-smoke .8s ease-out 1.08s both; }
+.smoke-two { animation:battle-smoke .9s ease-out 1.13s both; }
+.smoke-three { animation:battle-smoke .85s ease-out 1.18s both; }
+.battle-unit-shadow { fill:#0009; }
+.battle-unit-pack { fill:color-mix(in srgb,var(--unit-color) 55%,#111); stroke:#101314; stroke-width:.8; }
+.battle-unit-body { fill:var(--unit-color); stroke:#101314; stroke-width:1; }
+.battle-unit-limb,.battle-unit-rifle { fill:none; stroke:#26292b; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.battle-unit-head { fill:#d4c7ae; stroke:#1b1c1e; stroke-width:.8; }
+.battle-unit-helmet { fill:color-mix(in srgb,var(--unit-color) 68%,#101314); stroke:#101314; stroke-width:.8; }
+.battle-unit-highlight { fill:none; stroke:#fff9; stroke-width:.65; stroke-linecap:round; }
+@keyframes battle-route-flow { to { stroke-dashoffset:-24; } }
+@keyframes battle-origin-pulse { 50% { opacity:.45; transform:scale(1.3); } }
+@keyframes battle-impact-ring { 0% { opacity:0; transform:scale(.5); } 22% { opacity:1; } 100% { opacity:0; transform:scale(3.1); } }
+@keyframes explosion-enter { 0% { opacity:0; transform:scale(.18); } 16% { opacity:1; transform:scale(1.12); } 45% { opacity:1; transform:scale(1); } 100% { opacity:0; transform:scale(1.28); } }
+@keyframes explosion-shockwave { 0% { opacity:0; transform:scale(.2); } 15% { opacity:1; } 100% { opacity:0; transform:scale(3.8); } }
+@keyframes explosion-burst { 0% { opacity:0; transform:scale(.2) rotate(-22deg); } 22% { opacity:1; } 100% { opacity:0; transform:scale(1.75) rotate(28deg); } }
+@keyframes explosion-core { 0% { opacity:0; transform:scale(.1); } 18% { opacity:1; } 100% { opacity:0; transform:scale(3.5); } }
+@keyframes explosion-rays { 0% { opacity:0; transform:scale(.2); } 20% { opacity:1; } 100% { opacity:0; transform:scale(1.45); } }
+@keyframes explosion-smoke-a { 0% { opacity:0; transform:translate(0,0) scale(.45); } 28% { opacity:.9; } 100% { opacity:0; transform:translate(-7px,-20px) scale(1.8); } }
+@keyframes explosion-smoke-b { 0% { opacity:0; transform:translate(0,0) scale(.4); } 25% { opacity:.85; } 100% { opacity:0; transform:translate(7px,-24px) scale(1.7); } }
+@keyframes explosion-smoke-c { 0% { opacity:0; transform:translate(0,0) scale(.4); } 25% { opacity:.8; } 100% { opacity:0; transform:translate(2px,-18px) scale(1.9); } }
+@keyframes explosion-sparks { 0% { opacity:1; transform:scale(.3); } 100% { opacity:0; transform:scale(1.6); } }
+@keyframes battle-impact { 0% { opacity:0; } 25% { opacity:1; } 100% { opacity:1; } }
+@keyframes battle-flash { 0% { opacity:.95; transform:scale(.2); } 100% { opacity:0; transform:scale(2.8); } }
+@keyframes battle-rays { 0% { opacity:1; transform:scale(.25); } 100% { opacity:0; transform:scale(1.5); } }
+@keyframes battle-smoke { 0% { opacity:.8; transform:translate(0,0) scale(.7); } 100% { opacity:0; transform:translate(0,-16px) scale(2); } }
+@media (prefers-reduced-motion: reduce) {
+  .battle-route-dash,.battle-origin-pulse,.battle-impact-ring,.battle-impact,.battle-impact-core,.battle-impact-rays,.battle-smoke,.battle-explosion,.explosion-shockwave,.explosion-burst,.explosion-core,.explosion-rays,.explosion-smoke,.explosion-sparks { animation-duration:.01ms; animation-iteration-count:1; }
+}
+
+.world-board-scroll{touch-action:none;cursor:grab;scrollbar-color:#84724f #203332}.world-board-scroll.is-dragging{cursor:grabbing;user-select:none}.world-board-scroll.is-dragging .world-board{pointer-events:none}.match-screen .world-board-shell{inset:64px 0 84px}.match-screen .world-board-shell .world-board-scroll{inset:42px 0 0}.match-screen .world-board{min-width:0!important}.match-screen .world-legend{position:sticky;left:0;bottom:0;width:max-content;max-width:100%;background:#192824ed;border:1px solid #77694e}.match-screen .geo-name{font-size:8px;font-weight:700;paint-order:stroke}.match-screen .geo-cell circle{r:10px}.match-screen .geo-troops{font-size:11px;font-weight:800}
+@media(max-width:800px){.match-screen .world-board-shell{inset:158px 0 144px}.match-screen .world-board-shell .world-board-scroll{inset:40px 0 0}}

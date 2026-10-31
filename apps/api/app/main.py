@@ -8,10 +8,14 @@ from app.websocket import routes as websocket_routes
 
 from contextlib import asynccontextmanager
 from app.database import Base, engine
+from sqlalchemy import inspect, text
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
+    if "color" not in {column["name"] for column in inspect(engine).get_columns("room_players")}:
+        with engine.begin() as connection:
+            connection.execute(text("ALTER TABLE room_players ADD COLUMN color VARCHAR NOT NULL DEFAULT '#49A3D9'"))
     yield
 
 app = FastAPI(

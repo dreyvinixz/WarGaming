@@ -108,3 +108,22 @@ def test_cannot_join_full_room():
     res3 = client.post(f"/api/v1/rooms/{room_code}/join", json={"player_name": "P3"})
     assert res3.status_code == 400
     assert "full" in res3.json()["detail"].lower()
+
+def test_leave_waiting_room_transfers_host_and_releases_slot():
+    host = client.post('/api/v1/rooms', json={'player_name': 'Host', 'max_players': 2}).json()
+    code = host['room_code']
+    guest = client.post(f'/api/v1/rooms/{code}/join', json={'player_name': 'Guest'}).json()
+    assert client.post(f'/api/v1/rooms/{code}/leave', headers={'Authorization': 'Bearer wrong'}).status_code == 403
+    assert client.post(f'/api/v1/rooms/{code}/leave', headers={'Authorization': 'Bearer ' + host['player_token']}).status_code == 204
+    players = client.get(f'/api/v1/rooms/{code}').json()['players']
+    assert len(players) == 1 and players[0]['id'] == guest['player_id'] and players[0]['is_host']
+    assert client.post(f'/api/v1/rooms/{code}/leave', headers={'Authorization': 'Bearer ' + guest['player_token']}).status_code == 204
+    assert client.get(f'/api/v1/rooms/{code}').status_code == 404
+
+def test_cannot_leave_started_game_as_waiting_player():
+    host = client.post('/api/v1/rooms', json={'player_name': 'Host'}).json()
+    code = host['room_code']
+    client.post(f'/api/v1/rooms/{code}/join', json={'player_name': 'Guest'})
+    headers = {'Authorization': 'Bearer ' + host['player_token']}
+    assert client.post(f'/api/v1/rooms/{code}/start', headers=headers).status_code == 200
+    assert client.post(f'/api/v1/rooms/{code}/leave', headers=headers).status_code == 409

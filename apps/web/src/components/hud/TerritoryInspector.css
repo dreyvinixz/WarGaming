@@ -10,7 +10,7 @@
   border: 1px solid #1a3556;
   border-radius: 12px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  font-family: 'Rajdhani', 'Chakra Petch', system-ui, sans-serif;
+  font-family: 'Barlow Condensed', 'Barlow Condensed', system-ui, sans-serif;
   animation: inspectorFade 0.2s ease-out;
 }
 
@@ -67,6 +67,23 @@
   font: 700 20px var(--heading);
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+.inspector-territory-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.inspector-country-flag {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 23px;
+  object-fit: cover;
+  border: 1px solid #77777b;
+  border-radius: 2px;
+  box-shadow: 0 2px 6px #0008;
 }
 
 .inspector-status-row {

@@ -6,12 +6,14 @@ interface ObjectiveBadgeProps {
   controlledCount: number;
   troopCount: number;
   totalTerritories?: number;
+  objective?: { title: string; description: string };
 }
 
 export function ObjectiveBadge({
   controlledCount,
   troopCount,
   totalTerritories = 13,
+  objective,
 }: ObjectiveBadgeProps) {
   const [isOpen, setIsOpen] = useState(false);
   const percent = Math.min(100, Math.round((controlledCount / totalTerritories) * 100));
@@ -22,11 +24,11 @@ export function ObjectiveBadge({
         <div className="objective-card-popover" role="region" aria-label="Objetivo da Missão">
           <div className="objective-popover-header">
             <Target size={14} />
-            <span>MISSÃO // ESTRATÉGICA</span>
+            <span>SUA MISSÃO SECRETA</span>
           </div>
-          <div className="objective-popover-title">Domínio Global do Setor</div>
+          <div className="objective-popover-title">{objective?.title ?? "Objetivo indisponível"}</div>
           <div className="objective-popover-desc">
-            Controle a maioria dos territórios e aniquile a presença adversária nas fronteiras.
+            {objective?.description ?? "Reconecte para recuperar seu objetivo."}
           </div>
           <div className="objective-progress-bar">
             <div className="objective-progress-fill" style={{ width: `${percent}%` }} />
@@ -44,7 +46,7 @@ export function ObjectiveBadge({
         aria-expanded={isOpen}
       >
         <span className="objective-trigger-dot" />
-        <span>MISSÃO // OBJETIVO</span>
+        <span>VER MINHA MISSÃO</span>
       </button>
     </div>
   );

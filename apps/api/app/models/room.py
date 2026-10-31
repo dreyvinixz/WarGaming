@@ -29,6 +29,7 @@ class RoomPlayer(Base):
     player_name = Column(String, nullable=False)
     is_host = Column(Boolean, default=False)
     token = Column(String, default=lambda: str(uuid.uuid4()))
+    color = Column(String, nullable=False, default="#49A3D9")
 
     room = relationship("Room", back_populates="players")
 
