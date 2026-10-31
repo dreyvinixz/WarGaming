@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
+import { Target } from 'lucide-react';
 import { TopStatusBar } from '../components/hud/TopStatusBar';
 import { PhaseBanner } from '../components/hud/PhaseBanner';
 import { ActionDock } from '../components/hud/ActionDock';
@@ -7,6 +8,7 @@ import { ObjectiveBadge } from '../components/hud/ObjectiveBadge';
 import { TerritoryInspector } from '../components/hud/TerritoryInspector';
 import { GameLogDrawer, GameLogTrigger } from '../components/hud/GameLogDrawer';
 import { AtlasMap } from '../components/AtlasMap';
+import { BattleDie } from '../components/hud/BattleDie';
 import { Onboarding } from '../components/Onboarding';
 import { useGameStore } from '../store/useGameStore';
 import { sendAction, disconnectWebSocket } from '../services/ws';
@@ -25,6 +27,8 @@ export function MatchBoard() {
   const [exitOpen, setExitOpen] = useState(false);
   const [battle, setBattle] = useState<any>(null);
   const [battleResultVisible, setBattleResultVisible] = useState(false);
+  const [objectiveBriefing, setObjectiveBriefing] = useState<{ storageKey: string; title: string; description: string } | null>(null);
+  const objectiveBriefingsShown = useRef(new Set<string>());
   const previousState = useRef<any>(null);
   const timeoutRequestRef = useRef<{ deadline: string | null; sentAt: number }>({ deadline: null, sentAt: 0 });
   const [clockNow, setClockNow] = useState(Date.now());
@@ -35,6 +39,23 @@ export function MatchBoard() {
     const timer = setInterval(() => setClockNow(Date.now()), 250);
     return () => clearInterval(timer);
   }, []);
+  useEffect(() => {
+    if (!matchState || !playerName) return;
+    const playerId = Object.keys(matchState.players ?? {}).find(id => matchState.players[id].name === playerName);
+    const player = playerId ? matchState.players[playerId] : null;
+    const objective = player?.objective_id ? matchState.objectives?.[player.objective_id] : null;
+    if (!playerId || !objective) return;
+
+    const storageKey = `atlas-war:objective-read:${matchState.match_id}:${playerId}`;
+    if (objectiveBriefingsShown.current.has(storageKey)) return;
+    try {
+      if (window.localStorage.getItem(storageKey)) return;
+    } catch {
+      // Keep the briefing available when browser storage is disabled.
+    }
+    objectiveBriefingsShown.current.add(storageKey);
+    setObjectiveBriefing({ storageKey, title: objective.title, description: objective.description });
+  }, [matchState, playerName]);
   useEffect(() => {
     if (!isConnected || secondsRemaining !== 0 || !deadlineAt) return;
     if (timeoutRequestRef.current.deadline === deadlineAt && clockNow - timeoutRequestRef.current.sentAt < 3000) return;
@@ -140,6 +161,11 @@ export function MatchBoard() {
     }
 
     if (phase === 'attack') {
+      if (matchState.round_number === 1) {
+        setSelectedNode(null);
+        setTargetNode(null);
+        return;
+      }
       // Clicking already selected territory deselects it
       if (nodeId === selectedNode) {
         setSelectedNode(null);
@@ -246,6 +272,17 @@ export function MatchBoard() {
     setTargetNode(null);
   };
 
+  const dismissObjectiveBriefing = () => {
+    if (objectiveBriefing) {
+      try {
+        window.localStorage.setItem(objectiveBriefing.storageKey, 'read');
+      } catch {
+        // Closing the briefing should still work when browser storage is disabled.
+      }
+    }
+    setObjectiveBriefing(null);
+  };
+
   // Max troops for stepper/action
   const maxTroops = phase === 'reinforcement'
     ? myPlayer?.reinforcement_pool ?? 0
@@ -255,7 +292,8 @@ export function MatchBoard() {
 
   return (
     <div className="match-screen" style={matchThemeStyle}>
-      {battle && battleResultVisible && <div className="battle-backdrop" role="presentation"><section className="battle-result" role="dialog" aria-modal="true" aria-labelledby="battle-title"><div className="battle-header">RELATÓRIO DE COMBATE</div><h2 id="battle-title">{battle.won ? 'Território conquistado' : 'Ataque repelido'}</h2><p className="battle-route">{battle.source} <span>→</span> {battle.target}</p><div className="battle-forces"><div><small>ATACANTE</small><strong>{battle.attacker}</strong><div className="battle-die">{battle.attack_roll}</div><span>Força total: {battle.attack_power}</span><b>Perdas: {battle.attacking_troops_lost}</b></div><span className="battle-versus">VS</span><div><small>DEFENSOR</small><strong>{battle.defender}</strong><div className="battle-die defense">{battle.defense_roll}</div><span>Força total: {battle.defense_power}</span><b>Perdas: {battle.defending_troops_lost}</b></div></div><p className="battle-rule">Força total = tropas + dado. O defensor vence empates.</p><button onClick={() => setBattle(null)}>Continuar partida</button></section></div>}
+      {objectiveBriefing && <div className="objective-briefing-backdrop"><section className="objective-briefing-modal" role="dialog" aria-modal="true" aria-labelledby="objective-briefing-title"><div className="objective-briefing-kicker"><Target size={15} /> BRIEFING DE MISSÃO</div><h1 id="objective-briefing-title">Seu objetivo secreto</h1><p className="objective-briefing-intro">Leia sua missão antes de iniciar. Ela define sua condição de vitória.</p><div className="objective-briefing-card"><strong>{objectiveBriefing.title}</strong><p>{objectiveBriefing.description}</p></div><button autoFocus onClick={dismissObjectiveBriefing}>ENTENDI, COMANDANTE</button><small>Você pode consultar sua missão durante a partida.</small></section></div>}
+      {battle && battleResultVisible && <div className="battle-backdrop" role="presentation"><section className="battle-result" role="dialog" aria-modal="true" aria-labelledby="battle-title"><div className="battle-header">RELATÓRIO DE COMBATE</div><h2 id="battle-title">{battle.won ? 'Território conquistado' : 'Ataque repelido'}</h2><p className="battle-route">{battle.source} <span>→</span> {battle.target}</p><div className="battle-forces"><div><small>ATACANTE</small><strong>{battle.attacker}</strong><BattleDie key={`${battle.animationId}:attack`} value={battle.attack_roll} side="attack" animationId={battle.animationId} /><span>Força total: {battle.attack_power}</span><b>Perdas: {battle.attacking_troops_lost}</b></div><span className="battle-versus">VS</span><div><small>DEFENSOR</small><strong>{battle.defender}</strong><BattleDie key={`${battle.animationId}:defense`} value={battle.defense_roll} side="defense" animationId={battle.animationId} /><span>Força total: {battle.defense_power}</span><b>Perdas: {battle.defending_troops_lost}</b></div></div><p className="battle-rule">Força total = tropas + dado. O defensor vence empates.</p><button onClick={() => setBattle(null)}>Continuar partida</button></section></div>}
       {exitOpen && <div className="victory-overlay" role="dialog" aria-modal="true" aria-labelledby="exit-title"><div><h1 id="exit-title">Voltar ao início?</h1><p>Sua vaga permanece na partida. Você poderá retomá-la neste navegador; os demais jogadores podem precisar aguardar seu turno.</p><button onClick={() => setExitOpen(false)}>Continuar jogando</button> <button onClick={() => { disconnectWebSocket(); saveAndExit(); }}>Voltar ao início</button></div></div>}
       {error && <div role="alert" className="match-error">{error} <button onClick={() => setError('')}>Fechar</button></div>}
       {!isConnected && <div role="status" className="match-error">Conexão perdida. Tentando reconectar…</div>}
@@ -275,7 +313,7 @@ export function MatchBoard() {
       <main className="match-viewport">
         <div className="command-players" aria-label="Comandantes da partida">{playerIds.map(id => <div className={`command-player ${id === currentPlayerId ? 'active' : ''}`} key={id}><span className="command-player__medal" style={{ backgroundColor: getPlayerColor(id) }}><img src="/assets/ui/atlas-crest.svg" alt="" /><b>{matchState.players[id].name.slice(0, 1).toUpperCase()}</b></span><span><strong>{matchState.players[id].name}{id === myPlayerId ? ' · você' : ''}</strong><small>{id === currentPlayerId ? 'Jogando agora' : 'Aguardando'}</small></span></div>)}</div>
         {/* Floating Contextual Phase Banner */}
-        <PhaseBanner phase={phase} isMyTurn={isMyTurn} secondsRemaining={secondsRemaining} />
+        <PhaseBanner phase={phase} isMyTurn={isMyTurn} secondsRemaining={secondsRemaining} roundNumber={matchState.round_number} />
 
         {/* 100% SVG World Map */}
         <AtlasMap

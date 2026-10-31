@@ -5,6 +5,7 @@ interface PhaseBannerProps {
   phase: 'reinforcement' | 'attack' | 'movement';
   isMyTurn: boolean;
   secondsRemaining: number | null;
+  roundNumber: number;
 }
 
 const phaseInfo = {
@@ -32,7 +33,7 @@ const phaseInfo = {
 
 } as const;
 
-export function PhaseBanner({ phase, isMyTurn, secondsRemaining }: PhaseBannerProps) {
+export function PhaseBanner({ phase, isMyTurn, secondsRemaining, roundNumber }: PhaseBannerProps) {
   const current = phaseInfo[phase] ?? phaseInfo.reinforcement;
   const Icon = current.icon;
 
@@ -45,9 +46,13 @@ export function PhaseBanner({ phase, isMyTurn, secondsRemaining }: PhaseBannerPr
           {!isMyTurn && <span>· AGUARDE SUA VEZ</span>}
           {secondsRemaining !== null && <span className={`phase-countdown ${secondsRemaining <= 10 ? 'is-urgent' : ''}`} role="timer" aria-live="off" aria-label={`Tempo restante: ${secondsRemaining} segundos`}>{String(Math.floor(secondsRemaining / 60)).padStart(2, '0')}:{String(secondsRemaining % 60).padStart(2, '0')}</span>}
         </div>
-        <div className="phase-banner-title">{current.title}</div>
+        <div className="phase-banner-title">
+          {phase === 'attack' && roundNumber === 1 ? 'Trégua da rodada inicial' : current.title}
+        </div>
         <div className="phase-banner-description">
-          {isMyTurn ? current.description : 'Acompanhe o turno do outro comandante.'}
+          {phase === 'attack' && roundNumber === 1
+            ? 'Trégua inicial: ataques liberados a partir da rodada 2.'
+            : isMyTurn ? current.description : 'Acompanhe o turno do outro comandante.'}
         </div>
       </div>
     </div>

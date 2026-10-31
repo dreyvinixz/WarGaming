@@ -41,6 +41,8 @@ def validate_reinforcement_action(state: MatchState, player_id: str, territory_i
 def validate_attack_action(state: MatchState, player_id: str, source_id: str, target_id: str, attacking_troops: int) -> None:
     validate_current_player(state, player_id)
     validate_phase(state, GamePhase.ATTACK, "Attack")
+    if state.round_number == 1:
+        raise GameActionError("Attacks are disabled during the first round")
     if attacking_troops < 1:
         raise GameActionError("Attack must use at least 1 troop")
     if source_id not in state.territories or target_id not in state.territories:

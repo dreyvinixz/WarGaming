@@ -242,6 +242,26 @@
 .match-screen .victory-overlay button{color:#fff;background:#EF534F;border-color:#ff7771;}.match-screen .match-error{color:#fff;background:#3d2027;border-color:#EF534F;}
 @media(max-width:800px){.match-screen .command-player{background:#1C2B3A;}.match-screen .phase-banner-card{background:#1C2B3A;}}.match-screen .battle-result h2{color:#F1F5F9;font:700 29px 'Barlow Condensed',sans-serif;}
 .match-screen .battle-forces strong{color:#F1F5F9;}
+.objective-briefing-backdrop{position:fixed;inset:0;z-index:240;display:grid;place-items:center;padding:20px;background:#030303e8;backdrop-filter:blur(6px);animation:modalFadeIn .2s ease-out;}
+.objective-briefing-modal{position:relative;width:min(520px,94vw);padding:30px;color:#EDEBE7;background:linear-gradient(150deg,#202023,#101011 78%);border:1px solid #55555a;box-shadow:0 24px 80px #000c;text-align:left;}
+.objective-briefing-modal:before{content:'';position:absolute;inset:0 0 auto;height:3px;background:#CF3630;}
+.objective-briefing-kicker{display:flex;align-items:center;gap:8px;color:#F05449;font:700 11px 'Barlow Condensed',sans-serif;letter-spacing:.18em;}
+.objective-briefing-modal h1{margin:16px 0 8px;color:#EDEBE7;font:700 clamp(26px,5vw,36px) 'Barlow Condensed',sans-serif;}
+.objective-briefing-intro{margin:0 0 22px;color:#A5A29F;font-size:14px;line-height:1.5;}
+.objective-briefing-card{padding:18px;background:#090909;border:1px solid #444447;border-left:3px solid #CF3630;}
+.objective-briefing-card strong{color:#fff;font:700 20px 'Barlow Condensed',sans-serif;}
+.objective-briefing-card p{margin:8px 0 0;color:#D0CECA;font-size:15px;line-height:1.55;}
+.objective-briefing-modal>button{width:100%;min-height:44px;margin-top:20px;color:#fff;background:#CF3630;border:1px solid #F05449;font:700 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;cursor:pointer;}
+.objective-briefing-modal>button:hover{background:#F05449;}
+.objective-briefing-modal>small{display:block;margin-top:12px;color:#858588;text-align:center;font-size:11px;}
+.match-screen .battle-die{position:relative;transform-style:preserve-3d;will-change:transform;}
+.match-screen .battle-die.is-rolling{animation:battle-dice-tumble 1.17s cubic-bezier(.18,.72,.25,1) both;}
+.match-screen .battle-die.is-rolling span{animation:battle-dice-face .09s steps(1,end) infinite;}
+.match-screen .battle-die.has-landed{animation:battle-dice-settle .24s cubic-bezier(.2,.8,.2,1) both;}
+.match-screen .battle-die-status{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);font:700 8px 'Barlow Condensed',sans-serif;letter-spacing:.14em;color:#EF534F;white-space:nowrap;}
+@keyframes battle-dice-tumble{0%{transform:perspective(420px) rotateX(0) rotateY(0) rotateZ(0) scale(.8);filter:brightness(.8)}75%{transform:perspective(420px) rotateX(670deg) rotateY(520deg) rotateZ(210deg) scale(1.15);filter:brightness(1.25)}100%{transform:perspective(420px) rotateX(720deg) rotateY(540deg) rotateZ(180deg) scale(1);filter:brightness(1)}}
+@keyframes battle-dice-face{0%{opacity:.8}50%{opacity:1}100%{opacity:.8}}
+@keyframes battle-dice-settle{0%{transform:scale(1.1) rotate(-6deg)}65%{transform:scale(.96) rotate(2deg)}100%{transform:scale(1) rotate(0)}}
 .match-screen .objective-card-popover,.match-screen .territory-inspector{--yellow:#EF534F;--cyan:#49A3D9;}
 .match-screen .world-legend{color:#F1F5F9;background:#101C29;border-color:#34495E;}
 .match-screen .world-legend i{border:1px solid #F1F5F9;}

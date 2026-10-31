@@ -27,6 +27,16 @@ export function BattleAnimation({ source, target, color, troopCount, animationId
       <path className="battle-route-dash" d={route} />
       <circle className="battle-origin-pulse" cx={sourceX} cy={sourceY} r="16" />
       <circle className="battle-impact-ring" cx={targetX} cy={targetY} r="8" />
+      <g className="battle-explosion" transform={`translate(${targetX} ${targetY})`}>
+        <circle className="explosion-shockwave" r="8" />
+        <path className="explosion-burst" d="M0-25 5-13 13-20 12-8 25-9 16 0 25 8 12 9 16 21 5 14 0 27-5 14-15 21-12 9-25 8-16 0-25-9-12-8-15-20-5-13Z" />
+        <circle className="explosion-core" r="9" />
+        <path className="explosion-rays" d="M0-34 2-19M24-24 14-13M34 0 19 2M24 24 13 14M0 35-2 19M-24 24-14 13M-35 0-19-2M-24-24-13-14" />
+        <circle className="explosion-smoke smoke-a" cx="-12" cy="-5" r="8" />
+        <circle className="explosion-smoke smoke-b" cx="9" cy="-10" r="7" />
+        <circle className="explosion-smoke smoke-c" cx="8" cy="8" r="8" />
+        <path className="explosion-sparks" d="M-21-19l-5-7m40 9 6-7m4 31 8 3m-44 2-7 6" />
+      </g>
       <g className="battle-impact" transform={`translate(${targetX} ${targetY})`}>
         <circle className="battle-impact-core" r="7" />
         <path d="M-16 0h32M0-16v32M-11-11l22 22M11-11-11 11" className="battle-impact-rays" />
