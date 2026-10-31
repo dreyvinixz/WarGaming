@@ -517,6 +517,115 @@
   .match-screen .game-log-trigger { min-height: 38px; padding: 6px 9px; }
   .match-screen .territory-inspector { bottom: 68px; max-height: 45dvh; }
 }
+
+/* Animated soldier clash and visible troop casualties in the shared combat report. */
+.match-screen .battle-scene {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: 174px;
+  margin: 12px 0 14px;
+  overflow: hidden;
+  border: 1px solid #34495E;
+  background: radial-gradient(ellipse at 50% 72%, #263c4b 0%, #132230 53%, #0b121a 100%);
+  box-shadow: inset 0 0 28px #03070c99;
+}
+.match-screen .battle-scene-scanlines,
+.match-screen .battle-scene-grid,
+.match-screen .battle-scene-ground,
+.match-screen .battle-scene-flash { position: absolute; pointer-events: none; }
+.match-screen .battle-scene-scanlines { z-index: 1; inset: 0; opacity: .22; background: repeating-linear-gradient(0deg, transparent 0 5px, #ffffff09 6px 7px); }
+.match-screen .battle-scene-grid { z-index: 0; inset: 0; opacity: .2; background: linear-gradient(#5d778422 1px, transparent 1px), linear-gradient(90deg, #5d778422 1px, transparent 1px); background-size: 22px 22px; mask-image: linear-gradient(transparent,#000 28%,#000 80%,transparent); }
+.match-screen .battle-scene-ground { z-index: 2; right: 0; bottom: 30px; left: 0; height: 1px; background: linear-gradient(90deg,transparent,#75899a99,transparent); box-shadow: 0 8px 18px #050a10; }
+.match-screen .battle-scene-flash { z-index: 2; top: 42%; left: 50%; width: 6px; height: 6px; border-radius: 50%; background: #fff4c1; opacity: 0; box-shadow: 0 0 12px 8px #ff9a3d99,0 0 34px 20px #ef534f55; animation: battle-clash-flash .65s 1.05s ease-out both; }
+.match-screen .battle-impact-mark { position: absolute; z-index: 4; top: 37%; left: 50%; color: #fff0b3; font-size: 32px; line-height: 1; opacity: 0; text-shadow: 0 0 12px #ff7447; transform: translate(-50%,-50%) scale(.2); animation: battle-clash-mark .5s 1.05s cubic-bezier(.16,.8,.3,1) both; }
+.match-screen .battle-fighter { position: absolute; z-index: 3; bottom: 26px; width: 64px; height: 105px; transform-origin: 50% 88%; filter: drop-shadow(0 6px 4px #000b); }
+.match-screen .battle-fighter--attacker { left: calc(50% - 112px); }
+.match-screen .battle-fighter--defender { right: calc(50% - 112px); }
+.match-screen .battle-soldier { display: block; width: 100%; height: 100%; overflow: visible; }
+.match-screen .battle-fighter--defender .battle-soldier { transform: scaleX(-1); }
+.match-screen .soldier-shadow { fill: #02060a; opacity: .75; }
+.match-screen .soldier-pack { fill: color-mix(in srgb,var(--fighter-color) 48%,#111a22); stroke: #091018; stroke-width: 2; }
+.match-screen .soldier-leg { fill: #26313a; stroke: #111922; stroke-width: 3; stroke-linejoin: round; }
+.match-screen .soldier-boot { fill: none; stroke: #111820; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.match-screen .soldier-vest { fill: var(--fighter-color); stroke: #121a22; stroke-width: 3; stroke-linejoin: round; }
+.match-screen .soldier-strap { fill: none; stroke: color-mix(in srgb,var(--fighter-color) 40%,#101820); stroke-width: 3; }
+.match-screen .soldier-arm { fill: none; stroke: color-mix(in srgb,var(--fighter-color) 65%,#111820); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.match-screen .soldier-face { fill: #c7aa89; stroke: #22252a; stroke-width: 2; }
+.match-screen .soldier-neck { fill: #847360; }
+.match-screen .soldier-helmet { fill: color-mix(in srgb,var(--fighter-color) 74%,#202a32); stroke: #131c24; stroke-width: 2; }
+.match-screen .soldier-visor { fill: none; stroke: #d7dce0; stroke-width: 2; opacity: .55; }
+.match-screen .soldier-rifle { fill: none; stroke: #11161c; stroke-width: 6; stroke-linecap: square; stroke-linejoin: round; }
+.match-screen .battle-fighter .soldier-rifle { transform-box: fill-box; transform-origin: 10% 50%; animation: battle-rifle-swing 2.35s ease-in-out both; }
+.match-screen .soldier-highlight { fill: none; stroke: #ffffff80; stroke-width: 1.2; }
+.match-screen .battle-scene.is-attacker-win .battle-fighter--attacker { animation: attacker-wins-advance 2.35s cubic-bezier(.18,.78,.24,1) both; }
+.match-screen .battle-scene.is-attacker-win .battle-fighter--defender { animation: defender-loses-fall 2.35s cubic-bezier(.18,.78,.24,1) both; }
+.match-screen .battle-scene.is-defender-win .battle-fighter--attacker { animation: attacker-loses-fall 2.35s cubic-bezier(.18,.78,.24,1) both; }
+.match-screen .battle-scene.is-defender-win .battle-fighter--defender { animation: defender-wins-hold 2.35s cubic-bezier(.18,.78,.24,1) both; }
+.match-screen .battle-scene-name { position: absolute; z-index: 4; top: 9px; width: 42%; overflow: hidden; color: #c6d3df; font: 700 9px 'Barlow Condensed',sans-serif; letter-spacing: .1em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.match-screen .battle-scene-name--attacker { left: 8px; text-align: left; }
+.match-screen .battle-scene-name--defender { right: 8px; text-align: right; }
+.match-screen .battle-casualties { position: absolute; z-index: 5; right: 8px; bottom: 3px; left: 8px; display: flex; justify-content: space-between; align-items: end; pointer-events: none; }
+.match-screen .battle-casualty-group { --fighter-color: var(--casualty-color); display: flex; flex-direction: column; align-items: center; min-width: 58px; opacity: 0; animation: casualty-report-in .35s 1.42s ease-out forwards; }
+.match-screen .battle-casualty-label { color: #94A8BB; font: 700 8px 'Barlow Condensed',sans-serif; letter-spacing: .14em; }
+.match-screen .battle-casualty-figures { display: flex; align-items: center; justify-content: center; height: 20px; gap: 1px; }
+.match-screen .battle-casualty-figures .battle-soldier { width: 19px; height: 18px; opacity: .72; transform: rotate(90deg); filter: grayscale(.75); }
+.match-screen .battle-casualty-figures .soldier-shadow { display: none; }
+.match-screen .battle-casualty-figures .soldier-vest,
+.match-screen .battle-casualty-figures .soldier-pack { fill: var(--casualty-color); }
+.match-screen .battle-casualty-figures small { color: #cbd5e1; font-size: 9px; }
+.match-screen .battle-casualty-group>strong { color: #F05449; font: 700 10px 'Barlow Condensed',sans-serif; letter-spacing: .08em; }
+.match-screen .battle-casualty-group>strong span { color: #A5A29F; font-size: 8px; }
+.match-screen .battle-forces { margin: 8px 0 12px; }
+.match-screen .battle-forces>div { gap: 3px; }
+.match-screen .battle-forces strong { color: #F1F5F9; }
+.match-screen .battle-scene + .battle-forces .battle-versus { font-size: 16px; }
+@keyframes attacker-wins-advance {
+  0% { opacity: 0; transform: translateX(-24px) scale(.92); }
+  15% { opacity: 1; }
+  45% { transform: translateX(48px) scale(1); }
+  55% { transform: translateX(34px) scale(1.04); }
+  66%,100% { transform: translateX(34px) scale(1); }
+}
+@keyframes defender-loses-fall {
+  0% { opacity: 0; transform: translateX(24px) scaleX(-1) scale(.92); }
+  15% { opacity: 1; }
+  45% { transform: translateX(-48px) scaleX(-1) scale(1); }
+  54% { transform: translateX(-34px) scaleX(-1) rotate(-8deg); }
+  72% { transform: translate(-3px,7px) scaleX(-1) rotate(-76deg); }
+  82%,100% { opacity: .48; transform: translate(-4px,14px) scaleX(-1) rotate(-88deg); }
+}
+@keyframes attacker-loses-fall {
+  0% { opacity: 0; transform: translateX(-24px) scale(.92); }
+  15% { opacity: 1; }
+  45% { transform: translateX(48px) scale(1); }
+  54% { transform: translateX(34px) rotate(8deg); }
+  72% { transform: translate(3px,7px) rotate(76deg); }
+  82%,100% { opacity: .48; transform: translate(4px,14px) rotate(88deg); }
+}
+@keyframes defender-wins-hold {
+  0% { opacity: 0; transform: translateX(24px) scaleX(-1) scale(.92); }
+  15% { opacity: 1; }
+  45% { transform: translateX(-48px) scaleX(-1) scale(1); }
+  55% { transform: translateX(-34px) scaleX(-1) scale(1.04); }
+  66%,100% { transform: translateX(-34px) scaleX(-1) scale(1); }
+}
+@keyframes battle-clash-flash { 0% { opacity: 0; transform: translate(-50%,-50%) scale(.2); } 22% { opacity: 1; transform: translate(-50%,-50%) scale(1.3); } 100% { opacity: 0; transform: translate(-50%,-50%) scale(4); } }
+@keyframes battle-clash-mark { 0% { opacity: 0; transform: translate(-50%,-50%) scale(.2) rotate(0); } 28% { opacity: 1; transform: translate(-50%,-50%) scale(1.2) rotate(28deg); } 100% { opacity: 0; transform: translate(-50%,-50%) scale(1.8) rotate(60deg); } }
+@keyframes casualty-report-in { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes battle-rifle-swing { 0%,28%,100% { transform: rotate(0); } 44% { transform: rotate(-14deg); } 53% { transform: rotate(24deg); } 67% { transform: rotate(-5deg); } }
+@media (max-width: 420px) {
+  .match-screen .battle-scene { height: 158px; margin: 9px 0 11px; }
+  .match-screen .battle-fighter { width: 56px; height: 94px; }
+  .match-screen .battle-fighter--attacker { left: calc(50% - 96px); }
+  .match-screen .battle-fighter--defender { right: calc(50% - 96px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .match-screen .battle-fighter,
+  .match-screen .battle-scene-flash,
+  .match-screen .battle-impact-mark,
+  .match-screen .battle-casualty-group { animation-duration: .01ms !important; animation-delay: 0ms !important; }
+}
 .match-screen .battle-die.has-landed{animation:battle-dice-settle .24s cubic-bezier(.2,.8,.2,1) both;}
 .match-screen .battle-die-status{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);font:700 8px 'Barlow Condensed',sans-serif;letter-spacing:.14em;color:#EF534F;white-space:nowrap;}
 @keyframes battle-dice-tumble{0%{transform:perspective(420px) rotateX(0) rotateY(0) rotateZ(0) scale(.8);filter:brightness(.8)}75%{transform:perspective(420px) rotateX(670deg) rotateY(520deg) rotateZ(210deg) scale(1.15);filter:brightness(1.25)}100%{transform:perspective(420px) rotateX(720deg) rotateY(540deg) rotateZ(180deg) scale(1);filter:brightness(1)}}
