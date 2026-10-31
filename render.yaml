@@ -1,0 +1,25 @@
+# Deploy from the Render Dashboard -> New -> Blueprint.
+# IMPORTANT: the free PostgreSQL instance expires after 30 days.
+services:
+  - type: web
+    name: atlas-war-game
+    runtime: docker
+    plan: free
+    branch: feat/game-ui-redesign-v2
+    dockerfilePath: ./Dockerfile.render
+    dockerContext: .
+    healthCheckPath: /api/v1/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: atlas-war-db
+          property: connectionString
+databases:
+  - name: atlas-war-db
+    plan: free
+    databaseName: atlas_war
+    user: atlas_war
+    ipAllowList: []
