@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: atlas-war-api
+    runtime: python
+    plan: free
+    region: ohio
+    rootDir: apps/api
+    buildCommand: pip install .
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/v1/health
+    numInstances: 1
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.15
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: atlas-war-db
+          property: connectionString
+      - key: CORS_ORIGINS
+        value: https://atlas-war-web.onrender.com
+
+  - type: web
+    name: atlas-war-web
+    runtime: static
+    rootDir: apps/web
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://atlas-war-api.onrender.com/api/v1
+      - key: VITE_WS_URL
+        value: wss://atlas-war-api.onrender.com/ws
+
+databases:
+  - name: atlas-war-db
+    databaseName: atlaswar
+    user: atlaswar
+    plan: free
+    region: ohio
+    postgresMajorVersion: "16"
