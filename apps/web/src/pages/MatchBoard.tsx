@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
-import { Target } from 'lucide-react';
+import { ArrowRight, Crown, Sparkles, Target, Trophy } from 'lucide-react';
 import { TopStatusBar } from '../components/hud/TopStatusBar';
 import { PhaseBanner } from '../components/hud/PhaseBanner';
 import { ActionDock } from '../components/hud/ActionDock';
@@ -308,7 +308,7 @@ export function MatchBoard() {
       {exitOpen && <div className="victory-overlay" role="dialog" aria-modal="true" aria-labelledby="exit-title"><div><h1 id="exit-title">Voltar ao início?</h1><p>Sua vaga permanece na partida. Você poderá retomá-la neste navegador; os demais jogadores podem precisar aguardar seu turno.</p><button onClick={() => setExitOpen(false)}>Continuar jogando</button> <button onClick={() => { disconnectWebSocket(); saveAndExit(); }}>Voltar ao início</button></div></div>}
       {error && <div role="alert" className="match-error">{error} <button onClick={() => setError('')}>Fechar</button></div>}
       {!isConnected && <div role="status" className="match-error">Conexão perdida. Tentando reconectar…</div>}
-      {matchState.phase === 'finished' && <div className="victory-overlay" role="dialog" aria-modal="true"><div><h1>Partida encerrada</h1><p>Vencedor: {matchState.players[matchState.winner_player_id]?.name ?? 'Jogador'}</p><button onClick={reset}>Voltar ao início</button></div></div>}
+      {matchState.phase === 'finished' && <div className="victory-overlay" role="presentation"><div className="victory-confetti" aria-hidden="true">{Array.from({ length: 28 }, (_, index) => <i key={index} style={{ left: `${(index * 37) % 100}%`, animationDelay: `${-((index % 9) * 0.48)}s`, animationDuration: `${4 + (index % 5)}s`, backgroundColor: ['#CF3630', '#F05449', '#C9A75F', '#EDEBE7', '#77777B'][index % 5] }} />)}</div><section className="victory-card" role="dialog" aria-modal="true" aria-labelledby="victory-title"><div className="victory-crown-orbit" aria-hidden="true"><span /><span /><span /><div><Trophy size={36} /></div></div><div className="victory-kicker"><Sparkles size={13} /> CAMPANHA CONCLUÍDA</div><h1 id="victory-title">VITÓRIA!</h1><p className="victory-winner"><Crown size={17} /><span>Comandante vencedor</span></p><strong className="victory-winner-name">{matchState.players[matchState.winner_player_id]?.name ?? 'Jogador'}</strong><p className="victory-message">O mapa agora está sob seu comando.</p><button onClick={reset}>VOLTAR AO INÍCIO <ArrowRight size={17} /></button></section></div>}
       {/* 1. Military Top Status Bar */}
       <TopStatusBar
         roomCode={matchState.room_code}

@@ -117,7 +117,7 @@ export function Lobby() {
           {mode === 'join' && <Input label="Código da sala" placeholder="Ex.: A7C9T2" value={roomToJoin} onChange={event => setRoomToJoin(event.target.value.toUpperCase())} maxLength={6}/>}
           <label className="commander-color-picker"><span>Cor do exército</span><input type="color" value={playerColor} onChange={event => { setPlayerColor(event.target.value.toUpperCase()); setCustomColorChosen(true); }} /><strong>{playerColor}</strong></label>
           {error && <div className="error-banner" role="alert">{error}</div>}
-          {mode === 'create' ? <Button onClick={handleCreateRoom} isLoading={loading} className="menu-play"><span>CRIAR PARTIDA</span><ArrowRight size={21}/></Button> : <Button onClick={handleJoinRoom} isLoading={loading} className="menu-play"><span>ENTRAR NA SALA</span><ArrowRight size={21}/></Button>}
+          {mode === 'create' ? <Button onClick={handleCreateRoom} isLoading={loading} className="menu-play menu-play--create"><span>CRIAR PARTIDA</span><ArrowRight size={21}/></Button> : <Button onClick={handleJoinRoom} isLoading={loading} className="menu-play menu-play--join"><span>ENTRAR NA SALA</span><ArrowRight size={21}/></Button>}
           <p className="menu-panel-note">PARTIDA PRIVADA · ATÉ 6 COMANDANTES</p>
         </section>
         <footer className="game-menu__stage-footer">ATLAS WAR <span>·</span> JOGO DE ESTRATÉGIA</footer>

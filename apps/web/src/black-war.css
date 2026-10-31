@@ -36,9 +36,10 @@ button:focus-visible, input:focus-visible, [role='button']:focus-visible { outli
 .game-menu__stage { background: #090909; }
 .game-menu__world::after { border-color: #444447; box-shadow: inset -22px 0 45px #0009; }
 .game-menu__brand, .game-menu__heading h1 { color: #EDEBE7; }
-.game-menu__brand b, .game-menu__heading h1 em { color: #CF3630; }
+.game-menu .game-menu__brand img { filter: grayscale(1); }
+.game-menu__brand b, .game-menu__heading h1 em { color: #A5A29F; }
 .game-menu__brand small, .game-menu__world-footer, .game-menu__stage-footer { color: #A5A29F; }
-.game-menu__heading > span, .game-menu__panel-heading .section-kicker { color: #F05449; }
+.game-menu__heading > span, .game-menu__panel-heading .section-kicker { color: #A5A29F; }
 .game-menu__heading p { color: #EDEBE7; }
 .game-menu__panel, .menu-modal { color: #EDEBE7; background: #1B1B1D; border-color: #444447; box-shadow: 0 24px 62px #000b; }
 .game-menu__panel-heading h2, .menu-modal h2 { color: #EDEBE7; }
@@ -47,17 +48,21 @@ button:focus-visible, input:focus-visible, [role='button']:focus-visible { outli
 .menu-settings:hover, .menu-modal-close:hover { background: #343438; border-color: #77777B; }
 .menu-mode-tabs button { color: #A5A29F; background: #131314; border-color: #444447; }
 .menu-mode-tabs button:hover { color: #EDEBE7; border-color: #77777B; }
-.menu-mode-tabs button.active { color: #EDEBE7; background: #29292C; border-color: #CF3630; box-shadow: inset 0 -3px #CF3630; }
+.menu-mode-tabs button.active { color: #EDEBE7; background: #29292C; border-color: #77777B; box-shadow: inset 0 -3px #77777B; }
 .game-menu__panel .input-label { color: #EDEBE7; }
 .game-menu__panel .input-field { color: #EDEBE7; background: #131314; border-color: #444447; }
 .game-menu__panel .input-field::placeholder { color: #858588; }
-.game-menu__panel .input-field:focus { border-color: #F05449; box-shadow: 0 0 0 3px #F0544933; }
-.game-menu__panel .menu-play, .menu-modal > button:last-child, .resume-session button { color: #fff; background: #CF3630; border-color: #F05449; box-shadow: 0 4px 0 #76201d, 0 12px 22px #0006; }
-.game-menu__panel .menu-play:hover:not(:disabled), .menu-modal > button:last-child:hover, .resume-session button:hover { background: #F05449; }
+.game-menu__panel .input-field:focus { border-color: #77777B; box-shadow: 0 0 0 3px #77777B33; }
+.game-menu__panel .menu-play--create { color: #fff; background: #CF3630; border-color: #F05449; box-shadow: 0 4px 0 #76201d, 0 12px 22px #0006; }
+.game-menu__panel .menu-play--create:hover:not(:disabled) { background: #F05449; }
+.game-menu__panel .menu-play--join, .menu-modal > button:last-child, .resume-session button { color: #EDEBE7; background: #29292C; border-color: #55555A; box-shadow: 0 3px 0 #111, 0 8px 16px #0005; }
+.game-menu__panel .menu-play--join:hover:not(:disabled), .menu-modal > button:last-child:hover, .resume-session button:hover { background: #343438; border-color: #77777B; }
 .menu-panel-note { color: #A5A29F; }
 .resume-session { color: #EDEBE7; background: #29292C; border-color: #444447; }
 .menu-modal-backdrop, .battle-backdrop { background: #000e; }
-.menu-modal input { accent-color: #CF3630; }
+.menu-modal input { accent-color: #858588; }
+.game-menu .audio-settings-control input[type=range] { accent-color: #858588; }
+.game-menu button:focus-visible, .game-menu input:focus-visible { outline-color: #A5A29F; }
 .commander-color-picker {
   display: flex;
   align-items: center;
