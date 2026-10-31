@@ -4,6 +4,7 @@ import { ArrowRight, Play, Shield, Users, Settings, X } from 'lucide-react';
 import { createRoom, joinRoom, startMatch, getRoom, leaveWaitingRoom } from '../services/api';
 import { useGameStore } from '../store/useGameStore';
 import { disconnectWebSocket } from '../services/ws';
+import { getGameAudioSettings, updateGameAudioSettings, type GameAudioSettings } from '../services/gameAudio';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import './Lobby.css';
@@ -14,6 +15,7 @@ export function Lobby() {
   const [customColorChosen, setCustomColorChosen] = useState(false);
   const [mode, setMode] = useState<'create' | 'join'>('create');
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [audioSettings, setAudioSettings] = useState(getGameAudioSettings);
   const [reducedMotion, setReducedMotion] = useState(() => {
     const preference = localStorage.getItem('atlas-reduced-motion');
     return preference === 'true' || (preference === null && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -25,6 +27,9 @@ export function Lobby() {
   const { setPlayerInfo, roomCode, playerToken, isConnected, reset, savedSession, resume } = useGameStore();
 
   const [room, setRoom] = useState<any>(null);
+  const changeAudioSetting = (key: keyof GameAudioSettings, value: number) => {
+    setAudioSettings(updateGameAudioSettings({ [key]: value }));
+  };
   useEffect(() => {
     if (!roomCode) return;
     const refresh = () => getRoom(roomCode).then(setRoom).catch((error: Error) => {
@@ -117,7 +122,7 @@ export function Lobby() {
         </section>
         <footer className="game-menu__stage-footer">ATLAS WAR <span>·</span> JOGO DE ESTRATÉGIA</footer>
       </main>
-      {settingsOpen && <div className="menu-modal-backdrop"><section role="dialog" aria-modal="true" aria-labelledby="settings-title" className="menu-modal"><button className="menu-modal-close" onClick={() => setSettingsOpen(false)} aria-label="Fechar configurações"><X size={18}/></button><h2 id="settings-title">Configurações</h2><label><input type="checkbox" checked={reducedMotion} onChange={event => setReducedMotion(event.target.checked)}/> Reduzir animações</label><p>A preferência é salva neste navegador.</p><button onClick={() => setSettingsOpen(false)}>Concluído</button></section></div>}
+      {settingsOpen && <div className="menu-modal-backdrop"><section role="dialog" aria-modal="true" aria-labelledby="settings-title" className="menu-modal"><button className="menu-modal-close" onClick={() => setSettingsOpen(false)} aria-label="Fechar configurações"><X size={18}/></button><h2 id="settings-title">Configurações</h2><label><input type="checkbox" checked={reducedMotion} onChange={event => setReducedMotion(event.target.checked)}/> Reduzir animações</label><div className="audio-settings" aria-label="Volumes de áudio">{([['master', 'Volume geral'], ['music', 'Música'], ['effects', 'Efeitos sonoros']] as const).map(([key, label]) => <label className="audio-settings-control" key={key}><span>{label}<output>{audioSettings[key]}%</output></span><input type="range" min="0" max="100" step="1" value={audioSettings[key]} onChange={event => changeAudioSetting(key, Number(event.target.value))} aria-label={label} /></label>)}</div><p>As preferências de áudio são salvas neste navegador.</p><button onClick={() => setSettingsOpen(false)}>Concluído</button></section></div>}
     </div>
   );
 }

@@ -12,6 +12,7 @@ import { BattleDie } from '../components/hud/BattleDie';
 import { Onboarding } from '../components/Onboarding';
 import { useGameStore } from '../store/useGameStore';
 import { sendAction, disconnectWebSocket } from '../services/ws';
+import { playGameSound } from '../services/gameAudio';
 import './MatchBoard.css';
 
 type PhaseType = 'reinforcement' | 'attack' | 'movement';
@@ -63,16 +64,26 @@ export function MatchBoard() {
     sendAction('phase_timeout');
   }, [clockNow, deadlineAt, isConnected, secondsRemaining]);
   useEffect(() => {
+    if (!matchState) return;
     const previous = previousState.current;
     previousState.current = matchState;
-    if (!matchState || !previous || previous.match_id !== matchState.match_id) return;
+    const localPlayerId = Object.keys(matchState.players ?? {}).find(id => matchState.players[id].name === playerName);
+    if (!previous || previous.match_id !== matchState.match_id) {
+      if (localPlayerId && matchState.current_player_id === localPlayerId) playGameSound('turn');
+      return;
+    }
     const oldIds = new Set((previous.action_log ?? []).map((entry: any) => entry.id));
-    const entry = (matchState.action_log ?? []).find((item: any) => !oldIds.has(item.id) && (item.type === 'attack_success' || item.type === 'attack_failed'));
-    if (!entry) return;
-    const payload = entry.payload ?? {};
-    const defenderId = previous.territories?.[payload.target_id]?.owner_id;
-    setBattle({ ...payload, animationId: entry.id, attackerColor: previous.players?.[entry.player_id]?.color ?? '#CF3630', defenderColor: previous.players?.[defenderId]?.color ?? '#49A3D9', won: entry.type === 'attack_success', attacker: previous.players?.[entry.player_id]?.name ?? 'Atacante', defender: previous.players?.[defenderId]?.name ?? 'Defensor', source: previous.territories?.[payload.source_id]?.name ?? 'Origem', target: previous.territories?.[payload.target_id]?.name ?? 'Destino' });
-  }, [matchState]);
+    const newEntries = (matchState.action_log ?? []).filter((item: any) => !oldIds.has(item.id));
+    const attackEntry = newEntries.find((item: any) => item.type === 'attack_success' || item.type === 'attack_failed');
+    if (attackEntry) {
+      const payload = attackEntry.payload ?? {};
+      const defenderId = previous.territories?.[payload.target_id]?.owner_id;
+      setBattle({ ...payload, animationId: attackEntry.id, attackerColor: previous.players?.[attackEntry.player_id]?.color ?? '#CF3630', defenderColor: previous.players?.[defenderId]?.color ?? '#49A3D9', won: attackEntry.type === 'attack_success', attacker: previous.players?.[attackEntry.player_id]?.name ?? 'Atacante', defender: previous.players?.[defenderId]?.name ?? 'Defensor', source: previous.territories?.[payload.source_id]?.name ?? 'Origem', target: previous.territories?.[payload.target_id]?.name ?? 'Destino' });
+      window.setTimeout(() => playGameSound('attack'), 850);
+    }
+    if (newEntries.some((item: any) => item.type === 'troop_movement')) playGameSound('movement');
+    if (localPlayerId && newEntries.some((item: any) => item.type === 'turn_started' && item.player_id === localPlayerId)) playGameSound('turn');
+  }, [matchState, playerName]);
 
   useEffect(() => {
     if (!battle) {

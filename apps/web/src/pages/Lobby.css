@@ -51,6 +51,11 @@
 .menu-modal label{display:flex;align-items:center;gap:10px;margin:20px 0;font-size:17px;}
 .menu-modal p{color:#c8c9ba;font-size:15px;}
 .menu-modal>button:last-child{width:100%;margin-top:24px;padding:14px;color:#1d241d;background:#d0ad70;border:1px solid #f1d59e;font:700 17px 'Barlow Condensed',sans-serif;}
+.audio-settings{display:grid;gap:15px;margin:20px 0;padding:14px;background:#111;border:1px solid #444447;}
+.audio-settings-control{display:grid!important;gap:7px!important;margin:0!important;font:600 14px 'Barlow Condensed',sans-serif!important;}
+.audio-settings-control span{display:flex;justify-content:space-between;color:#EDEBE7;}
+.audio-settings-control output{color:#A5A29F;font-variant-numeric:tabular-nums;}
+.audio-settings-control input[type=range]{width:100%;margin:0;accent-color:#CF3630;}
 
 /* Waiting room */
 .waiting-screen{min-height:100svh;color:#f0e4c9;background:linear-gradient(90deg,#101b1af2,#12211dd9),url('/assets/campaign/campaign-art.png') center/cover fixed;font-family:'Barlow Condensed',sans-serif;}

@@ -34,6 +34,8 @@ const phaseInfo = {
 } as const;
 
 export function PhaseBanner({ phase, isMyTurn, secondsRemaining, roundNumber }: PhaseBannerProps) {
+  if (!isMyTurn) return null;
+
   const current = phaseInfo[phase] ?? phaseInfo.reinforcement;
   const Icon = current.icon;
 
@@ -43,7 +45,6 @@ export function PhaseBanner({ phase, isMyTurn, secondsRemaining, roundNumber }: 
         <div className="phase-banner-eyebrow">
           <Icon size={12} />
           <span>{current.code}</span>
-          {!isMyTurn && <span>· AGUARDE SUA VEZ</span>}
           {secondsRemaining !== null && <span className={`phase-countdown ${secondsRemaining <= 10 ? 'is-urgent' : ''}`} role="timer" aria-live="off" aria-label={`Tempo restante: ${secondsRemaining} segundos`}>{String(Math.floor(secondsRemaining / 60)).padStart(2, '0')}:{String(secondsRemaining % 60).padStart(2, '0')}</span>}
         </div>
         <div className="phase-banner-title">
@@ -52,7 +53,7 @@ export function PhaseBanner({ phase, isMyTurn, secondsRemaining, roundNumber }: 
         <div className="phase-banner-description">
           {phase === 'attack' && roundNumber === 1
             ? 'Trégua inicial: ataques liberados a partir da rodada 2.'
-            : isMyTurn ? current.description : 'Acompanhe o turno do outro comandante.'}
+            : current.description}
         </div>
       </div>
     </div>
