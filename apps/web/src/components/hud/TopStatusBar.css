@@ -13,7 +13,7 @@
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(26, 47, 76, 0.7);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  font-family: 'Rajdhani', 'Chakra Petch', system-ui, sans-serif;
+  font-family: 'Barlow Condensed', 'Barlow Condensed', system-ui, sans-serif;
 }
 
 .top-bar-left,

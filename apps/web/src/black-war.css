@@ -1,0 +1,170 @@
+/* Atlas War: Black War palette */
+:root {
+  color-scheme: dark;
+  --bg-primary: #090909;
+  --bg-secondary: #131314;
+  --bg-panel: #1B1B1D;
+  --bg-elevated: #29292C;
+  --border-primary: #444447;
+  --border-hover: #77777B;
+  --text-primary: #EDEBE7;
+  --text-secondary: #A5A29F;
+  --text-muted: #858588;
+  --accent-primary: #CF3630;
+  --accent-primary-hover: #F05449;
+  --accent-selection: #F05449;
+  --accent-success: #34B78F;
+  --ink: #EDEBE7;
+  --muted: #A5A29F;
+  --line: #444447;
+  --panel: #1B1B1D;
+  --panel-deep: #131314;
+  --yellow: #CF3630;
+  --red: #F05449;
+  --cyan: #A5A29F;
+  background: #090909;
+  color: #EDEBE7;
+}
+
+html, body, #root { background: #090909; color: #EDEBE7; }
+body { background: #090909; color: #EDEBE7; }
+body::before { display: none; }
+button:focus-visible, input:focus-visible, [role='button']:focus-visible { outline-color: #F05449; }
+
+/* Main menu: keep the cinematic art natural; the command side is black. */
+.game-menu { background: #090909; color: #EDEBE7; }
+.game-menu__stage { background: #090909; }
+.game-menu__world::after { border-color: #444447; box-shadow: inset -22px 0 45px #0009; }
+.game-menu__brand, .game-menu__heading h1 { color: #EDEBE7; }
+.game-menu__brand b, .game-menu__heading h1 em { color: #CF3630; }
+.game-menu__brand small, .game-menu__world-footer, .game-menu__stage-footer { color: #A5A29F; }
+.game-menu__heading > span, .game-menu__panel-heading .section-kicker { color: #F05449; }
+.game-menu__heading p { color: #EDEBE7; }
+.game-menu__panel, .menu-modal { color: #EDEBE7; background: #1B1B1D; border-color: #444447; box-shadow: 0 24px 62px #000b; }
+.game-menu__panel-heading h2, .menu-modal h2 { color: #EDEBE7; }
+.game-menu__panel-heading p, .menu-modal p { color: #A5A29F; }
+.menu-settings, .menu-modal-close { color: #EDEBE7; background: #29292C; border-color: #444447; }
+.menu-settings:hover, .menu-modal-close:hover { background: #343438; border-color: #77777B; }
+.menu-mode-tabs button { color: #A5A29F; background: #131314; border-color: #444447; }
+.menu-mode-tabs button:hover { color: #EDEBE7; border-color: #77777B; }
+.menu-mode-tabs button.active { color: #EDEBE7; background: #29292C; border-color: #CF3630; box-shadow: inset 0 -3px #CF3630; }
+.game-menu__panel .input-label { color: #EDEBE7; }
+.game-menu__panel .input-field { color: #EDEBE7; background: #131314; border-color: #444447; }
+.game-menu__panel .input-field::placeholder { color: #858588; }
+.game-menu__panel .input-field:focus { border-color: #F05449; box-shadow: 0 0 0 3px #F0544933; }
+.game-menu__panel .menu-play, .menu-modal > button:last-child, .resume-session button { color: #fff; background: #CF3630; border-color: #F05449; box-shadow: 0 4px 0 #76201d, 0 12px 22px #0006; }
+.game-menu__panel .menu-play:hover:not(:disabled), .menu-modal > button:last-child:hover, .resume-session button:hover { background: #F05449; }
+.menu-panel-note { color: #A5A29F; }
+.resume-session { color: #EDEBE7; background: #29292C; border-color: #444447; }
+.menu-modal-backdrop, .battle-backdrop { background: #000e; }
+.menu-modal input { accent-color: #CF3630; }
+
+/* Waiting room */
+.waiting-screen { color: #EDEBE7; background-color: #090909; background-image: linear-gradient(90deg, #090909f5, #090909e8), url('/campaign-war.webp'); }
+.waiting-screen .lobby-nav { border-color: #444447; }
+.waiting-screen .lobby-brand { color: #EDEBE7; }
+.waiting-screen .lobby-brand b, .waiting-copy h1 em, .room-code-display strong { color: #CF3630; }
+.waiting-screen .lobby-nav-note, .waiting-copy > p, .waiting-note, .room-code-display span { color: #A5A29F; }
+.waiting-screen .room-code-display { border-color: #CF3630; }
+.waiting-card { background: #1B1B1D; border-color: #444447; }
+.waiting-card-heading h2, .waiting-screen .player-slot strong { color: #EDEBE7; }
+.waiting-screen .player-slot { background: #131314; border-color: #444447; }
+.waiting-screen .player-avatar { background: #343438; }
+.waiting-screen .player-slot small { color: #A5A29F; }
+.waiting-pulse i { background: #CF3630; }
+.waiting-screen .connection-line { color: #A5A29F; }
+.waiting-screen .connection-line i.online { background: #34B78F; box-shadow: 0 0 8px #34B78F; }
+.waiting-screen .error-banner { color: #ffe1df; background: #3d1717; border-color: #CF3630; }
+@media (min-width: 761px) {
+  .waiting-copy { isolation: isolate; }
+  .waiting-figure { top: 220px; right: -15px; left: auto; z-index: 0; height: 255px; opacity: .55; }
+  .waiting-copy > :not(.waiting-figure) { position: relative; z-index: 1; }
+}
+@media (max-width: 760px) {
+  .waiting-figure { top: 20px; right: 0; left: auto; height: 150px; }
+}
+
+/* Shared controls and cards */
+.panel-card, .glass-panel { color: #EDEBE7; background: #1B1B1D; border-color: #444447; border-radius: 3px; box-shadow: 0 14px 30px #0009; }
+.btn { border-radius: 2px; font-family: 'Barlow Condensed', sans-serif; letter-spacing: .06em; }
+.btn-primary { color: #fff; background: #CF3630; border-color: #F05449; box-shadow: 0 3px 0 #76201d, 0 8px 18px #0006; }
+.btn-primary:hover:not(:disabled) { color: #fff; background: #F05449; }
+.btn-secondary { color: #EDEBE7; background: #29292C; border-color: #444447; }
+.btn-secondary:hover:not(:disabled) { color: #fff; background: #343438; border-color: #77777B; }
+.input-label { color: #EDEBE7; }
+.input-field { color: #EDEBE7; background: #131314; border-color: #444447; }
+.input-field::placeholder { color: #858588; }
+.input-field:focus { border-color: #F05449; box-shadow: 0 0 0 2px #F0544933; }
+.error-banner { color: #ffe1df; background: #3d1717; border-color: #CF3630; }
+
+/* Live match: the ocean and exposed canvas stay black. Player colors remain distinct. */
+.match-screen { --heading: 'Barlow Condensed', sans-serif; --yellow: #CF3630; --cyan: #A5A29F; background: #090909; color: #EDEBE7; }
+.match-viewport, .atlas-map-container, .world-board-shell, .world-board-scroll { background: #090909 !important; }
+.atlas-map-container::before { background-image: linear-gradient(#ffffff08 1px, transparent 1px), linear-gradient(90deg, #ffffff08 1px, transparent 1px); }
+.atlas-map-container::after { box-shadow: inset 0 0 100px #000b; }
+.atlas-country:not(.is-playable) { fill: #131314; stroke: #343438; }
+.atlas-country.is-playable { stroke: color-mix(in srgb, var(--territory-color) 70%, #444447); }
+.atlas-country.is-playable:hover { stroke: #EDEBE7; filter: drop-shadow(0 0 7px #EDEBE755); }
+.atlas-country.is-selected { stroke: #F05449 !important; filter: drop-shadow(0 0 10px #F0544977) !important; }
+.atlas-country.is-attackable, .atlas-country.is-target { stroke: #CF3630 !important; filter: drop-shadow(0 0 9px #CF363088) !important; }
+.tactical-vector-line.is-attack, .tactical-vector-line.is-engaged { stroke: #F05449; }
+.tactical-vector-line.is-movement { stroke: #A5A29F; }
+.tactical-troop-marker.is-selected .tactical-marker-base { stroke: #F05449 !important; filter: drop-shadow(0 0 8px #F0544988) !important; }
+.tactical-troop-marker.is-target .tactical-marker-base { stroke: #CF3630 !important; filter: drop-shadow(0 0 8px #CF363088) !important; }
+
+/* Match HUD */
+.match-screen .top-status-bar { color: #EDEBE7; background: #131314; border-color: #444447; box-shadow: 0 5px 18px #0009; }
+.top-status-bar, .action-dock, .phase-banner-card { color: #EDEBE7; background: #1B1B1D; border-color: #444447; box-shadow: 0 8px 24px #0009; }
+.match-screen .top-bar-brand, .top-bar-meta-value, .phase-banner-title, .inspector-territory-name, .inspector-troops-count, .matchup-side strong, .stepper-display strong { color: #EDEBE7; }
+.match-screen .top-bar-brand b, .section-kicker, .inspector-tag { color: #F05449; }
+.match-screen .top-bar-brand-icon { color: #F05449; background: #29292C; border-color: #444447; }
+.top-bar-meta-label, .phase-banner-description, .inspector-troops-count small, .matchup-side span, .stepper-display small { color: #858588; }
+.top-bar-divider { background: #444447; }
+.top-bar-btn, .inspector-close-btn { color: #A5A29F; border-color: #444447; background: #131314; }
+.top-bar-btn:hover, .inspector-close-btn:hover { color: #EDEBE7; border-color: #77777B; }
+.turn-indicator-badge.is-my-turn, .reserves-counter-badge.has-reserves { color: #F05449; border-color: #CF3630; }
+.dock-slot { color: #A5A29F; background: #131314; border-color: #444447; }
+.dock-slot.is-active, .dock-slot.is-active.phase-attack, .dock-slot.is-active.phase-movement { color: #EDEBE7; background: #29292C; border-color: #CF3630; box-shadow: inset 0 -2px #CF3630; }
+.dock-btn-advance { color: #fff; background: #CF3630; border-color: #F05449; box-shadow: 0 3px 0 #76201d; }
+.dock-btn-advance:hover { background: #F05449; }
+.dock-btn-end { color: #A5A29F; background: #29292C; border-color: #444447; }
+.phase-banner-eyebrow, .is-attack .phase-banner-eyebrow { color: #F05449; }
+.is-movement .phase-banner-eyebrow { color: #A5A29F; }
+.phase-banner-card.is-attack { border-color: #CF3630; box-shadow: 0 8px 32px #0009, 0 0 16px #CF363022; }
+.phase-banner-card.is-movement { border-color: #444447; }
+
+/* Map tools, inspectors, objective, event log and dialogs */
+.objective-trigger-btn, .game-log-trigger-btn { color: #EDEBE7; background: #131314; border-color: #444447; }
+.objective-trigger-btn:hover, .game-log-trigger-btn:hover { color: #F05449; border-color: #CF3630; }
+.objective-trigger-dot, .objective-progress-fill { background: #CF3630; box-shadow: 0 0 8px #CF3630; }
+.objective-card-popover, .territory-inspector, .game-log-drawer { color: #EDEBE7; background: #1B1B1D; border-color: #444447; box-shadow: 0 16px 40px #000b; }
+.objective-popover-header { color: #F05449; }
+.objective-popover-title, .objective-stats-row strong { color: #EDEBE7; }
+.objective-popover-desc, .objective-stats-row, .inspector-owner-badge { color: #A5A29F; }
+.objective-progress-bar, .inspector-matchup, .troop-stepper { background: #131314; border-color: #444447; }
+.inspector-header { border-color: #444447; }
+.matchup-vs { color: #F05449; background: #29292C; border-color: #444447; }
+.stepper-btn { color: #F05449; background: #29292C; border-color: #444447; }
+.stepper-btn:hover:not(:disabled) { color: #fff; background: #CF3630; }
+.inspector-commit-btn, .inspector-commit-btn.is-attack { color: #fff; background: #CF3630; border-color: #F05449; box-shadow: 0 3px 0 #76201d; }
+.inspector-commit-btn:hover:not(:disabled), .inspector-commit-btn.is-attack:hover:not(:disabled) { background: #F05449; }
+.game-log-backdrop, .modal-overlay, .tutorial-backdrop, .victory-overlay { background: #000d; }
+.game-log-drawer, .modal-content, .tutorial-modal, .victory-overlay > div { color: #EDEBE7; background: #1B1B1D; border-color: #444447; border-radius: 3px; }
+.game-log-header, .inspector-header { border-color: #444447; }
+.game-log-title, .game-log-title strong, .game-log-item-body, .tutorial-modal h2 { color: #EDEBE7; }
+.game-log-title-icon, .game-log-item-icon, .game-log-item.is-attack_success .game-log-item-icon { color: #F05449; }
+.game-log-item { border-color: #343438; }
+.game-log-item.is-attack_success, .game-log-item.is-attack_failed { border-left-color: #CF3630; }
+.game-log-item-meta, .game-log-item-body p { color: #A5A29F; }
+.tutorial-step { color: #A5A29F; background: #131314; border-color: #444447; }
+.tutorial-step.is-active { color: #EDEBE7; background: #29292C; border-color: #CF3630; }
+.tutorial-step.is-active > span, .tutorial-modal .primary-action { color: #fff; background: #CF3630; border-color: #F05449; }
+.tutorial-modal h2 em { color: #F05449; }
+.tutorial-modal .primary-action:hover { background: #F05449; box-shadow: 0 0 18px #CF363044; }
+.world-map-tools button, .world-list-heading button { color: #EDEBE7; background: #29292C; border-color: #444447; }
+.world-territory-list { color: #EDEBE7; background: #1B1B1D; border-color: #444447; }
+.world-territory-list h3 { color: #F05449; }
+.world-territory-list section > button:hover, .world-territory-list section > button:focus, .world-territory-list section > button.active { background: #343438; }
+.world-territory-list small { color: #A5A29F; }
+.match-screen .world-legend { color: #EDEBE7; background: #131314ed; border-color: #444447; }
+.match-error { color: #fff; background: #3d1717; }

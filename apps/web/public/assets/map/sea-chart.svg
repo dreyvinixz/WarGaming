@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480">
+  <defs>
+    <pattern id="waves" width="120" height="80" patternUnits="userSpaceOnUse">
+      <path d="M-30 20c20-13 40-13 60 0s40 13 60 0 40-13 60 0M-30 50c20-13 40-13 60 0s40 13 60 0 40-13 60 0" fill="none" stroke="#94A8BB" stroke-opacity=".105" stroke-width=".75"/>
+      <path d="M14 68h25m39-48h18m-63 9h12m44 48h20" stroke="#49A3D9" stroke-opacity=".09" stroke-width="1"/>
+    </pattern>
+    <radialGradient id="depth"><stop stop-color="#34495E" stop-opacity=".18"/><stop offset="1" stop-color="#0B121B" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="480" height="480" fill="#142638"/>
+  <rect width="480" height="480" fill="url(#waves)"/>
+  <circle cx="240" cy="240" r="225" fill="url(#depth)"/>
+</svg>

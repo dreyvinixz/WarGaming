@@ -10,7 +10,7 @@
   border: 1px solid #1a3556;
   border-radius: 12px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  font-family: 'Rajdhani', 'Chakra Petch', system-ui, sans-serif;
+  font-family: 'Barlow Condensed', 'Barlow Condensed', system-ui, sans-serif;
   animation: inspectorFade 0.2s ease-out;
 }
 

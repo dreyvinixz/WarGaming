@@ -19,7 +19,7 @@ const NODE_POSITION: Record<string, [number, number]> = {
   C1: [481, 226], C2: [530, 228], C3: [510, 285], C4: [536, 378], S1: [520, 570], S2: [704, 365], S3: [840, 555],
 };
 
-const PLAYER_COLORS = ['#d0a64e', '#719aa0', '#a36562', '#82916b', '#a683b4', '#d58350'];
+const PLAYER_COLORS = ['#EF534F', '#49A3D9', '#34B78F', '#A78BFA', '#F59E0B', '#E2E8F0'];
 
 interface AtlasMapProps {
   matchState: any;
@@ -100,6 +100,7 @@ export function AtlasMap({
     const players = Object.keys(matchState.players).sort();
     const source = selectedNode ? matchState.territories[selectedNode] : null;
     return <div className="world-board-shell">
+      <img className="world-compass-rose" src="/assets/map/compass-rose.svg" alt="" aria-hidden="true" />
       <div className="world-map-tools" role="group" aria-label="Navegação do mapa">
         <button type="button" onClick={() => setZoom(z => Math.max(1, z - 0.25))} disabled={zoom <= 1} aria-label="Diminuir zoom">−</button><span aria-live="polite">{Math.round(zoom * 100)}%</span><button type="button" onClick={() => setZoom(z => Math.min(2, z + 0.25))} disabled={zoom >= 2} aria-label="Aumentar zoom">+</button><button type="button" aria-expanded={listOpen} onClick={() => setListOpen(open => !open)}>Territórios</button>
       </div>
@@ -114,8 +115,10 @@ export function AtlasMap({
           const valid = source && source.owner_id === myPlayerId && source.troops > 1 && source.neighbors.includes(item.id) && ((phase === 'attack' && item.owner_id !== myPlayerId) || (phase === 'movement' && item.owner_id === myPlayerId));
           return <g key={item.id} role="button" tabIndex={0} aria-label={`${item.name}, ${matchState.players[item.owner_id]?.name ?? 'Neutro'}, ${item.troops} tropas`} onClick={() => { if (!dragMoved.current) onNodeClick(item.id); }} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNodeClick(item.id); } }} className={`world-cell geo-cell ${selectedNode === item.id ? 'selected' : ''} ${targetNode === item.id || valid ? 'valid' : ''}`}>
             {geo.paths.map((path, i) => <path key={i} d={path.d} transform={'transform' in path ? path.transform : undefined} fill={color} />)}
-            <circle cx={geo.x} cy={geo.y} r="10" /><text x={geo.x} y={geo.y + 4} textAnchor="middle" className="geo-troops">{item.troops}</text>
-            <text x={geo.x} y={geo.y + 16} textAnchor="middle" className="geo-name">{item.name}</text><title>{item.name}</title>
+            <path className="geo-token-shape" d={`M${geo.x - 11} ${geo.y - 12}h22v15c0 5-4.2 8.8-11 12-6.8-3.2-11-7-11-12v-15Z`} style={{ fill: color }} />
+            <image className="geo-token-frame" href="/assets/tokens/troop-token-frame.svg" x={geo.x - 15} y={geo.y - 15} width="30" height="34" />
+            <text x={geo.x} y={geo.y + 3} textAnchor="middle" className="geo-troops">{item.troops}</text>
+            <text x={geo.x} y={geo.y + 27} textAnchor="middle" className="geo-name">{item.name}</text><title>{item.name}</title>
           </g>;
         }) : Object.values(matchState.territories).map((item: any) => {
           const x = 12 + item.x * 118, y = 12 + item.y * 126;
@@ -139,7 +142,7 @@ export function AtlasMap({
 
 
   const getPlayerColor = (playerId: string | null) => {
-    if (!playerId) return '#1b2a40';
+    if (!playerId) return '#101C29';
     const index = playerIds.indexOf(playerId);
     return PLAYER_COLORS[index < 0 ? 0 : index % PLAYER_COLORS.length];
   };

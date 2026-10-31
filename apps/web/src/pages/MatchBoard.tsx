@@ -13,7 +13,7 @@ import './MatchBoard.css';
 
 type PhaseType = 'reinforcement' | 'attack' | 'movement';
 
-const PLAYER_COLORS = ['#d0a64e', '#719aa0', '#a36562', '#82916b', '#a683b4', '#d58350'];
+const PLAYER_COLORS = ['#EF534F', '#49A3D9', '#34B78F', '#A78BFA', '#F59E0B', '#E2E8F0'];
 
 export function MatchBoard() {
   const { matchState, playerName, error, setError, reset, saveAndExit, isConnected } = useGameStore();
@@ -46,7 +46,7 @@ export function MatchBoard() {
   const phase = (matchState.phase as PhaseType) ?? 'reinforcement';
 
   const getPlayerColor = (playerId: string | null) => {
-    if (!playerId) return '#1b2a40';
+    if (!playerId) return '#101C29';
     const index = playerIds.indexOf(playerId);
     return PLAYER_COLORS[index < 0 ? 0 : index % PLAYER_COLORS.length];
   };
@@ -228,7 +228,7 @@ export function MatchBoard() {
 
       {/* 2. Full-Viewport Battlefield Canvas */}
       <main className="match-viewport">
-        <div className="command-players" aria-label="Comandantes da partida">{playerIds.map(id => <div className={`command-player ${id === currentPlayerId ? 'active' : ''}`} key={id}><span className="command-player__medal" style={{ backgroundColor: getPlayerColor(id) }}>{matchState.players[id].name.slice(0, 1).toUpperCase()}</span><span><strong>{matchState.players[id].name}{id === myPlayerId ? ' · você' : ''}</strong><small>{id === currentPlayerId ? 'Jogando agora' : 'Aguardando'}</small></span></div>)}</div>
+        <div className="command-players" aria-label="Comandantes da partida">{playerIds.map(id => <div className={`command-player ${id === currentPlayerId ? 'active' : ''}`} key={id}><span className="command-player__medal" style={{ backgroundColor: getPlayerColor(id) }}><img src="/assets/ui/atlas-crest.svg" alt="" /><b>{matchState.players[id].name.slice(0, 1).toUpperCase()}</b></span><span><strong>{matchState.players[id].name}{id === myPlayerId ? ' · você' : ''}</strong><small>{id === currentPlayerId ? 'Jogando agora' : 'Aguardando'}</small></span></div>)}</div>
         {/* Floating Contextual Phase Banner */}
         <PhaseBanner phase={phase} isMyTurn={isMyTurn} />
 

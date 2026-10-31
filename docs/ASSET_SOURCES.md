@@ -26,5 +26,14 @@ A primeira camada do redesign usa CSS, SVG do Atlas Vivo e `lucide-react` para v
 - Identificado na página da fonte como domínio público (Public Domain Mark). Usado como textura de fundo; não representa o tabuleiro jogável.
 
 ### Arte de campanha e tipografia
-- `campaign-art.png` e `army-standard.png`: ilustrações originais geradas para Atlas War, sem uso de imagens dos jogos de referência.
-- Roboto Condensed: fonte distribuída sob SIL Open Font License por Fontsource; usada como referência tipográfica a partir do projeto Risk Game 3D. As demais fontes instaladas preservam suas respectivas licenças.
+- `campaign-art.png`, `campaign-war.webp` e `army-standard.png`: ilustrações originais geradas para Atlas War, sem uso de imagens dos jogos de referência. `campaign-war.webp` é o poster/fallback do vídeo no menu principal.
+- `campaign-loop.mp4`: clipe de campanha fornecido para o Atlas War, preparado para começar a reprodução progressiva no menu; reproduz sem áudio e em loop.
+- `assets/ui/atlas-crest.svg`, `assets/ui/ornate-divider.svg`, `assets/map/sea-chart.svg`, `assets/map/compass-rose.svg`, `assets/tokens/troop-token-frame.svg` e `assets/combat/die-red.svg` / `die-blue.svg`: vetores originais criados para Atlas War nesta etapa.
+- Barlow Condensed e Cinzel: pacotes Fontsource auto-hospedados sob SIL Open Font License 1.1. Os avisos completos acompanham a aplicação em `apps/web/public/assets/licenses/`.
+- Removemos a dependência runtime de Google Fonts; os estilos usam os arquivos tipográficos locais.
+
+### Materiais avaliados nos repositórios de referência
+- [`lan-games`](https://github.com/kbennett2000/lan-games): licença MIT para o software do repositório. Seu SVG de tabuleiro Risk é baseado em cartografia de terceiros; a licença MIT do repositório não substitui a atribuição CC BY-SA dessa cartografia.
+- [`risk-game`](https://github.com/daniel3303/risk-game): os créditos identificam a geometria cartográfica como CC BY-SA 4.0, com atribuição e compartilhamento pela mesma licença. Não copiamos essa geometria nesta etapa porque o mapa do Atlas War tem outra topologia e quantidade de territórios.
+- Os retratos e a miniatura de infantaria do `risk-game` não foram copiados: os créditos os descrevem como arte criada para aquele projeto, mas não concedem uma licença de reutilização.
+- Os frontends de [`go-risk-it-frontend`](https://github.com/go-risk-it/go-risk-it-frontend) e [`playgrid`](https://github.com/dkirby-ms/playgrid) não apresentavam uma licença explícita nos arquivos consultados; foram usados apenas como referência de produto, sem copiar seus arquivos.
