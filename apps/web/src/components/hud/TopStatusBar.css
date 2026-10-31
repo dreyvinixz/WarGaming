@@ -145,6 +145,20 @@
   font-weight: 700;
 }
 
+.fighter-counter-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  color: #94a8bb;
+  background: rgba(15, 29, 50, 0.6);
+  border: 1px solid #233e61;
+  border-radius: 6px;
+  font-size: 11px;
+}
+.fighter-counter-badge.has-fighters { color: #75c9ff; border-color: #39799e; background: #143047aa; }
+.fighter-counter-badge strong { font-size: 13px; }
+
 .top-bar-btn {
   display: inline-flex;
   align-items: center;

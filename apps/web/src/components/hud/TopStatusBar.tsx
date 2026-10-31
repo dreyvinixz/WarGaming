@@ -1,4 +1,4 @@
-import { Flag, HelpCircle, LogOut, Shield } from 'lucide-react';
+import { Flag, HelpCircle, LogOut, Plane, Shield } from 'lucide-react';
 import './TopStatusBar.css';
 
 interface TopStatusBarProps {
@@ -7,6 +7,7 @@ interface TopStatusBarProps {
   isMyTurn: boolean;
   currentPlayerName: string;
   reinforcementPool: number;
+  fighters: number;
   onOpenTutorial: () => void;
   onExitMatch?: () => void;
 }
@@ -17,6 +18,7 @@ export function TopStatusBar({
   isMyTurn,
   currentPlayerName,
   reinforcementPool,
+  fighters,
   onOpenTutorial,
   onExitMatch,
 }: TopStatusBarProps) {
@@ -49,6 +51,11 @@ export function TopStatusBar({
           <span className="reserves-icon"><Flag size={14} /></span>
           <span className="top-bar-meta-label hide-mobile">REFORÇOS:</span>
           <span className="reserves-count">{String(reinforcementPool).padStart(2, '0')}</span>
+        </div>
+        <div className={`fighter-counter-badge ${fighters > 0 ? 'has-fighters' : ''}`} title="Caças de apoio disponíveis">
+          <Plane size={14} />
+          <span className="hide-mobile">CAÇAS:</span>
+          <strong>{String(fighters).padStart(2, '0')}</strong>
         </div>
 
         <button className="top-bar-btn" onClick={onOpenTutorial} title="Como jogar">

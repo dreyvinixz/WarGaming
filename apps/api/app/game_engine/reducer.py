@@ -149,8 +149,8 @@ def _player_has_territories(state: MatchState, player_id: str) -> bool:
     return any(t.owner_id == player_id for t in state.territories.values())
 
 
-def attack(state: MatchState, player_id: str, source_id: str, target_id: str, attacking_troops: int) -> MatchState:
-    validate_attack_action(state, player_id, source_id, target_id, attacking_troops)
+def attack(state: MatchState, player_id: str, source_id: str, target_id: str, attacking_troops: int, use_fighter: bool = False) -> MatchState:
+    validate_attack_action(state, player_id, source_id, target_id, attacking_troops, use_fighter)
     new_state = state.model_copy(deep=True)
     source = new_state.territories[source_id]
     target = new_state.territories[target_id]
@@ -158,22 +158,31 @@ def attack(state: MatchState, player_id: str, source_id: str, target_id: str, at
     if defender_id is None:
         raise GameActionError("Cannot attack neutral territory")
 
-    result = resolve_combat(attacking_troops, target.troops)
+    result = resolve_combat(attacking_troops, target.troops, fighter_support=use_fighter)
+    attacker = new_state.players[player_id]
+    if use_fighter:
+        new_state.players[player_id] = attacker.model_copy_update(fighters=attacker.fighters - 1)
+
     if result.attacker_won:
-        new_state.territories[source_id] = source.model_copy_update(troops=source.troops - attacking_troops)
-        new_state.territories[target_id] = target.model_copy_update(owner_id=player_id, troops=attacking_troops)
-        attacker = new_state.players[player_id]
-        new_state.players[player_id] = attacker.model_copy_update(territories_conquered_this_turn=attacker.territories_conquered_this_turn + 1)
-        _log(new_state, "attack_success", player_id, f"Território conquistado: {target.name}", result.model_dump() | {"source_id": source_id, "target_id": target_id})
-        if not _player_has_territories(new_state, defender_id):
+        remaining_defenders = target.troops - result.defending_troops_lost
+        conquered = remaining_defenders <= 0
+        if conquered:
+            new_state.territories[source_id] = source.model_copy_update(troops=source.troops - attacking_troops)
+            new_state.territories[target_id] = target.model_copy_update(owner_id=player_id, troops=attacking_troops)
+            attacker = new_state.players[player_id]
+            new_state.players[player_id] = attacker.model_copy_update(territories_conquered_this_turn=attacker.territories_conquered_this_turn + 1)
+        else:
+            new_state.territories[target_id] = target.model_copy_update(troops=remaining_defenders)
+        _log(new_state, "attack_success", player_id, f"{'Território conquistado' if conquered else 'Defesa inimiga enfraquecida'}: {target.name}", result.model_dump() | {"source_id": source_id, "target_id": target_id, "territory_conquered": conquered, "fighter_used": use_fighter})
+        if conquered and not _player_has_territories(new_state, defender_id):
             defender = new_state.players[defender_id]
             new_state.players[defender_id] = defender.model_copy_update(eliminated=True)
             attacker = new_state.players[player_id]
             new_state.players[player_id] = attacker.model_copy_update(players_eliminated=attacker.players_eliminated + 1)
             _log(new_state, "player_eliminated", player_id, f"Eliminated {defender.name}", {"eliminated_player_id": defender_id})
     else:
-        new_state.territories[source_id] = source.model_copy_update(troops=source.troops - attacking_troops)
-        _log(new_state, "attack_failed", player_id, f"Ataque repelido em {target.name}", result.model_dump() | {"source_id": source_id, "target_id": target_id})
+        new_state.territories[source_id] = source.model_copy_update(troops=source.troops - result.attacking_troops_lost)
+        _log(new_state, "attack_failed", player_id, f"Ataque repelido em {target.name}", result.model_dump() | {"source_id": source_id, "target_id": target_id, "territory_conquered": False, "fighter_used": use_fighter})
     return new_state
 
 
@@ -210,8 +219,13 @@ def _find_next_player(state: MatchState, current_player_id: str) -> tuple[str, b
 def end_turn(state: MatchState, player_id: str) -> MatchState:
     validate_end_turn_action(state, player_id)
     new_state = state.model_copy(deep=True)
-    new_state.players[player_id] = new_state.players[player_id].model_copy_update(reinforcement_pool=0)
-    _log(new_state, "turn_ended", player_id, "Turn ended", {"round": new_state.round_number})
+    ending_player = new_state.players[player_id]
+    fighter_awarded = int(ending_player.territories_conquered_this_turn > 0)
+    new_state.players[player_id] = ending_player.model_copy_update(
+        reinforcement_pool=0,
+        fighters=ending_player.fighters + fighter_awarded,
+    )
+    _log(new_state, "turn_ended", player_id, "Turn ended", {"round": new_state.round_number, "fighters_awarded": fighter_awarded})
 
     active = _active_players(new_state)
     if len(active) == 1:

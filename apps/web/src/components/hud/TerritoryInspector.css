@@ -169,6 +169,8 @@
   font-weight: 700;
 }
 
+.inspector-combat-note { margin: 8px 2px 0; color: #9aabba; font-size: 10px; line-height: 1.4; }
+
 /* Quick Action Controls */
 .inspector-action-box {
   margin-top: 14px;
@@ -186,6 +188,23 @@
   border: 1px solid #1c324e;
   border-radius: 8px;
 }
+
+.fighter-support-option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  color: #e5edf5;
+  background: #111b27;
+  border: 1px solid #35475a;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.fighter-support-option input { width: 16px; height: 16px; accent-color: #49a3d9; }
+.fighter-support-icon { color: #75c9ff; font-size: 18px; line-height: 1; }
+.fighter-support-option strong,.fighter-support-option small { display: block; }
+.fighter-support-option strong { font-size: 12px; }
+.fighter-support-option small { margin-top: 2px; color: #94a8bb; font-size: 10px; }
 
 .stepper-btn {
   display: grid;

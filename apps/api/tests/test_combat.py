@@ -50,13 +50,13 @@ class TestResolveCombat:
     def test_attacker_lost_troops_on_defeat(self):
         result = resolve_combat(3, 100, rng=random.Random(99))
         if not result.attacker_won:
-            assert result.attacking_troops_lost == 3
+            assert result.attacking_troops_lost == 1
             assert result.defending_troops_lost == 0
 
     def test_defender_lost_all_troops_on_attacker_win(self):
         result = resolve_combat(100, 3, rng=random.Random(1))
         if result.attacker_won:
-            assert result.defending_troops_lost == 3
+            assert result.defending_troops_lost == 1
             assert result.attacking_troops_lost == 0
 
     def test_raises_on_zero_attacking_troops(self):

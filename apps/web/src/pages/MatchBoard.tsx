@@ -8,7 +8,7 @@ import { ObjectiveBadge } from '../components/hud/ObjectiveBadge';
 import { TerritoryInspector } from '../components/hud/TerritoryInspector';
 import { GameLogDrawer, GameLogTrigger } from '../components/hud/GameLogDrawer';
 import { AtlasMap } from '../components/AtlasMap';
-import { BattleDie } from '../components/hud/BattleDie';
+import { BattleScene } from '../components/hud/BattleScene';
 import { Onboarding } from '../components/Onboarding';
 import { useGameStore } from '../store/useGameStore';
 import { sendAction, disconnectWebSocket } from '../services/ws';
@@ -247,7 +247,7 @@ export function MatchBoard() {
     }
   };
 
-  const handleConfirmAction = (troops: number) => {
+  const handleConfirmAction = (troops: number, useFighter = false) => {
     if (phase === 'reinforcement' && selectedNode) {
       sendAction('place_reinforcement', { territory_id: selectedNode, troops });
       if ((myPlayer?.reinforcement_pool ?? 0) - troops <= 0) {
@@ -256,11 +256,8 @@ export function MatchBoard() {
     }
 
     if (phase === 'attack' && selectedNode && targetNode) {
-      sendAction('attack', { source_id: selectedNode, target_id: targetNode, attacking_troops: troops });
+      sendAction('attack', { source_id: selectedNode, target_id: targetNode, attacking_troops: troops, use_fighter: useFighter });
       setTargetNode(null);
-      if ((selectedTerritory?.troops ?? 0) - troops < 2) {
-        setSelectedNode(null);
-      }
     }
 
     if (phase === 'movement' && selectedNode && targetNode) {
@@ -302,9 +299,9 @@ export function MatchBoard() {
     : 1;
 
   return (
-    <div className="match-screen" style={matchThemeStyle}>
+    <div className="match-screen" data-my-turn={isMyTurn ? 'true' : 'false'} style={matchThemeStyle}>
       {objectiveBriefing && <div className="objective-briefing-backdrop"><section className="objective-briefing-modal" role="dialog" aria-modal="true" aria-labelledby="objective-briefing-title"><div className="objective-briefing-kicker"><Target size={15} /> BRIEFING DE MISSÃO</div><h1 id="objective-briefing-title">Seu objetivo secreto</h1><p className="objective-briefing-intro">Leia sua missão antes de iniciar. Ela define sua condição de vitória.</p><div className="objective-briefing-card"><strong>{objectiveBriefing.title}</strong><p>{objectiveBriefing.description}</p></div><button autoFocus onClick={dismissObjectiveBriefing}>ENTENDI, COMANDANTE</button><small>Você pode consultar sua missão durante a partida.</small></section></div>}
-      {battle && battleResultVisible && <div className="battle-backdrop" role="presentation"><section className="battle-result" role="dialog" aria-modal="true" aria-labelledby="battle-title"><div className="battle-header">RELATÓRIO DE COMBATE</div><h2 id="battle-title">{battle.won ? 'Território conquistado' : 'Ataque repelido'}</h2><p className="battle-route">{battle.source} <span>→</span> {battle.target}</p><div className="battle-forces"><div><small>ATACANTE</small><strong>{battle.attacker}</strong><BattleDie key={`${battle.animationId}:attack`} value={battle.attack_roll} side="attack" animationId={battle.animationId} /><span>Força total: {battle.attack_power}</span><b>Perdas: {battle.attacking_troops_lost}</b></div><span className="battle-versus">VS</span><div><small>DEFENSOR</small><strong>{battle.defender}</strong><BattleDie key={`${battle.animationId}:defense`} value={battle.defense_roll} side="defense" animationId={battle.animationId} /><span>Força total: {battle.defense_power}</span><b>Perdas: {battle.defending_troops_lost}</b></div></div><p className="battle-rule">Força total = tropas + dado. O defensor vence empates.</p><button onClick={() => setBattle(null)}>Continuar partida</button></section></div>}
+      {battle && battleResultVisible && <div className="battle-backdrop" role="presentation"><section className="battle-result" role="dialog" aria-modal="true" aria-labelledby="battle-title"><div className="battle-header">RELATÓRIO DE COMBATE</div><h2 id="battle-title">{battle.territory_conquered ? 'Território conquistado' : battle.won ? 'Ataque bem-sucedido' : 'Ataque repelido'}</h2><p className="battle-route">{battle.source} <span>→</span> {battle.target}</p><BattleScene key={battle.animationId} animationId={battle.animationId} attacker={battle.attacker} defender={battle.defender} attackerColor={battle.attackerColor} defenderColor={battle.defenderColor} attackerLosses={battle.attacking_troops_lost} defenderLosses={battle.defending_troops_lost} winner={battle.won ? 'attacker' : 'defender'} fighterSupport={Boolean(battle.fighter_used)} /><div className="battle-forces"><div><small>ATACANTE</small><strong>{battle.attacker}</strong><span>Força total: {battle.attack_power}</span></div><span className="battle-versus">VS</span><div><small>DEFENSOR</small><strong>{battle.defender}</strong><span>Força total: {battle.defense_power}</span></div></div><p className="battle-rule">Cada troca elimina no máximo uma tropa. O caça concede +2 de força no ataque.</p><button onClick={() => setBattle(null)}>Continuar partida</button></section></div>}
       {exitOpen && <div className="victory-overlay" role="dialog" aria-modal="true" aria-labelledby="exit-title"><div><h1 id="exit-title">Voltar ao início?</h1><p>Sua vaga permanece na partida. Você poderá retomá-la neste navegador; os demais jogadores podem precisar aguardar seu turno.</p><button onClick={() => setExitOpen(false)}>Continuar jogando</button> <button onClick={() => { disconnectWebSocket(); saveAndExit(); }}>Voltar ao início</button></div></div>}
       {error && <div role="alert" className="match-error">{error} <button onClick={() => setError('')}>Fechar</button></div>}
       {!isConnected && <div role="status" className="match-error">Conexão perdida. Tentando reconectar…</div>}
@@ -316,6 +313,7 @@ export function MatchBoard() {
         isMyTurn={isMyTurn}
         currentPlayerName={matchState.players[currentPlayerId]?.name ?? 'Outro Jogador'}
         reinforcementPool={myPlayer?.reinforcement_pool ?? 0}
+        fighters={myPlayer?.fighters ?? 0}
         onOpenTutorial={() => setTutorialOpen(true)}
         onExitMatch={() => setExitOpen(true)}
       />
@@ -349,6 +347,7 @@ export function MatchBoard() {
             ownerColor={getPlayerColor(selectedTerritory.owner_id)}
             targetOwnerName={targetTerritory ? getPlayerName(targetTerritory.owner_id) : undefined}
             targetOwnerColor={targetTerritory ? getPlayerColor(targetTerritory.owner_id) : undefined}
+            fighters={myPlayer?.fighters ?? 0}
             maxTroops={maxTroops}
             onConfirmAction={handleConfirmAction}
             onClose={() => {

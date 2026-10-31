@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Minus, Plus, Shield, Swords, Truck, X } from 'lucide-react';
 import { getTerritoryFlagCode } from '../map/territoryFlags';
 import './TerritoryInspector.css';
@@ -13,8 +13,9 @@ interface TerritoryInspectorProps {
   ownerColor: string;
   targetOwnerName?: string;
   targetOwnerColor?: string;
+  fighters: number;
   maxTroops: number;
-  onConfirmAction: (troops: number) => void;
+  onConfirmAction: (troops: number, useFighter?: boolean) => void;
   onClose: () => void;
 }
 
@@ -28,6 +29,7 @@ export function TerritoryInspector({
   ownerColor,
   targetOwnerName,
   targetOwnerColor,
+  fighters,
   maxTroops,
   onConfirmAction,
   onClose,
@@ -36,12 +38,17 @@ export function TerritoryInspector({
   const [troops, setTroops] = useState<number>(() => (
     phase === 'reinforcement' ? Math.min(maxTroops, Math.max(1, maxTroops)) : Math.max(1, maxTroops)
   ));
+  const [useFighter, setUseFighter] = useState(false);
 
   const currentSelection = `${selectedTerritory?.id}-${targetTerritory?.id}-${phase}`;
   if (currentSelection !== lastSelection) {
     setLastSelection(currentSelection);
     setTroops(phase === 'reinforcement' ? Math.min(maxTroops, Math.max(1, maxTroops)) : Math.max(1, maxTroops));
+    setUseFighter(false);
   }
+  useEffect(() => {
+    setTroops(previous => Math.max(1, Math.min(maxTroops, previous)));
+  }, [maxTroops]);
 
   if (!selectedTerritory) return null;
 
@@ -107,6 +114,10 @@ export function TerritoryInspector({
           </div>
         )}
 
+        {phase === 'attack' && targetTerritory && (
+          <p className="inspector-combat-note">Cada troca elimina no máximo 1 tropa. Conquiste um território no turno para receber um caça ao encerrá-lo.</p>
+        )}
+
         {isMyTurn && (
           <div className="inspector-action-box">
             {canCommit && (
@@ -120,7 +131,7 @@ export function TerritoryInspector({
                 </button>
                 <div className="stepper-display">
                   <strong>{troops}</strong>
-                  <small>{phase === 'reinforcement' ? 'REFORÇOS' : 'TROPAS'}</small>
+                  <small>{phase === 'reinforcement' ? 'REFORÇOS' : phase === 'attack' ? 'FORÇA' : 'TROPAS'}</small>
                 </div>
                 <button
                   className="stepper-btn"
@@ -132,10 +143,18 @@ export function TerritoryInspector({
               </div>
             )}
 
+            {phase === 'attack' && targetTerritory && fighters > 0 && isMine && (
+              <label className="fighter-support-option">
+                <input type="checkbox" checked={useFighter} onChange={event => setUseFighter(event.target.checked)} />
+                <span className="fighter-support-icon" aria-hidden="true">✈</span>
+                <span><strong>Apoio de caça</strong><small>+2 de força · {fighters} disponível(is)</small></span>
+              </label>
+            )}
+
             {canCommit ? (
               <button
                 className={`inspector-commit-btn ${phase === 'attack' ? 'is-attack' : ''}`}
-                onClick={() => onConfirmAction(troops)}
+                onClick={() => onConfirmAction(troops, useFighter)}
               >
                 <ActionIcon size={14} />
                 <span>{actionLabel}</span>
@@ -149,7 +168,7 @@ export function TerritoryInspector({
                   'Clique em um território aliado conectado para mover.'
                 )}
                 {selectedTerritory.troops <= 1 && phase !== 'reinforcement' && (
-                  'Território sem tropas suficientes para manobra (mínimo 2).'
+                  phase === 'attack' ? 'São necessárias pelo menos 2 tropas para atacar.' : 'São necessárias pelo menos 2 tropas para manobrar.'
                 )}
               </small>
             )}
