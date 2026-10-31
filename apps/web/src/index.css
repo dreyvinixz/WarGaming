@@ -1,27 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Chakra+Petch:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap');
 
 :root {
-  font-family: 'Inter', 'Chakra Petch', system-ui, sans-serif;
-  color: #edf8ff;
-  background: #040810;
+  font-family: 'Barlow Condensed', 'Segoe UI', sans-serif;
+  color: #f1f5f9;
+  background: #0b121b;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --ink: #edf8ff;
-  --muted: #7892a8;
-  --line: #1a2f4c;
-  --panel: #07101d;
-  --panel-deep: #050b14;
-  --yellow: #ffd600;
-  --cyan: #00d9f5;
-  --purple: #8b4cc4;
-  --red: #ff475d;
-  --success: #71d88e;
-  --heading: 'Rajdhani', 'Chakra Petch', sans-serif;
+  --ink: #f1f5f9;
+  --muted: #94a8bb;
+  --line: #34495e;
+  --panel: #1c2b3a;
+  --panel-deep: #101c29;
+  --yellow: #ef534f;
+  --cyan: #49a3d9;
+  --purple: #a78bfa;
+  --red: #ef534f;
+  --success: #34b78f;
+  --body: 'Barlow Condensed', 'Segoe UI', sans-serif;
+  --heading: 'Barlow Condensed', 'Segoe UI', sans-serif;
 }
 * { box-sizing: border-box; }
 html, body, #root { min-width: 320px; min-height: 100%; margin: 0; }
-body { min-height: 100vh; overflow-x: hidden; color: var(--ink); background: #07101e; }
-body::before { content: ''; position: fixed; z-index: -1; inset: 0; pointer-events: none; background: radial-gradient(circle at 14% 12%, #15436228, transparent 30%), radial-gradient(circle at 89% 82%, #3f246824, transparent 34%), linear-gradient(135deg, #07101e, #050b15 70%); }
+body { min-height: 100vh; overflow-x: hidden; color: var(--ink); background: #0b121b; }
+body::before { content: ''; position: fixed; z-index: -1; inset: 0; pointer-events: none; background: url('/assets/map/sea-chart.svg') center / 480px 480px repeat; opacity: .2; }
 button, input { font: inherit; }
 button { cursor: pointer; }
 button:focus-visible, input:focus-visible, [role='button']:focus-visible { outline: 2px solid var(--yellow); outline-offset: 3px; }
@@ -45,3 +45,19 @@ h1, h2, h3 { font-family: var(--heading); font-weight: 600; letter-spacing: -.03
 
 @media (max-width: 900px) { .lobby-hero { grid-template-columns: 1fr; gap: 28px; }.hero-map-art { min-height: 270px; }.waiting-layout { grid-template-columns: 1fr; gap: 35px; max-width: 600px; }.waiting-copy h1 { font-size: 5rem; } }
 @media (max-width: 600px) { .lobby-nav { padding: 18px 20px; }.lobby-nav-links { display: none; }.lobby-main { padding: 24px 20px 40px; }.hero-copy h1 { font-size: 4rem; }.hero-copy > p { font-size: 13px; }.hero-stats { gap: 12px; }.hero-stats div { padding-right: 12px; }.hero-stats strong { font-size: 25px; }.hero-stats span { font-size: 8px; }.hero-map-art { min-height: 240px; }.hero-world { width: 135px; height: 135px; }.hero-world span { bottom: 19px; font-size: 12px; }.lobby-entry { padding: 20px; }.entry-form, .join-form { align-items: stretch; flex-direction: column; }.join-form .input-wrapper { max-width: none; }.entry-form .btn, .join-form .btn { width: 100%; }.how-grid { grid-template-columns: 1fr; }.waiting-layout { padding: 30px 20px; }.waiting-copy h1 { font-size: 4.4rem; } }
+
+/* Operation Onyx shared surface and action tokens. */
+:root{color-scheme:dark;--bg-primary:#0B121B;--bg-secondary:#101C29;--bg-panel:#1C2B3A;--border-primary:#34495E;--border-hover:#57738B;--text-primary:#F1F5F9;--text-secondary:#94A8BB;--accent-primary:#EF534F;--accent-primary-hover:#FF6863;--accent-selection:#49A3D9;--accent-success:#34B78F;}
+body{background:#0B121B;color:#F1F5F9;}
+body::before{background:url('/assets/map/sea-chart.svg') center/480px 480px repeat;opacity:.1;}
+.panel-card{background:linear-gradient(145deg,#1C2B3A,#101C29);border-color:#34495E;border-radius:3px;box-shadow:0 14px 30px #02060b99,inset 0 1px #f1f5f90a;}
+.glass-panel{background:#101C29;border-color:#34495E;border-radius:3px;}
+.btn{border-radius:2px;font-family:'Barlow Condensed',sans-serif;letter-spacing:.06em;}
+.btn-primary{color:#fff;background:#EF534F;border-color:#ff7771;box-shadow:0 3px 0 #8e3334,0 8px 18px #0005;}
+.btn-primary:hover:not(:disabled){background:#FF6863;transform:translateY(-1px);box-shadow:0 4px 0 #8e3334,0 10px 20px #0006;}
+.btn-secondary{color:#F1F5F9;background:#1C2B3A;border-color:#34495E;}
+.btn-secondary:hover:not(:disabled){color:#fff;background:#34495E;border-color:#57738B;}
+.input-label{color:#DCE5EF;font-family:'Barlow Condensed',sans-serif;}
+.input-field{color:#F1F5F9;background:#101C29;border-color:#34495E;border-radius:2px;font-family:'Barlow Condensed',sans-serif;}
+.input-field::placeholder{color:#94A8BB;}
+.input-field:focus{border-color:#49A3D9;box-shadow:0 0 0 2px #49A3D933;}

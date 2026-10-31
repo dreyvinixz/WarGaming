@@ -1,20 +1,22 @@
-import { ArrowRight, ChevronRight, Eye, Shield, Swords, Truck } from 'lucide-react';
+import { ArrowRight, ChevronRight, Shield, Swords, Truck } from 'lucide-react';
 import './ActionDock.css';
 
 interface ActionDockProps {
   phase: 'reinforcement' | 'attack' | 'movement';
   isMyTurn: boolean;
+  reinforcementPool: number;
   onAdvancePhase: () => void;
   onEndTurn: () => void;
-  onToggleObjective: () => void;
+
 }
 
 export function ActionDock({
   phase,
   isMyTurn,
+  reinforcementPool,
   onAdvancePhase,
   onEndTurn,
-  onToggleObjective,
+
 }: ActionDockProps) {
   return (
     <div className="action-dock-container" role="toolbar" aria-label="Ações da Partida">
@@ -34,17 +36,13 @@ export function ActionDock({
           <span>MANOBRA</span>
         </div>
 
-        <button className="dock-slot" onClick={onToggleObjective} title="Ver objetivo e inteligência">
-          <span className="dock-icon"><Eye size={16} /></span>
-          <span>INTEL</span>
-        </button>
       </div>
 
       {isMyTurn && (
         <div className="dock-actions-group">
           {phase !== 'movement' ? (
-            <button className="dock-btn dock-btn-advance" onClick={onAdvancePhase}>
-              <span>AVANÇAR FASE</span>
+            <button className="dock-btn dock-btn-advance" onClick={onAdvancePhase} disabled={phase === 'reinforcement' && reinforcementPool > 0} title={phase === 'reinforcement' && reinforcementPool > 0 ? 'Distribua todos os reforços primeiro' : undefined}>
+              <span>PRÓXIMA FASE</span>
               <ArrowRight size={15} />
             </button>
           ) : (
@@ -54,11 +52,7 @@ export function ActionDock({
             </button>
           )}
 
-          {phase !== 'movement' && (
-            <button className="dock-btn dock-btn-end" onClick={onEndTurn} title="Pular direto para encerramento">
-              <span>PASSAR TURNO</span>
-            </button>
-          )}
+
         </div>
       )}
     </div>

@@ -1,0 +1,580 @@
+{
+  "territories": [
+    {
+      "id": "G01",
+      "name": "Alasca",
+      "region": "america_norte",
+      "terrain": "land",
+      "neighbors": [
+        "G02",
+        "G04",
+        "G26"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G02",
+      "name": "Terras do Noroeste",
+      "region": "america_norte",
+      "terrain": "land",
+      "neighbors": [
+        "G01",
+        "G03",
+        "G04"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G03",
+      "name": "Groenlândia",
+      "region": "america_norte",
+      "terrain": "land",
+      "neighbors": [
+        "G02",
+        "G04",
+        "G05",
+        "G12"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G04",
+      "name": "Canadá Central",
+      "region": "america_norte",
+      "terrain": "land",
+      "neighbors": [
+        "G01",
+        "G02",
+        "G03",
+        "G05",
+        "G06",
+        "G07"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G05",
+      "name": "Quebec",
+      "region": "america_norte",
+      "terrain": "land",
+      "neighbors": [
+        "G03",
+        "G04",
+        "G07"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G06",
+      "name": "Oeste dos Estados Unidos",
+      "region": "america_norte",
+      "terrain": "land",
+      "neighbors": [
+        "G04",
+        "G07",
+        "G08"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G07",
+      "name": "Leste dos Estados Unidos",
+      "region": "america_norte",
+      "terrain": "land",
+      "neighbors": [
+        "G04",
+        "G05",
+        "G06",
+        "G08"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G08",
+      "name": "América Central",
+      "region": "america_norte",
+      "terrain": "land",
+      "neighbors": [
+        "G06",
+        "G07",
+        "G09"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G09",
+      "name": "Andes do Norte",
+      "region": "america_sul",
+      "terrain": "land",
+      "neighbors": [
+        "G08",
+        "G10",
+        "G11"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G10",
+      "name": "Brasil",
+      "region": "america_sul",
+      "terrain": "land",
+      "neighbors": [
+        "G09",
+        "G11",
+        "G18"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G11",
+      "name": "Cone Sul",
+      "region": "america_sul",
+      "terrain": "land",
+      "neighbors": [
+        "G09",
+        "G10"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G12",
+      "name": "Islândia",
+      "region": "europa",
+      "terrain": "land",
+      "neighbors": [
+        "G03",
+        "G13",
+        "G15"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G13",
+      "name": "Escandinávia",
+      "region": "europa",
+      "terrain": "land",
+      "neighbors": [
+        "G12",
+        "G14",
+        "G15"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G14",
+      "name": "Leste Europeu",
+      "region": "europa",
+      "terrain": "land",
+      "neighbors": [
+        "G13",
+        "G15",
+        "G17",
+        "G23",
+        "G29",
+        "G31"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G15",
+      "name": "Ilhas e Mar do Norte",
+      "region": "europa",
+      "terrain": "land",
+      "neighbors": [
+        "G12",
+        "G13",
+        "G14",
+        "G16",
+        "G17"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G16",
+      "name": "Europa Ocidental",
+      "region": "europa",
+      "terrain": "land",
+      "neighbors": [
+        "G15",
+        "G17",
+        "G18"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G17",
+      "name": "Europa do Sul",
+      "region": "europa",
+      "terrain": "land",
+      "neighbors": [
+        "G14",
+        "G15",
+        "G16",
+        "G18",
+        "G19",
+        "G31"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G18",
+      "name": "Norte da África",
+      "region": "africa",
+      "terrain": "land",
+      "neighbors": [
+        "G10",
+        "G16",
+        "G17",
+        "G19",
+        "G20",
+        "G21"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G19",
+      "name": "Egito",
+      "region": "africa",
+      "terrain": "land",
+      "neighbors": [
+        "G17",
+        "G18",
+        "G20",
+        "G31"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G20",
+      "name": "África Oriental",
+      "region": "africa",
+      "terrain": "land",
+      "neighbors": [
+        "G18",
+        "G19",
+        "G21",
+        "G22",
+        "G31"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G21",
+      "name": "África Central e Sul",
+      "region": "africa",
+      "terrain": "land",
+      "neighbors": [
+        "G18",
+        "G20",
+        "G22"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G22",
+      "name": "Madagascar",
+      "region": "africa",
+      "terrain": "land",
+      "neighbors": [
+        "G20",
+        "G21"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G23",
+      "name": "Urais",
+      "region": "asia",
+      "terrain": "land",
+      "neighbors": [
+        "G14",
+        "G24",
+        "G29",
+        "G30"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G24",
+      "name": "Sibéria",
+      "region": "asia",
+      "terrain": "land",
+      "neighbors": [
+        "G23",
+        "G25",
+        "G27",
+        "G30"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G25",
+      "name": "Lagos Siberianos",
+      "region": "asia",
+      "terrain": "land",
+      "neighbors": [
+        "G24",
+        "G26",
+        "G27"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G26",
+      "name": "Kamchatka",
+      "region": "asia",
+      "terrain": "land",
+      "neighbors": [
+        "G01",
+        "G25",
+        "G27",
+        "G28"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G27",
+      "name": "Mongólia",
+      "region": "asia",
+      "terrain": "land",
+      "neighbors": [
+        "G24",
+        "G25",
+        "G26",
+        "G28",
+        "G30"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G28",
+      "name": "Japão",
+      "region": "asia",
+      "terrain": "land",
+      "neighbors": [
+        "G26",
+        "G27"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G29",
+      "name": "Afeganistão",
+      "region": "asia",
+      "terrain": "land",
+      "neighbors": [
+        "G14",
+        "G23",
+        "G30",
+        "G31",
+        "G32"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G30",
+      "name": "China",
+      "region": "asia",
+      "terrain": "land",
+      "neighbors": [
+        "G23",
+        "G24",
+        "G27",
+        "G29",
+        "G32",
+        "G33"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G31",
+      "name": "Oriente Médio",
+      "region": "asia",
+      "terrain": "land",
+      "neighbors": [
+        "G14",
+        "G17",
+        "G19",
+        "G20",
+        "G29",
+        "G32"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G32",
+      "name": "Índia",
+      "region": "asia",
+      "terrain": "land",
+      "neighbors": [
+        "G29",
+        "G30",
+        "G31",
+        "G33"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G33",
+      "name": "Sudeste Asiático",
+      "region": "asia",
+      "terrain": "land",
+      "neighbors": [
+        "G30",
+        "G32",
+        "G34"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G34",
+      "name": "Indonésia",
+      "region": "oceania",
+      "terrain": "land",
+      "neighbors": [
+        "G33",
+        "G35",
+        "G36"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G35",
+      "name": "Nova Guiné",
+      "region": "oceania",
+      "terrain": "land",
+      "neighbors": [
+        "G34",
+        "G36"
+      ],
+      "x": 0,
+      "y": 0
+    },
+    {
+      "id": "G36",
+      "name": "Austrália",
+      "region": "oceania",
+      "terrain": "land",
+      "neighbors": [
+        "G34",
+        "G35"
+      ],
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "regions": [
+    {
+      "id": "america_norte",
+      "name": "América do Norte",
+      "bonus_troops": 5,
+      "territory_ids": [
+        "G01",
+        "G02",
+        "G03",
+        "G04",
+        "G05",
+        "G06",
+        "G07",
+        "G08"
+      ]
+    },
+    {
+      "id": "america_sul",
+      "name": "América do Sul",
+      "bonus_troops": 2,
+      "territory_ids": [
+        "G09",
+        "G10",
+        "G11"
+      ]
+    },
+    {
+      "id": "europa",
+      "name": "Europa",
+      "bonus_troops": 5,
+      "territory_ids": [
+        "G12",
+        "G13",
+        "G14",
+        "G15",
+        "G16",
+        "G17"
+      ]
+    },
+    {
+      "id": "africa",
+      "name": "África",
+      "bonus_troops": 3,
+      "territory_ids": [
+        "G18",
+        "G19",
+        "G20",
+        "G21",
+        "G22"
+      ]
+    },
+    {
+      "id": "asia",
+      "name": "Ásia",
+      "bonus_troops": 7,
+      "territory_ids": [
+        "G23",
+        "G24",
+        "G25",
+        "G26",
+        "G27",
+        "G28",
+        "G29",
+        "G30",
+        "G31",
+        "G32",
+        "G33"
+      ]
+    },
+    {
+      "id": "oceania",
+      "name": "Oceania",
+      "bonus_troops": 2,
+      "territory_ids": [
+        "G34",
+        "G35",
+        "G36"
+      ]
+    }
+  ]
+}

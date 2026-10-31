@@ -36,6 +36,17 @@ def load_default_map() -> tuple[dict[str, Territory], dict[str, Region]]:
 
 
 def validate_map_graph(territories: dict[str, Territory]) -> None:
+    if not territories:
+        raise ValueError("Map must contain territories")
+    seen, pending = set(), [next(iter(territories))]
+    while pending:
+        tid = pending.pop()
+        if tid in seen:
+            continue
+        seen.add(tid)
+        pending.extend(n for n in territories[tid].neighbors if n in territories and n not in seen)
+    if len(seen) != len(territories):
+        raise ValueError("Map graph is disconnected")
     for tid, territory in territories.items():
         for neighbor_id in territory.neighbors:
             if neighbor_id not in territories:
@@ -51,3 +62,48 @@ def validate_regions(territories: dict[str, Territory], regions: dict[str, Regio
                 raise ValueError(f"Region {rid} references unknown territory {tid}")
             if territories[tid].region != rid:
                 raise ValueError(f"Territory {tid} region mismatch: {territories[tid].region} != {rid}")
+
+
+# Original board: six regional blocks, each with six adjacent territories.
+WORLD_REGIONS = [
+    ("aurora", "Aurora", ["Alvorada", "Baía Fria", "Pinhal", "Lago Azul", "Terras Altas", "Cabo Norte"]),
+    ("occidente", "Ocidente", ["Costa Verde", "Vale Longo", "Serra Clara", "Rios Unidos", "Planície Dourada", "Ponta Oeste"]),
+    ("meridia", "Merídia", ["Ilha Branca", "Colinas", "Estreito", "Campo Central", "Vale do Sol", "Costa Sul"]),
+    ("oriente", "Oriente", ["Montes Cinzentos", "Rio Antigo", "Passagem Alta", "Bosque Real", "Planície Oriental", "Porto Leste"]),
+    ("sahara", "Sahara", ["Mar de Areia", "Pedra Vermelha", "Oásis", "Dunas", "Vale Seco", "Cabo Âmbar"]),
+    ("austral", "Austral", ["Arquipélago", "Terra Nova", "Baía Serena", "Planícies Austrais", "Costa Coral", "Ilha do Sul"]),
+]
+
+def load_world_map() -> tuple[dict[str, Territory], dict[str, Region]]:
+    territories = {}
+    regions = {}
+    for r, (rid, name, names) in enumerate(WORLD_REGIONS):
+        ids = []
+        for n, territory_name in enumerate(names):
+            row, col = divmod(n, 3)
+            tid = f"W{r * 6 + n + 1:02}"
+            ids.append(tid)
+            x, y = (r % 3) * 3 + col, (r // 3) * 2 + row
+            neighbors = []
+            for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < 9 and 0 <= ny < 4:
+                    nr = (ny // 2) * 3 + nx // 3
+                    nn = (ny % 2) * 3 + nx % 3
+                    neighbors.append(f"W{nr * 6 + nn + 1:02}")
+            territories[tid] = Territory(id=tid, name=territory_name, region=rid, terrain="land", neighbors=neighbors, x=x, y=y)
+        regions[rid] = Region(id=rid, name=name, bonus_troops=3, territory_ids=ids)
+    validate_map_graph(territories)
+    validate_regions(territories, regions)
+    return territories, regions
+
+
+def load_geographic_map() -> tuple[dict[str, Territory], dict[str, Region]]:
+    import json
+    from pathlib import Path
+    data = json.loads(Path(__file__).with_name("world_v2.json").read_text(encoding="utf-8"))
+    territories = {item["id"]: Territory(**item) for item in data["territories"]}
+    regions = {item["id"]: Region(**item) for item in data["regions"]}
+    validate_map_graph(territories)
+    validate_regions(territories, regions)
+    return territories, regions

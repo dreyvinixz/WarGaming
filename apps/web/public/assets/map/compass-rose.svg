@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140" fill="none">
+  <g stroke="#94A8BB" stroke-opacity=".62">
+    <circle cx="60" cy="72" r="42" stroke-width="1"/>
+    <circle cx="60" cy="72" r="34" stroke-width=".7" stroke-dasharray="1 3"/>
+    <path d="M60 24v96M12 72h96M26 38l68 68M94 38l-68 68" stroke-width=".7"/>
+    <path d="m60 34 8 38-8-5-8 5 8-38Zm0 76-8-38 8 5 8-5-8 38Zm-38-38 38-8-5 8 5 8-38-8Zm76 0-38 8 5-8-5-8 38 8Z" fill="#94A8BB" fill-opacity=".18"/>
+  </g>
+  <text x="60" y="15" text-anchor="middle" fill="#F1F5F9" fill-opacity=".8" font-family="serif" font-size="11" letter-spacing="2">N</text>
+</svg>

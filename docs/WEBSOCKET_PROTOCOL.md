@@ -1,96 +1,11 @@
-# WebSocket Protocol
+# Protocolo WebSocket — Atlas War
 
-All gameplay communication happens over WebSockets once a match starts.
+Conecte em `/ws/rooms/{codigo}?token={player_token}`. O token retornado ao criar ou entrar na sala identifica o participante; conexão sem token válido é recusada com código 1008. Use TLS em produção, pois o token é transmitido na URL.
 
-## Connection
-Endpoint: `ws://[host]/api/v1/matches/{match_id}/ws?token={player_token}`
+Após conectar a uma partida iniciada, o servidor envia `match_state_updated` com `state`. O mesmo evento é enviado após cada ação válida, individualmente para cada cliente: `objectives` contém apenas o objetivo do destinatário e `objective_id` dos demais jogadores é omitido. A reconexão recebe o estado persistido atual. Partidas anteriores sem `map_id` são interpretadas como `atlas_legacy_v1`; a correspondência de identidade nessas partidas usa o nome registrado na sala.
 
-## 1. Client to Server (Actions)
+Envie `{ "type": "place_reinforcement", "payload": { "territory_id": "W01", "troops": 1 } }`. Outros tipos: `advance_phase`, `attack` (`source_id`, `target_id`, `attacking_troops`), `move_troops` (`source_id`, `target_id`, `troops`) e `end_turn`. O servidor valida turno, fase e regras. Ações recusadas retornam `action_rejected` com `reason` apenas ao remetente.
 
-Clients send JSON payloads representing player actions. The server processes these via the Game Engine.
+`atlas_world_v1` possui versão 1, 36 territórios e seis regiões; `atlas_legacy_v1` preserva o tabuleiro de 13 territórios. A sala só pode ser iniciada pelo anfitrião autenticado e com pelo menos dois participantes.
 
-### `PlaceReinforcements`
-Sent during the Reinforcement phase.
-```json
-{
-  "type": "PlaceReinforcements",
-  "payload": {
-    "territory_id": "earth",
-    "amount": 3
-  }
-}
-```
-
-### `Attack`
-Sent during the Attack phase.
-```json
-{
-  "type": "Attack",
-  "payload": {
-    "source_id": "earth",
-    "target_id": "mars",
-    "amount": 2
-  }
-}
-```
-
-### `MoveTroops`
-Sent during the Movement phase.
-```json
-{
-  "type": "MoveTroops",
-  "payload": {
-    "source_id": "earth",
-    "target_id": "moon",
-    "amount": 1
-  }
-}
-```
-
-### `EndPhase` / `EndTurn`
-Advances the current phase or ends the turn.
-```json
-{
-  "type": "EndPhase",
-  "payload": {}
-}
-```
-
-## 2. Server to Client (Events)
-
-### `GameStateUpdate`
-Broadcast to all players in the match whenever the state changes.
-```json
-{
-  "type": "GameStateUpdate",
-  "payload": {
-    "match_id": "...",
-    "phase": "attack",
-    "current_player": "player-uuid",
-    "territories": { ... },
-    "logs": [ ... ]
-  }
-}
-```
-
-### `Error`
-Sent to a specific client if their action was invalid.
-```json
-{
-  "type": "Error",
-  "payload": {
-    "message": "Not enough fleets to attack."
-  }
-}
-```
-
-### `GameLog`
-Broadcast to all players for UI activity feeds (e.g., combat results).
-```json
-{
-  "type": "GameLog",
-  "payload": {
-    "message": "Player 1 conquered Mars from Player 2!"
-  }
-}
-```
+Novas salas usam `atlas_world_v2` (versão 2): mapa geográfico de 36 territórios. Partidas `atlas_world_v1` mantêm a grade original.

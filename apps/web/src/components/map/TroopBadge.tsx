@@ -102,7 +102,7 @@ export function TroopBadge({
         y="3"
         fill={color}
         fontSize="8"
-        fontFamily="'Chakra Petch', sans-serif"
+        fontFamily="'Barlow Condensed', sans-serif"
         textAnchor="middle"
         pointerEvents="none"
       >
@@ -116,7 +116,7 @@ export function TroopBadge({
         fill="#edf8ff"
         fontSize="11"
         fontWeight="700"
-        fontFamily="'Rajdhani', 'Chakra Petch', sans-serif"
+        fontFamily="'Barlow Condensed', 'Barlow Condensed', sans-serif"
         textAnchor="middle"
         pointerEvents="none"
       >
@@ -133,7 +133,7 @@ export function TroopBadge({
             fill="#040810"
             fontSize="10"
             fontWeight="800"
-            fontFamily="'Rajdhani', sans-serif"
+            fontFamily="'Barlow Condensed', sans-serif"
             textAnchor="middle"
           >
             +{floatingBonus}

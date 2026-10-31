@@ -85,6 +85,8 @@ class GameLogEntry(EngineModel):
 
 class MatchState(EngineModel):
     match_id: str
+    map_id: str = "atlas_legacy_v1"
+    map_version: int = 1
     room_code: str
     status: str = "started"
     round_number: int = 1
@@ -98,3 +100,4 @@ class MatchState(EngineModel):
     action_log: list[GameLogEntry] = Field(default_factory=list)
     winner_player_id: str | None = None
     movement_used_this_turn: bool = False
+    phase_deadline_at: datetime | None = None
