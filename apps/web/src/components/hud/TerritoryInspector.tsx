@@ -31,18 +31,25 @@ export function TerritoryInspector({
   onConfirmAction,
   onClose,
 }: TerritoryInspectorProps) {
+  const [lastSelection, setLastSelection] = useState(`${selectedTerritory?.id}-${targetTerritory?.id}-${phase}`);
   const [troops, setTroops] = useState<number>(() => (
-    phase === 'reinforcement' ? Math.min(maxTroops, Math.max(1, maxTroops)) : 1
+    phase === 'reinforcement' ? Math.min(maxTroops, Math.max(1, maxTroops)) : Math.max(1, maxTroops)
   ));
 
+  const currentSelection = `${selectedTerritory?.id}-${targetTerritory?.id}-${phase}`;
+  if (currentSelection !== lastSelection) {
+    setLastSelection(currentSelection);
+    setTroops(phase === 'reinforcement' ? Math.min(maxTroops, Math.max(1, maxTroops)) : Math.max(1, maxTroops));
+  }
 
   if (!selectedTerritory) return null;
 
   const canCommit = isMyTurn && maxTroops > 0 && (
     (phase === 'reinforcement' && isMine) ||
-    (phase === 'attack' && targetTerritory) ||
-    (phase === 'movement' && targetTerritory)
+    (phase === 'attack' && targetTerritory && isMine) ||
+    (phase === 'movement' && targetTerritory && isMine)
   );
+
 
   const actionLabel = phase === 'reinforcement'
     ? 'ENVIAR REFORÇOS'
@@ -96,7 +103,7 @@ export function TerritoryInspector({
 
         {isMyTurn && (
           <div className="inspector-action-box">
-            {canCommit && maxTroops > 1 && (
+            {canCommit && (
               <div className="troop-stepper">
                 <button
                   className="stepper-btn"

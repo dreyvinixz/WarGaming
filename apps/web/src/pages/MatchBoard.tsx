@@ -61,6 +61,8 @@ export function MatchBoard() {
 
   const totalTerritories = Object.keys(matchState.territories).length || 13;
 
+  const isSelectedMine = selectedTerritory?.owner_id === myPlayerId;
+
   const handleNodeClick = (nodeId: string) => {
     const territory = matchState.territories[nodeId];
     if (!territory) return;
@@ -80,36 +82,82 @@ export function MatchBoard() {
         if ((myPlayer?.reinforcement_pool ?? 0) > 0) {
           setModalOpen(true);
         }
+      } else {
+        setSelectedNode(nodeId);
+        setTargetNode(null);
       }
       return;
     }
 
-    if (phase === 'attack' || phase === 'movement') {
-      if (!selectedNode) {
-        if (isMine && territory.troops > 1) {
-          setSelectedNode(nodeId);
-        } else {
-          setSelectedNode(nodeId);
-        }
-        return;
-      }
-
+    if (phase === 'attack') {
+      // Clicking already selected territory deselects it
       if (nodeId === selectedNode) {
         setSelectedNode(null);
         setTargetNode(null);
+        setModalOpen(false);
         return;
       }
 
-      const neighbors: string[] = matchState.territories[selectedNode]?.neighbors || [];
-      if (neighbors.includes(nodeId)) {
-        setTargetNode(nodeId);
-        setModalOpen(true);
-      } else if (isMine && territory.troops > 1) {
+      // If clicking one of my own territories, select/switch attack origin
+      if (isMine) {
         setSelectedNode(nodeId);
         setTargetNode(null);
+        setModalOpen(false);
+        return;
+      }
+
+      // If clicking an enemy territory
+      if (!isMine) {
+        const sourceTerritory = selectedNode ? matchState.territories[selectedNode] : null;
+        const isSourceMine = sourceTerritory?.owner_id === myPlayerId;
+        const sourceNeighbors: string[] = sourceTerritory?.neighbors || [];
+
+        if (selectedNode && isSourceMine && (sourceTerritory?.troops ?? 0) > 1 && sourceNeighbors.includes(nodeId)) {
+          // Valid adjacent enemy target!
+          setTargetNode(nodeId);
+          setModalOpen(true);
+        } else {
+          // Inspect enemy territory without attacking
+          setSelectedNode(nodeId);
+          setTargetNode(null);
+          setModalOpen(false);
+        }
+        return;
       }
     }
 
+    if (phase === 'movement') {
+      if (nodeId === selectedNode) {
+        setSelectedNode(null);
+        setTargetNode(null);
+        setModalOpen(false);
+        return;
+      }
+
+      if (isMine) {
+        const sourceTerritory = selectedNode ? matchState.territories[selectedNode] : null;
+        const isSourceMine = sourceTerritory?.owner_id === myPlayerId;
+        const sourceNeighbors: string[] = sourceTerritory?.neighbors || [];
+
+        if (selectedNode && isSourceMine && (sourceTerritory?.troops ?? 0) > 1 && sourceNeighbors.includes(nodeId)) {
+          // Valid movement target!
+          setTargetNode(nodeId);
+          setModalOpen(true);
+        } else {
+          // Switch source
+          setSelectedNode(nodeId);
+          setTargetNode(null);
+          setModalOpen(false);
+        }
+        return;
+      } else {
+        // Inspect enemy territory
+        setSelectedNode(nodeId);
+        setTargetNode(null);
+        setModalOpen(false);
+        return;
+      }
+    }
   };
 
   const handleConfirmAction = (troops: number) => {
@@ -123,6 +171,9 @@ export function MatchBoard() {
     if (phase === 'attack' && selectedNode && targetNode) {
       sendAction('attack', { source_id: selectedNode, target_id: targetNode, attacking_troops: troops });
       setTargetNode(null);
+      if ((selectedTerritory?.troops ?? 0) - troops < 2) {
+        setSelectedNode(null);
+      }
     }
 
     if (phase === 'movement' && selectedNode && targetNode) {
@@ -149,11 +200,10 @@ export function MatchBoard() {
   // Max troops for stepper/action
   const maxTroops = phase === 'reinforcement'
     ? myPlayer?.reinforcement_pool ?? 0
-    : selectedTerritory
+    : isSelectedMine && selectedTerritory
     ? Math.max(1, selectedTerritory.troops - 1)
     : 1;
 
-  const isSelectedMine = selectedTerritory?.owner_id === myPlayerId;
   const actionTitle = phase === 'reinforcement'
     ? 'Enviar reforços'
     : phase === 'attack'
@@ -194,7 +244,6 @@ export function MatchBoard() {
         {/* Floating Contextual Territory Inspector (Opens on Selection) */}
         {selectedTerritory && (
           <TerritoryInspector
-            key={`${selectedNode}-${targetNode ?? 'none'}-${phase}`}
             selectedTerritory={selectedTerritory}
             targetTerritory={targetTerritory}
             phase={phase}
@@ -212,6 +261,7 @@ export function MatchBoard() {
             }}
           />
         )}
+
 
         {/* Floating Bottom Left Objective Widget */}
         <ObjectiveBadge

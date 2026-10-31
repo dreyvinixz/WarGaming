@@ -13,7 +13,13 @@ interface ActionModalProps {
 }
 
 export function ActionModal({ title, description, maxTroops, onConfirm, onCancel }: ActionModalProps) {
-  const [troops, setTroops] = useState(maxTroops);
+  const [troops, setTroops] = useState(Math.max(1, maxTroops));
+  const [lastMax, setLastMax] = useState(maxTroops);
+
+  if (maxTroops !== lastMax) {
+    setLastMax(maxTroops);
+    setTroops(Math.max(1, maxTroops));
+  }
 
   return (
     <div className="modal-overlay">
