@@ -436,6 +436,87 @@
   .match-screen .match-log-trigger-anchor { bottom: 90px; }
   .match-screen .territory-inspector { bottom: calc(96px + env(safe-area-inset-bottom)); max-height: 38dvh; }
 }
+
+/* Follow-up: fit the entire world board to the actual mobile viewport. */
+@media (max-width: 800px) {
+  .match-screen .match-viewport {
+    flex: 1 1 auto;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .match-screen[data-my-turn='true'] .world-board-shell { top: 180px; }
+  .match-screen[data-my-turn='false'] .world-board-shell { top: 104px; }
+  .match-screen[data-my-turn='false'] .world-board-shell .world-board-scroll { top: 38px; }
+  .match-screen .world-legend { display: none; }
+  .match-screen .action-dock-container { bottom: max(12px, env(safe-area-inset-bottom)); }
+  .match-screen .territory-inspector {
+    bottom: calc(118px + env(safe-area-inset-bottom));
+    max-height: min(40dvh, 320px);
+  }
+  .match-screen .top-bar-brand { font-size: 12px; }
+  .match-screen .top-bar-brand-icon { width: 24px; height: 24px; }
+  .match-screen .turn-indicator-badge { max-width: 112px; }
+  .match-screen .top-bar-center { min-width: 0; }
+  .match-screen .turn-indicator-badge > span:last-child { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .match-screen .geo-name { font-size: 12px; stroke-width: 3px; }
+  .match-screen .geo-troops { font-size: 13px; }
+  .match-screen .world-board-scroll { scrollbar-width: none; overscroll-behavior: contain; }
+  .match-screen .world-board-scroll::-webkit-scrollbar { display: none; }
+  .match-screen .top-bar-right { gap: 4px; }
+  .match-screen .top-bar-btn { min-width: 38px; min-height: 38px; }
+}
+
+@media (max-width: 480px) {
+  .match-screen[data-my-turn='true'] .world-board-shell { top: 154px; }
+}
+
+@media (max-height: 600px) and (orientation: landscape) {
+  .match-screen .match-viewport { height: auto; min-height: 0; }
+  .match-screen .top-status-bar { height: 46px; padding: 0 10px; }
+  .match-screen .command-players {
+    top: 50px;
+    right: 8px;
+    left: 8px;
+    flex-direction: row;
+    gap: 5px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .match-screen .command-players::-webkit-scrollbar { display: none; }
+  .match-screen .command-player { flex: 0 0 auto; max-width: 145px; padding: 4px 7px; }
+  .match-screen .command-player__medal { width: 25px; height: 25px; }
+  .match-screen .command-player strong { max-width: 100px; }
+  .match-screen .command-player small { display: none; }
+  .match-screen .phase-banner-container { top: 91px; width: min(370px, calc(100% - 18px)); }
+  .match-screen .phase-banner-card { padding: 4px 8px; }
+  .match-screen .phase-banner-description { display: none; }
+  .match-screen .world-board-shell { top: 138px; right: 0; bottom: 68px; left: 0; }
+  .match-screen[data-my-turn='true'] .world-board-shell { top: 148px; }
+  .match-screen[data-my-turn='false'] .world-board-shell { top: 94px; }
+  .match-screen .world-board-shell .world-board-scroll,
+  .match-screen[data-my-turn='false'] .world-board-shell .world-board-scroll { top: 34px; }
+  .match-screen .action-dock-container {
+    right: 8px;
+    bottom: max(6px, env(safe-area-inset-bottom));
+    left: 8px;
+    width: auto;
+    flex-direction: row;
+    justify-content: center;
+    gap: 7px;
+    transform: none;
+  }
+  .match-screen .action-dock { width: auto; padding: 3px; }
+  .match-screen .dock-slot { flex-direction: column; gap: 2px; min-width: 54px; min-height: 42px; padding: 3px; font-size: 9px; }
+  .match-screen .dock-actions-group { width: auto; }
+  .match-screen .dock-btn { width: auto; min-height: 48px; padding: 0 10px; font-size: 10px; }
+  .match-screen .objective-badge-container,
+  .match-screen .match-log-trigger-anchor { bottom: 67px; }
+  .match-screen .objective-trigger-btn,
+  .match-screen .game-log-trigger { min-height: 38px; padding: 6px 9px; }
+  .match-screen .territory-inspector { bottom: 68px; max-height: 45dvh; }
+}
 .match-screen .battle-die.has-landed{animation:battle-dice-settle .24s cubic-bezier(.2,.8,.2,1) both;}
 .match-screen .battle-die-status{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);font:700 8px 'Barlow Condensed',sans-serif;letter-spacing:.14em;color:#EF534F;white-space:nowrap;}
 @keyframes battle-dice-tumble{0%{transform:perspective(420px) rotateX(0) rotateY(0) rotateZ(0) scale(.8);filter:brightness(.8)}75%{transform:perspective(420px) rotateX(670deg) rotateY(520deg) rotateZ(210deg) scale(1.15);filter:brightness(1.25)}100%{transform:perspective(420px) rotateX(720deg) rotateY(540deg) rotateZ(180deg) scale(1);filter:brightness(1)}}

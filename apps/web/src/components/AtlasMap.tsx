@@ -46,6 +46,8 @@ export function AtlasMap({
   const prevOwnersRef = useRef<Record<string, string>>({});
   const [capturedNodes, setCapturedNodes] = useState<Set<string>>(new Set());
   const [zoom, setZoom] = useState(1);
+  const [boardBaseWidth, setBoardBaseWidth] = useState(850);
+  const userAdjustedZoom = useRef(false);
   const [listOpen, setListOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{x:number;y:number;left:number;top:number}|null>(null);
@@ -58,8 +60,9 @@ export function AtlasMap({
     const px = event.clientX - box.left + event.currentTarget.scrollLeft;
     const py = event.clientY - box.top + event.currentTarget.scrollTop;
     const factor = event.deltaY < 0 ? 1.15 : 1 / 1.15;
-    const next = Math.min(2.5, Math.max(0.75, zoom * factor));
+    const next = Math.min(2.5, Math.max(0.2, zoom * factor));
     setZoom(next);
+    userAdjustedZoom.current = true;
     requestAnimationFrame(() => { const el = scrollRef.current; if (el) { el.scrollLeft = px * next / zoom - (event.clientX - box.left); el.scrollTop = py * next / zoom - (event.clientY - box.top); } });
   };
   const startPan = (event: PointerEvent<HTMLDivElement>) => {
@@ -69,6 +72,31 @@ export function AtlasMap({
   };
   const pan = (event: PointerEvent<HTMLDivElement>) => { const start = dragRef.current; if (!start) return; if (Math.abs(event.clientX-start.x)+Math.abs(event.clientY-start.y)>3) dragMoved.current=true; event.currentTarget.scrollLeft=start.left-(event.clientX-start.x); event.currentTarget.scrollTop=start.top-(event.clientY-start.y); };
   const endPan = () => { dragRef.current=null; setDragging(false); setTimeout(()=>{dragMoved.current=false},0); };
+
+  useEffect(() => {
+    const viewport = scrollRef.current;
+    if (!viewport) return;
+    userAdjustedZoom.current = false;
+
+    const fitBoard = () => {
+      const width = Math.max(0, viewport.clientWidth - 16);
+      const height = Math.max(0, viewport.clientHeight - 16);
+      const isCompact = window.matchMedia('(max-width: 800px), (max-height: 600px) and (orientation: landscape)').matches;
+      const baseWidth = isCompact ? 850 : Math.min(1300, Math.max(850, width));
+      const aspectRatio = matchState.map_id === 'atlas_world_v2' ? 720 / 520 : 1080 / 520;
+      const fitZoom = Math.min(1, width / baseWidth, height / (baseWidth / aspectRatio));
+
+      setBoardBaseWidth(baseWidth);
+      if (!userAdjustedZoom.current && Number.isFinite(fitZoom) && fitZoom > 0) {
+        setZoom(Math.max(0.2, fitZoom));
+      }
+    };
+
+    fitBoard();
+    const observer = new ResizeObserver(fitBoard);
+    observer.observe(viewport);
+    return () => observer.disconnect();
+  }, [matchState.map_id, matchState.match_id]);
 
   useEffect(() => {
     if (!matchState?.territories) return;
@@ -123,11 +151,11 @@ export function AtlasMap({
     return <div className="world-board-shell">
       <img className="world-compass-rose" src="/assets/map/compass-rose.svg" alt="" aria-hidden="true" />
       <div className="world-map-tools" role="group" aria-label="Navegação do mapa">
-        <button type="button" onClick={() => setZoom(z => Math.max(1, z - 0.25))} disabled={zoom <= 1} aria-label="Diminuir zoom">−</button><span aria-live="polite">{Math.round(zoom * 100)}%</span><button type="button" onClick={() => setZoom(z => Math.min(2, z + 0.25))} disabled={zoom >= 2} aria-label="Aumentar zoom">+</button><button type="button" aria-expanded={listOpen} onClick={() => setListOpen(open => !open)}>Territórios</button>
+        <button type="button" onClick={() => { userAdjustedZoom.current = true; setZoom(z => Math.max(0.2, z - 0.25)); }} disabled={zoom <= 0.2} aria-label="Diminuir zoom">−</button><span aria-live="polite">{Math.round(zoom * 100)}%</span><button type="button" onClick={() => { userAdjustedZoom.current = true; setZoom(z => Math.min(2.5, z + 0.25)); }} disabled={zoom >= 2.5} aria-label="Aumentar zoom">+</button><button type="button" aria-expanded={listOpen} onClick={() => setListOpen(open => !open)}>Territórios</button>
       </div>
       {listOpen && <div className="world-territory-list" role="region" aria-label="Lista de territórios"><div className="world-list-heading">Selecione um território <button type="button" onClick={() => setListOpen(false)} aria-label="Fechar lista">×</button></div>{Object.values(matchState.regions).map((region: any) => <section key={region.id}><h3>{region.name} · bônus +{region.bonus_troops}</h3>{region.territory_ids.map((id: string) => { const t = matchState.territories[id]; if (!t) return null; return <button type="button" className={selectedNode === id ? 'active' : ''} key={id} onClick={() => { onNodeClick(id); setListOpen(false); }}><span>{t.name}</span><small>{matchState.players[t.owner_id]?.name ?? 'Neutro'} · {t.troops} tropas</small></button>; })}</section>)}</div>}
       <div ref={scrollRef} className={`world-board-scroll ${dragging ? 'is-dragging' : ''}`} tabIndex={0} aria-label="Mapa: arraste para deslocar; Ctrl+roda para ampliar" onWheel={handleWheel} onPointerDown={startPan} onPointerMove={pan} onPointerUp={endPan} onPointerCancel={endPan}>
-      <svg className="world-board" style={{ width: matchState.map_id === 'atlas_world_v2' ? `max(${850 * zoom}px, min(${100 * zoom}vw, calc(${138.46 * zoom}vh - ${328.15 * zoom}px)))` : `${zoom * 100}%`, minWidth: `${zoom * 850}px` }} viewBox={matchState.map_id === 'atlas_world_v2' ? "182 114 720 520" : "0 0 1080 520"} role="group" aria-label="Tabuleiro territorial Atlas War">
+      <svg className="world-board" style={{ width: `${boardBaseWidth * zoom}px`, minWidth: `${boardBaseWidth * zoom}px` }} viewBox={matchState.map_id === 'atlas_world_v2' ? "182 114 720 520" : "0 0 1080 520"} role="group" aria-label="Tabuleiro territorial Atlas War">
         {matchState.map_id === 'atlas_world_v2' && source && source.owner_id === myPlayerId && source.troops > 1 && (phase === 'attack' || phase === 'movement') && <g className="map-valid-routes" aria-hidden="true">{source.neighbors.map((neighborId: string) => { const neighbor = matchState.territories[neighborId]; const from = geographicMap[selectedNode as keyof typeof geographicMap]; const to = geographicMap[neighborId as keyof typeof geographicMap]; if (!from || !to || !neighbor || (phase === 'attack' ? neighbor.owner_id === myPlayerId : neighbor.owner_id !== myPlayerId)) return null; return <line key={neighborId} x1={from.x} y1={from.y} x2={to.x} y2={to.y} />; })}</g>}
         {matchState.map_id === 'atlas_world_v2' ? Object.values(matchState.territories).map((item: any) => {
           const geo = geographicMap[item.id as keyof typeof geographicMap];
