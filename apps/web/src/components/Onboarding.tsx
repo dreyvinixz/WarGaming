@@ -17,7 +17,7 @@ const steps: Array<{ icon: ReactNode; title: string; description: string }> = [
   {
     icon: <Crosshair size={20} />,
     title: 'Ataque com estratégia',
-    description: 'Escolha uma base com 2 ou mais tropas e mire um território inimigo conectado por uma rota tática.',
+    description: 'Escolha um território com 2 ou mais tropas e ataque um vizinho. Cada troca elimina no máximo uma tropa; conquiste um território no turno para ganhar um caça de apoio.',
   },
 ];
 

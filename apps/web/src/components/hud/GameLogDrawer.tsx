@@ -15,7 +15,7 @@ const logLabels: Record<string, string> = {
   phase_changed: 'Fase avançada',
   reinforcement: 'Reforço enviado',
   reinforcement_timeout: 'Reforços expirados',
-  attack_success: 'Território conquistado',
+  attack_success: 'Ataque bem-sucedido',
   attack_failed: 'Ataque repelido',
   troop_movement: 'Tropas movidas',
   player_eliminated: 'Jogador eliminado',
@@ -40,11 +40,11 @@ function friendlyMessage(log: any) {
   const territory = log.payload?.territory_id ?? 'território';
   if (log.type === 'match_started') return 'A partida começou. O mapa está aberto para disputa.';
   if (log.type === 'turn_started') return `Rodada ${log.payload?.round ?? ''} iniciada com ${log.payload?.reinforcement_pool ?? 0} reforços.`;
-  if (log.type === 'turn_ended') return 'O turno foi encerrado e o mapa avançou.';
+  if (log.type === 'turn_ended') return log.payload?.fighters_awarded ? 'Conquista garantiu um caça de apoio para o próximo turno.' : 'O turno foi encerrado e o mapa avançou.';
   if (log.type === 'phase_changed') return `A fase mudou para ${phaseLabels[log.payload?.phase] ?? 'a próxima etapa'}.`;
   if (log.type === 'reinforcement') return `Reforços enviados para ${territory}.`;
   if (log.type === 'reinforcement_timeout') return `${log.payload?.troops ?? 0} reforços não distribuídos foram perdidos pelo tempo.`;
-  if (log.type === 'attack_success') return 'O território foi conquistado com sucesso.';
+  if (log.type === 'attack_success') return log.payload?.territory_conquered ? 'O território foi conquistado.' : 'A defesa perdeu uma tropa; o território continua sob controle inimigo.';
   if (log.type === 'attack_failed') return 'A defesa inimiga repeliu o ataque.';
   if (log.type === 'troop_movement') return 'Tropas reposicionadas entre territórios conectados.';
   if (log.type === 'player_eliminated') return 'Uma facção foi eliminada da partida.';

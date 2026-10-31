@@ -9,6 +9,7 @@ interface BattleSceneProps {
   attackerLosses: number;
   defenderLosses: number;
   winner: 'attacker' | 'defender';
+  fighterSupport?: boolean;
 }
 
 function Soldier({ fallen = false }: { fallen?: boolean }) {
@@ -56,6 +57,7 @@ export function BattleScene({
   attackerLosses,
   defenderLosses,
   winner,
+  fighterSupport = false,
 }: BattleSceneProps) {
   return (
     <div
@@ -67,6 +69,7 @@ export function BattleScene({
       <div className="battle-scene-scanlines" />
       <div className="battle-scene-grid" />
       <div className="battle-scene-ground" />
+      {fighterSupport && <div className="battle-aircraft" aria-label="Apoio de caça" role="img"><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M3 21 26 17 36 3l6 1-3 13 16-2 6 4-23 7-9 11-5-1 4-10-19 1Z" /></svg><span>APOIO AÉREO</span></div>}
       <div className="battle-scene-flash" />
       <div className="battle-impact-mark" aria-hidden="true">✦</div>
       <div className="battle-fighter battle-fighter--attacker" style={{ '--fighter-color': attackerColor } as CSSProperties}>

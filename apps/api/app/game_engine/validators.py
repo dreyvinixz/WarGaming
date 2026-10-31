@@ -38,7 +38,7 @@ def validate_reinforcement_action(state: MatchState, player_id: str, territory_i
         raise GameActionError(f"You only have {pool} reinforcement troops")
 
 
-def validate_attack_action(state: MatchState, player_id: str, source_id: str, target_id: str, attacking_troops: int) -> None:
+def validate_attack_action(state: MatchState, player_id: str, source_id: str, target_id: str, attacking_troops: int, use_fighter: bool = False) -> None:
     validate_current_player(state, player_id)
     validate_phase(state, GamePhase.ATTACK, "Attack")
     if state.round_number == 1:
@@ -61,6 +61,8 @@ def validate_attack_action(state: MatchState, player_id: str, source_id: str, ta
         raise GameActionError("Source territory must have at least 2 troops")
     if attacking_troops >= source.troops:
         raise GameActionError("You must leave at least 1 behind")
+    if use_fighter and state.players[player_id].fighters < 1:
+        raise GameActionError("You do not have an available fighter")
 
 
 def validate_movement_action(state: MatchState, player_id: str, source_id: str, target_id: str, troops: int) -> None:

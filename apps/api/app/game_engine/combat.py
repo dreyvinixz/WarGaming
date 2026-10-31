@@ -13,9 +13,10 @@ class CombatResult(BaseModel):
     attacking_troops_sent: int
     attacking_troops_lost: int
     defending_troops_lost: int
+    fighter_bonus: int = 0
 
 
-def resolve_combat(attacking_troops: int, defending_troops: int, rng=None) -> CombatResult:
+def resolve_combat(attacking_troops: int, defending_troops: int, rng=None, fighter_support: bool = False) -> CombatResult:
     if attacking_troops <= 0:
         raise ValueError("attacking_troops must be greater than zero")
     if defending_troops <= 0:
@@ -24,7 +25,8 @@ def resolve_combat(attacking_troops: int, defending_troops: int, rng=None) -> Co
     rng = rng or random
     attack_roll = rng.randint(1, 6)
     defense_roll = rng.randint(1, 6)
-    attack_power = attacking_troops + attack_roll
+    fighter_bonus = 2 if fighter_support else 0
+    attack_power = attacking_troops + attack_roll + fighter_bonus
     defense_power = defending_troops + defense_roll
     attacker_won = attack_power > defense_power
     return CombatResult(
@@ -34,8 +36,9 @@ def resolve_combat(attacking_troops: int, defending_troops: int, rng=None) -> Co
         attack_power=attack_power,
         defense_power=defense_power,
         attacking_troops_sent=attacking_troops,
-        attacking_troops_lost=0 if attacker_won else attacking_troops,
-        defending_troops_lost=defending_troops if attacker_won else 0,
+        attacking_troops_lost=0 if attacker_won else 1,
+        defending_troops_lost=1 if attacker_won else 0,
+        fighter_bonus=fighter_bonus,
     )
 
 

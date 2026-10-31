@@ -41,6 +41,7 @@ class Player(EngineModel):
     reinforcement_pool: int = 0
     territories_conquered_this_turn: int = 0
     players_eliminated: int = 0
+    fighters: int = 0
 
 
 class Territory(EngineModel):
