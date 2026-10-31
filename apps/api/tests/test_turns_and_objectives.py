@@ -151,7 +151,14 @@ class TestEndTurn:
 class TestObjectives:
     def test_objectives_loaded(self):
         objectives = load_default_objectives()
-        assert len(objectives) == 4
+        assert set(objectives) == {
+            "control_7_territories",
+            "control_2_regions",
+            "control_iron_and_sun",
+            "eliminate_one_player",
+            "control_12_territories",
+            "eliminate_two_players",
+        }
 
     def test_control_territory_count_objective(self):
         state = make_match()
