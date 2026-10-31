@@ -25,6 +25,7 @@ def test_geographic_map_graph_and_geometry_correspond():
     assert len(territories) == 36 and len(regions) == 6
     assert set(geometry) == set(territories)
     assert all(item["paths"] and all(path["d"] for path in item["paths"]) for item in geometry.values())
+    assert all(182 <= item["x"] <= 902 and 114 <= item["y"] <= 634 for item in geometry.values())
     assert {tid for region in regions.values() for tid in region.territory_ids} == set(territories)
     state = start_match(["A", "B"], map_id="atlas_world_v2")
     assert state.map_version == 2 and len(state.territories) == 36

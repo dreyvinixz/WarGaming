@@ -1,3 +1,4 @@
+import '@fontsource/roboto-condensed/700.css';
 import '@fontsource/cinzel/700.css';
 import '@fontsource/barlow-condensed/600.css';
 import '@fontsource/barlow-condensed/700.css';

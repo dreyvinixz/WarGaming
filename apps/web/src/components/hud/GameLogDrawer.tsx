@@ -68,12 +68,12 @@ export function GameLogDrawer({ open, onClose, logs }: GameLogDrawerProps) {
   return (
     <>
       <div className="game-log-backdrop" onClick={onClose} aria-hidden="true" />
-      <aside className="game-log-drawer" role="dialog" aria-label="Game Log">
+      <aside className="game-log-drawer" role="dialog" aria-label="Diário da partida">
         <div className="game-log-header">
           <div className="game-log-title">
             <span className="game-log-title-icon"><Swords size={16} /></span>
             <div>
-              <strong>GAME LOG · REGISTRO</strong>
+              <strong>DIÁRIO · REGISTRO</strong>
               <small>{logs.length} eventos registrados</small>
             </div>
           </div>
@@ -111,7 +111,7 @@ export function GameLogDrawer({ open, onClose, logs }: GameLogDrawerProps) {
 export function GameLogTrigger({ onClick, count }: { onClick: () => void; count: number }) {
   return (
     <button className="game-log-trigger-btn" onClick={onClick} aria-label="Abrir log da partida">
-      <span>GAME LOG</span>
+      <span>DIÁRIO</span>
       <ChevronUp size={14} />
       {count > 0 && <span className="game-log-badge">{count}</span>}
     </button>
