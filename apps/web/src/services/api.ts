@@ -7,7 +7,7 @@ async function request(input: RequestInfo | URL, init?: RequestInit) {
 
 
 
-export async function createRoom(playerName: string, color: string, maxPlayers: number = 2) {
+export async function createRoom(playerName: string, color: string, maxPlayers: number = 6) {
 
   const res = await request(`${API_URL}/rooms`, {
 

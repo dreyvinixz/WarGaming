@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 
 class RoomCreateRequest(BaseModel):
     player_name: str = Field(..., min_length=2, max_length=20)
-    max_players: int = Field(default=4, ge=2, le=4)
+    max_players: int = Field(default=6, ge=2, le=6)
     map_id: str = Field(default="atlas_world_v2")
     color: str = Field(default="#CF3630", pattern=r"^#[0-9A-Fa-f]{6}$")
 
